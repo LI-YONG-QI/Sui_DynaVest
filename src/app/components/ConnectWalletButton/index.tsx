@@ -60,28 +60,36 @@ export default function ConnectWalletButton() {
         className="cursor-pointer flex items-center gap-4 px-4 py-3"
       >
         <div className="flex items-center gap-4">
-          {ready && authenticated && address ? (
-            <div className="flex items-center gap-4 font-[family-name:var(--font-manrope)] font-medium text-base">
-              {/* TODO: Add wallet icon */}
+          {ready ? (
+            authenticated && address ? (
+              <div className="flex items-center gap-4 font-[family-name:var(--font-manrope)] font-medium text-base">
+                {/* TODO: Add wallet icon */}
 
-              <div className="flex items-center gap-2 text-black">
-                {/* TODO: Add username */}
-                <span>{address?.slice(0, 6) + "..." + address?.slice(-4)}</span>
+                <div className="flex items-center gap-2 text-black">
+                  {/* TODO: Add username */}
+                  <span>
+                    {address?.slice(0, 6) + "..." + address?.slice(-4)}
+                  </span>
+                </div>
+
+                <Image
+                  src="/arrow-down.svg"
+                  alt="Arrow Down"
+                  width={16}
+                  height={16}
+                  className={`text-white transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </div>
-
-              <Image
-                src="/arrow-down.svg"
-                alt="Arrow Down"
-                width={16}
-                height={16}
-                className={`text-white transition-transform ${
-                  isDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </div>
+            ) : (
+              <span className="text-center text-white font-[family-name:var(--font-manrope)] font-medium text-base">
+                Connect Wallet
+              </span>
+            )
           ) : (
             <span className="text-center text-white font-[family-name:var(--font-manrope)] font-medium text-base">
-              Connect Wallet
+              Loading...
             </span>
           )}
         </div>
