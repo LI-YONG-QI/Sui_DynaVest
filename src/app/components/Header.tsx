@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import ConnectWalletButton from "./ConnectWalletButton";
 
 interface NavItem {
   label: string;
@@ -41,20 +41,7 @@ export default function Header() {
         ))}
       </nav>
 
-      <div className="flex items-center gap-4 px-4 py-3 rounded-[10px] bg-gradient-to-r from-[#5F79F1] to-[#FDA4AF]">
-        <div className="flex items-center gap-4">
-          <span className="text-white font-[family-name:var(--font-manrope)] font-medium text-base">
-            Connect Wallet
-          </span>
-        </div>
-        <Image
-          src="/arrow-down.svg"
-          alt="Arrow Down"
-          width={16}
-          height={16}
-          className="text-white"
-        />
-      </div>
+      <ConnectWalletButton />
     </header>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Inter, Manrope, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import PrivyProvider from "@/providers/PrivyProvider";
 
 const lilyScript = localFont({
   src: "../../public/fonts/LilyScriptOne-Regular.ttf",
@@ -43,7 +44,7 @@ export default function RootLayout({
       <body
         className={`${lilyScript.variable} ${dmSans.variable} ${inter.variable} ${manrope.variable} ${plusJakarta.variable} antialiased`}
       >
-        {children}
+        <PrivyProvider>{children}</PrivyProvider>
       </body>
     </html>
   );
