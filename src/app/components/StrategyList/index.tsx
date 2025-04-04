@@ -1,6 +1,6 @@
 import Image from "next/image";
 import StrategyCard from "./StrategyCard";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
@@ -53,8 +53,48 @@ const strategies = [
   },
 ];
 
+// No results placeholder
+const NoResultsPlaceholder = () => (
+  <div className="flex flex-col items-center justify-center py-16 w-full">
+    <h3 className="text-lg font-medium text-gray-600 mb-2">
+      No strategies found
+    </h3>
+    <p className="text-sm text-gray-500">
+      Try adjusting your search query or filters
+    </p>
+  </div>
+);
+
 export default function StrategyList() {
   const [view, setView] = useState("grid");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter strategies based on search query using regex
+  const filteredStrategies = useMemo(() => {
+    if (!searchQuery.trim()) return strategies;
+
+    try {
+      const regex = new RegExp(searchQuery, "i");
+      return strategies.filter(
+        (strategy) =>
+          regex.test(strategy.title) ||
+          regex.test(strategy.protocol) ||
+          regex.test(strategy.description) ||
+          regex.test(strategy.risk.level)
+      );
+    } catch {
+      // If regex is invalid, fall back to simple includes
+      const query = searchQuery.toLowerCase();
+      return strategies.filter(
+        (strategy) =>
+          strategy.title.toLowerCase().includes(query) ||
+          strategy.protocol.toLowerCase().includes(query) ||
+          strategy.description.toLowerCase().includes(query) ||
+          strategy.risk.level.toLowerCase().includes(query)
+      );
+    }
+  }, [searchQuery]);
+
   return (
     <div>
       {/* Filters */}
@@ -90,7 +130,9 @@ export default function StrategyList() {
             />
             <input
               type="text"
-              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search strategies..."
               className="bg-transparent border-none outline-none font-[family-name:var(--font-inter)] font-medium text-sm text-[#AFB8C8] w-full"
             />
           </div>
@@ -118,14 +160,28 @@ export default function StrategyList() {
 
       {/* Strategy Cards */}
       {view === "grid" && (
-        <div className="grid grid-cols-3 gap-7">
-          {strategies.map((strategy, index) => (
-            <StrategyCard key={index} {...strategy} />
-          ))}
-        </div>
+        <>
+          {filteredStrategies.length > 0 ? (
+            <div className="grid grid-cols-3 gap-7">
+              {filteredStrategies.map((strategy, index) => (
+                <StrategyCard key={index} {...strategy} />
+              ))}
+            </div>
+          ) : (
+            <NoResultsPlaceholder />
+          )}
+        </>
       )}
 
-      {view === "list" && <StrategyTable strategies={strategies} />}
+      {view === "list" && (
+        <>
+          {filteredStrategies.length > 0 ? (
+            <StrategyTable strategies={filteredStrategies} />
+          ) : (
+            <NoResultsPlaceholder />
+          )}
+        </>
+      )}
     </div>
   );
 }
