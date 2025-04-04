@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="bg-gradient-to-br from-[#E6F2FB] via-[#ECE6FB] to-[#E6F2FB]">
-      <div className="min-h-screen max-w-7xl mx-auto ">
+      <div className="min-h-screen mx-auto">
         <Header />
         <div className="relative flex items-center py-8 px-20">
           <div className="absolute left-0 right-0 flex justify-center">
