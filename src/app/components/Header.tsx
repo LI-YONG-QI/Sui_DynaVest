@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ConnectWalletButton from "./ConnectWalletButton";
+import { usePathname } from "next/navigation";
 
 interface NavItem {
   label: string;
@@ -11,11 +12,13 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Strategies", href: "/strategies", isActive: true },
-  { label: "Bot", href: "/bot" },
+  { label: "Bot", href: "/", isActive: true },
   { label: "Quests", href: "/quests" },
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+
   return (
     <header className="flex justify-between items-center px-20 py-6">
       <div className="flex items-center">
@@ -33,7 +36,7 @@ export default function Header() {
             key={item.label}
             href={item.href}
             className={`font-[family-name:var(--font-dm-sans)] font-medium text-base ${
-              item.isActive ? "text-[#374151]" : "text-[#9CA3AF]"
+              pathname === item.href ? "text-[#374151]" : "text-[#9CA3AF]"
             }`}
           >
             {item.label}
