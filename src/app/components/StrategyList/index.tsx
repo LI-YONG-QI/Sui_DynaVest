@@ -1,5 +1,9 @@
 import Image from "next/image";
 import StrategyCard from "./StrategyCard";
+import { useState } from "react";
+import GridIcon from "./GridIcon";
+import ListIcon from "./ListIcon";
+import StrategyTable from "./StrategyTable";
 
 const strategies = [
   {
@@ -50,6 +54,7 @@ const strategies = [
 ];
 
 export default function StrategyList() {
+  const [view, setView] = useState("grid");
   return (
     <div>
       {/* Filters */}
@@ -90,30 +95,37 @@ export default function StrategyList() {
             />
           </div>
           <div className="flex justify-center items-center gap-2 px-3 py-2.5 bg-[#F8F9FE] rounded-lg">
-            <Image
-              src="/grid.svg"
-              alt="Grid view"
-              width={20}
-              height={20}
-              className="text-[#3568E8]"
-            />
-            <Image
-              src="/list.svg"
-              alt="List view"
-              width={20}
-              height={20}
-              className="text-[#AFB8C8]"
-            />
+            <button
+              className={`p-1 rounded hover:bg-gray-100`}
+              onClick={() => {
+                setView("grid");
+              }}
+            >
+              <GridIcon isActive={view === "grid"} />
+            </button>
+
+            <button
+              className={`p-1 rounded hover:bg-gray-100`}
+              onClick={() => {
+                setView("list");
+              }}
+            >
+              <ListIcon isActive={view === "list"} />
+            </button>
           </div>
         </div>
       </div>
 
       {/* Strategy Cards */}
-      <div className="grid grid-cols-3 gap-7">
-        {strategies.map((strategy, index) => (
-          <StrategyCard key={index} {...strategy} />
-        ))}
-      </div>
+      {view === "grid" && (
+        <div className="grid grid-cols-3 gap-7">
+          {strategies.map((strategy, index) => (
+            <StrategyCard key={index} {...strategy} />
+          ))}
+        </div>
+      )}
+
+      {view === "list" && <StrategyTable strategies={strategies} />}
     </div>
   );
 }
