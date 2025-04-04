@@ -3,6 +3,7 @@ import { DM_Sans, Inter, Manrope, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "@/providers";
+import Header from "./components/Header";
 
 const lilyScript = localFont({
   src: "../../public/fonts/LilyScriptOne-Regular.ttf",
@@ -44,7 +45,14 @@ export default function RootLayout({
       <body
         className={`${lilyScript.variable} ${dmSans.variable} ${inter.variable} ${manrope.variable} ${plusJakarta.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="bg-gradient-to-br from-[#E6F2FB] via-[#ECE6FB] to-[#E6F2FB]">
+            <div className="min-h-screen mx-auto">
+              <Header />
+              <div className="mt-10 max-w-7xl mx-auto px-20">{children}</div>
+            </div>
+          </div>
+        </Providers>
       </body>
     </html>
   );
