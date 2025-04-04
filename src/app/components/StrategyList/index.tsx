@@ -1,14 +1,15 @@
 import Image from "next/image";
 import StrategyCard from "./StrategyCard";
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
 import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
+import RiskFilter from "./RiskFilter";
 
 const strategies = [
   {
     title: "Morpho Lending Strategy",
-    apy: "APY 3.10%",
+    apy: 2.4,
     risk: {
       level: "Low" as const,
       color: "#10B981",
@@ -23,7 +24,7 @@ const strategies = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: "APY 3.10%",
+    apy: 3.1,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -38,7 +39,7 @@ const strategies = [
   },
   {
     title: "Compound Yield",
-    apy: "APY 3.10%",
+    apy: 3.9,
     risk: {
       level: "High" as const,
       color: "#E83033",
@@ -52,31 +53,82 @@ const strategies = [
     learnMoreLink: "https://compound.finance",
   },
 ];
+// No results placeholder
+const NoResultsPlaceholder = () => (
+  <div className="flex flex-col items-center justify-center py-16 w-full">
+    <h3 className="text-lg font-medium text-gray-600 mb-2">
+      No strategies found
+    </h3>
+    <p className="text-sm text-gray-500">
+      Try adjusting your search query or filters
+    </p>
+  </div>
+);
 
 export default function StrategyList() {
   const [view, setView] = useState("grid");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showRiskDropdown, setShowRiskDropdown] = useState(false);
+  const [selectedRisks, setSelectedRisks] = useState<string[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Toggle risk selection
+  const toggleRiskSelection = (risk: string) => {
+    setSelectedRisks((prev) =>
+      prev.includes(risk) ? prev.filter((r) => r !== risk) : [...prev, risk]
+    );
+  };
+
+  // Filter strategies based on search query and selected risks
+  const filteredStrategies = useMemo(() => {
+    let filtered = strategies;
+
+    // Filter by risk if any risks are selected
+    if (selectedRisks.length > 0) {
+      filtered = filtered.filter((strategy) =>
+        selectedRisks.includes(strategy.risk.level)
+      );
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      try {
+        const regex = new RegExp(searchQuery, "i");
+        filtered = filtered.filter(
+          (strategy) =>
+            regex.test(strategy.title) ||
+            regex.test(strategy.protocol) ||
+            regex.test(strategy.description)
+        );
+      } catch {
+        // If regex is invalid, fall back to simple includes
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(
+          (strategy) =>
+            strategy.title.toLowerCase().includes(query) ||
+            strategy.protocol.toLowerCase().includes(query) ||
+            strategy.description.toLowerCase().includes(query)
+        );
+      }
+    }
+
+    return filtered;
+  }, [searchQuery, selectedRisks]);
+
   return (
     <div>
       {/* Filters */}
+      {/* TODO: Implement more filters */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-[#E2E8F7] rounded-lg">
-            <span className="font-[family-name:var(--font-inter)] font-medium text-sm text-[#121212]">
-              High APY
-            </span>
-            <Image src="/caret-up.svg" alt="Caret up" width={16} height={16} />
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-[#F8F9FE] rounded-lg">
-            <span className="font-[family-name:var(--font-inter)] font-medium text-sm text-[#121212]">
-              Risk
-            </span>
-            <Image
-              src="/caret-down.svg"
-              alt="Caret down"
-              width={16}
-              height={16}
-            />
-          </button>
+          <RiskFilter
+            selectedRisks={selectedRisks}
+            setSelectedRisks={setSelectedRisks}
+            toggleRiskSelection={toggleRiskSelection}
+            showRiskDropdown={showRiskDropdown}
+            setShowRiskDropdown={setShowRiskDropdown}
+            dropdownRef={dropdownRef}
+          />
         </div>
 
         <div className="flex items-center gap-4">
@@ -90,7 +142,9 @@ export default function StrategyList() {
             />
             <input
               type="text"
-              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search strategies..."
               className="bg-transparent border-none outline-none font-[family-name:var(--font-inter)] font-medium text-sm text-[#AFB8C8] w-full"
             />
           </div>
@@ -118,14 +172,28 @@ export default function StrategyList() {
 
       {/* Strategy Cards */}
       {view === "grid" && (
-        <div className="grid grid-cols-3 gap-7">
-          {strategies.map((strategy, index) => (
-            <StrategyCard key={index} {...strategy} />
-          ))}
-        </div>
+        <>
+          {filteredStrategies.length > 0 ? (
+            <div className="grid grid-cols-3 gap-7">
+              {filteredStrategies.map((strategy, index) => (
+                <StrategyCard key={index} {...strategy} />
+              ))}
+            </div>
+          ) : (
+            <NoResultsPlaceholder />
+          )}
+        </>
       )}
 
-      {view === "list" && <StrategyTable strategies={strategies} />}
+      {view === "list" && (
+        <>
+          {filteredStrategies.length > 0 ? (
+            <StrategyTable strategies={filteredStrategies} />
+          ) : (
+            <NoResultsPlaceholder />
+          )}
+        </>
+      )}
     </div>
   );
 }
