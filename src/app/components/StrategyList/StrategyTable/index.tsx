@@ -6,7 +6,7 @@ import { getRiskColor } from "@/app/utils";
 interface StrategyTableProps {
   strategies: Array<{
     title: string;
-    apy: string;
+    apy: number;
     risk: {
       level: "Low" | "Medium" | "High";
       color: string;
@@ -23,18 +23,9 @@ interface StrategyTableProps {
 export default function StrategyTable({ strategies }: StrategyTableProps) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  // Parse APY value from string (e.g., "APY 3.10%" -> 3.10)
-  const parseApyValue = (apyString: string): number => {
-    const match = apyString.match(/\d+\.\d+/);
-    return match ? parseFloat(match[0]) : 0;
-  };
-
   // Sort strategies by APY
   const sortedStrategies = [...strategies].sort((a, b) => {
-    const apyA = parseApyValue(a.apy);
-    const apyB = parseApyValue(b.apy);
-
-    return sortOrder === "asc" ? apyA - apyB : apyB - apyA;
+    return sortOrder === "asc" ? a.apy - b.apy : b.apy - a.apy;
   });
 
   // Toggle sort order

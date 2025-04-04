@@ -7,7 +7,7 @@ interface InvestModalProps {
   onClose: () => void;
   strategy: {
     title: string;
-    apy: string;
+    apy: number;
     risk: {
       level: "Low" | "Medium" | "High";
       color: string;
@@ -122,7 +122,9 @@ export default function InvestModal({
 
                 {/* APY and Risk on same row */}
                 <div className="flex items-center space-x-4">
-                  <div className="text-lg font-medium">{strategy.apy}</div>
+                  <div className="text-lg font-medium text-gray-900">
+                    APY {strategy.apy}%
+                  </div>
                   <div
                     className="px-2 py-1 rounded-lg text-sm font-medium"
                     style={{
@@ -143,7 +145,7 @@ export default function InvestModal({
                   type="text"
                   name="amount"
                   id="amount"
-                  className="bg-transparent block w-full px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-0"
+                  className="bg-transparent text-gray-500 block w-full px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-0 placeholder:text-gray-500"
                   placeholder="0.00 USDT"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}

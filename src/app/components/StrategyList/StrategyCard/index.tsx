@@ -6,7 +6,7 @@ import InvestModal from "./InvestModal";
 
 interface StrategyCardProps {
   title: string;
-  apy: string;
+  apy: number;
   risk: {
     level: "Low" | "Medium" | "High";
     color: string;
@@ -54,7 +54,7 @@ export default function StrategyCard({
             </div>
             <div className="flex items-center gap-3">
               <span className="font-[family-name:var(--font-inter)] font-medium text-base text-[#17181C]">
-                {apy}
+                APY {apy}%
               </span>
               <div
                 className="flex justify-center items-center px-2 py-1 rounded-lg"

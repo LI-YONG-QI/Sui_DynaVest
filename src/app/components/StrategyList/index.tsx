@@ -8,7 +8,7 @@ import StrategyTable from "./StrategyTable";
 const strategies = [
   {
     title: "Morpho Lending Strategy",
-    apy: "APY 3.10%",
+    apy: 2.4,
     risk: {
       level: "Low" as const,
       color: "#10B981",
@@ -23,7 +23,7 @@ const strategies = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: "APY 3.10%",
+    apy: 3.1,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -38,7 +38,7 @@ const strategies = [
   },
   {
     title: "Compound Yield",
-    apy: "APY 3.10%",
+    apy: 3.9,
     risk: {
       level: "High" as const,
       color: "#E83033",
