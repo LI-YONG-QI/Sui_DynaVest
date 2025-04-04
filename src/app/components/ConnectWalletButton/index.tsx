@@ -9,6 +9,7 @@ export default function ConnectWalletButton() {
   const { login } = useLogin();
   const { disconnect } = useDisconnect();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleButtonOnClick = () => {
@@ -47,11 +48,16 @@ export default function ConnectWalletButton() {
   }, []);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div
+      className={`relative flex items-center justify-center text-center rounded-t-[10px] bg-gradient-to-r w-[170px] from-[#5F79F1] to-[#FDA4AF] ${
+        isDropdownOpen ? "" : "rounded-b-[10px]"
+      }`}
+      ref={dropdownRef}
+    >
       <button
         disabled={!ready}
         onClick={handleButtonOnClick}
-        className="cursor-pointer flex items-center gap-4 px-4 py-3 rounded-[10px] bg-gradient-to-r from-[#5F79F1] to-[#FDA4AF]"
+        className="cursor-pointer flex items-center gap-4 px-4 py-3"
       >
         <div className="flex items-center gap-4">
           {ready && authenticated && address ? (
@@ -74,23 +80,69 @@ export default function ConnectWalletButton() {
               />
             </div>
           ) : (
-            <span className="text-white font-[family-name:var(--font-manrope)] font-medium text-base">
+            <span className="text-center text-white font-[family-name:var(--font-manrope)] font-medium text-base">
               Connect Wallet
             </span>
           )}
         </div>
       </button>
 
+      {/* DROPDOWN */}
       {isDropdownOpen && authenticated && (
-        <div className="absolute top-full right-0 mt-2 w-full min-w-[180px] rounded-[10px] shadow-lg bg-gradient-to-r from-[#5F79F1] to-[#FDA4AF] p-[1px] z-10 transform origin-top-right transition-all duration-200 ease-out">
-          <div className="bg-white rounded-[9px] overflow-hidden">
-            <div className="py-2">
-              <div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
-                Account
-              </div>
+        <div className="absolute top-full rounded-b-[10px] right-0 w-full shadow-lg bg-gradient-to-r from-[#5F79F1] to-[#FDA4AF] p-[1px] z-10 transform origin-top-right transition-all duration-200 ease-out">
+          <div className="overflow-hidden">
+            <div className="">
+              {/* Copy Address Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (address) {
+                    navigator.clipboard.writeText(address);
+                    setIsCopied(true);
+                    setTimeout(() => setIsCopied(false), 2000);
+                  }
+                }}
+                className="w-full text-left px-4 py-3 text-sm flex items-center justify-between hover:opacity-90 transition-colors duration-150"
+              >
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <span className="font-medium">Copy Address</span>
+                </div>
+                {isCopied && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-green-500 animate-[checkmark_0.4s_ease-in-out]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                )}
+              </button>
+
+              {/* Disconnect Button */}
               <button
                 onClick={handleDisconnect}
-                className="w-full text-left px-4 py-3 text-sm flex items-center gap-2 hover:bg-gray-50 transition-colors duration-150"
+                className="w-full text-left px-4 py-3 text-sm flex items-center gap-2 hover:opacity-90 transition-colors duration-150"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
