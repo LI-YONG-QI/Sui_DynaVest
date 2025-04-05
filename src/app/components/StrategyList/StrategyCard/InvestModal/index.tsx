@@ -43,6 +43,10 @@ export default function InvestModal({
   const [isClosing, setIsClosing] = useState(false);
   const [currency, setCurrency] = useState<Token>(strategy.tokens[0]);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [orderHash, setOrderHash] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [swapError, setSwapError] = useState<string | null>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { address: user } = useAccount();
 
@@ -114,7 +118,36 @@ export default function InvestModal({
 
   // Handle swap submission
   const handleSwap = async () => {
-    console.log("swapping...");
+    try {
+      setIsLoading(true);
+
+      const response = await fetch("/api/createOrder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: "1000000",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to place order");
+      }
+
+      console.log("Order placed successfully:", data.orderHash);
+      setOrderHash(data.orderHash);
+      setIsSuccess(true);
+    } catch (error) {
+      console.error("Error during swap:", error);
+      setSwapError(
+        error instanceof Error ? error.message : "Unknown error occurred"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -209,10 +242,23 @@ export default function InvestModal({
                   <button
                     type="button"
                     onClick={handleSwap}
+                    disabled={isLoading}
                     className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                   >
-                    Confirm Swap
+                    {isLoading ? "Processing..." : "Confirm Swap"}
                   </button>
+
+                  {isSuccess && (
+                    <div className="mt-4 p-3 bg-green-100 text-green-800 rounded-md">
+                      Order placed successfully! Order hash: {orderHash}
+                    </div>
+                  )}
+
+                  {swapError && (
+                    <div className="mt-4 p-3 bg-red-100 text-red-800 rounded-md">
+                      {swapError}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div>
