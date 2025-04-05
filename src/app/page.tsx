@@ -6,6 +6,21 @@ import useChatbot from "./hooks/useChatbotResponse";
 import { Message } from "./types";
 import { format } from "date-fns";
 
+const COMMANDS = [
+  {
+    title: "DeFAI Strategies",
+    command: "Give me a list of available strategies.",
+  },
+  {
+    title: "Deposit",
+    command: "Deposit 100 USDT to Morpho Finance.",
+  },
+  {
+    title: "Withdraw",
+    command: "Withdraw 100 USDT from Morpho Finance.",
+  },
+];
+
 const HOT_TOPICS = [
   {
     icon: "/atom.svg",
@@ -158,22 +173,15 @@ export default function Home() {
                 Commands
               </span>
               <div className="flex gap-2">
-                <button
-                  onClick={() =>
-                    handleCommand("Deposit 100 USDT to Morpho Finance")
-                  }
-                  className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
-                >
-                  Deposit
-                </button>
-                <button
-                  onClick={() =>
-                    handleCommand("Withdraw 100 USDT from Morpho Finance")
-                  }
-                  className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
-                >
-                  Withdraw
-                </button>
+                {COMMANDS.map((command) => (
+                  <button
+                    key={command.title}
+                    onClick={() => handleCommand(command.command)}
+                    className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
+                  >
+                    {command.title}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -197,6 +205,13 @@ export default function Home() {
                       alt={topic.title}
                     />
                     {topic.title}
+                    <Image
+                      src="/arrow-right-circle.svg"
+                      alt="Arrow"
+                      width={12}
+                      height={12}
+                      className="h-6 w-6 ml-2 object-contain"
+                    />
                   </button>
                 ))}
               </div>
