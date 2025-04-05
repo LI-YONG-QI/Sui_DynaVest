@@ -1,7 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, FormEvent, KeyboardEvent, useRef } from "react";
+import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
+import useChatbot from "./hooks/useChatbot";
+import { Message } from "./types";
+import { format } from "date-fns";
 
 const HOT_TOPICS = [
   {
@@ -21,6 +24,12 @@ const HOT_TOPICS = [
 export default function Home() {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [conversation, setConversation] = useState<Message[]>([]);
+  const [typingText, setTypingText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
+    useChatbot();
 
   const handleCommand = (command: string) => {
     setCommand(command);
@@ -31,14 +40,62 @@ export default function Home() {
   };
 
   // TODO: Handle Ask AI
-  const handleAskAI = (e: FormEvent) => {
+  const handleAskAI = async (e: FormEvent) => {
     e.preventDefault();
     if (command.trim() === "") return;
 
-    console.log("Ask AI:", command);
+    console.log("Command:", command);
     // Process the command here
     // Reset form if needed
+
+    // Add user message to conversation
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: command,
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setConversation((prev) => [...prev, userMessage]);
     setCommand("");
+
+    try {
+      const botResponse = await sendMessage(command);
+      if (!botResponse || !botResponse.result) return;
+
+      // Add bot response to conversation
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: botResponse.result,
+        sender: "bot",
+        timestamp: new Date(),
+      };
+
+      // Start typewriter effect
+      setIsTyping(true);
+      let currentText = "";
+      const textToType = botResponse.result;
+
+      for (let i = 0; i < textToType.length; i++) {
+        currentText += textToType[i];
+        setTypingText(currentText);
+        // Slow down the typing speed
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+
+      setIsTyping(false);
+      setTypingText("");
+      setConversation((prev) => [...prev, botMessage]);
+    } catch {
+      // TODO: handle AI error
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Sorry, I couldn't process your request. Please try again.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setConversation((prev) => [...prev, errorMessage]);
+    }
   };
 
   // Handle key press in input field
@@ -57,6 +114,11 @@ export default function Home() {
       inputRef.current?.focus();
     }, 0);
   };
+
+  // Scroll to bottom of messages when conversation updates
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [conversation, isTyping]);
 
   return (
     <div className="">
@@ -113,27 +175,99 @@ export default function Home() {
         </div>
 
         {/* Hot Topics */}
-        <div className="mt-5 self-start">
-          <h3 className="text-[#160211] font-[family-name:var(--font-manrope)] font-bold text-2xl mb-4">
-            Hot Topics
-          </h3>
-          <div className="flex flex-col gap-3">
-            {HOT_TOPICS.map((topic) => (
-              <button
-                key={topic.title}
-                onClick={() => handleHotTopic(topic.title)}
-                className="w-fit flex items-center bg-white rounded-[14px] px-4 py-1.5 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-              >
-                <Image
-                  src={topic.icon}
-                  width={12}
-                  height={12}
-                  className="h-6 w-6 mr-2 object-contain"
-                  alt={topic.title}
-                />
-                {topic.title}
-              </button>
-            ))}
+        {conversation.length === 0 && (
+          <div className="mt-5 self-start">
+            <h3 className="text-[#160211] font-[family-name:var(--font-manrope)] font-bold text-2xl mb-4">
+              Hot Topics
+            </h3>
+            <div className="flex flex-col gap-3">
+              {HOT_TOPICS.map((topic) => (
+                <button
+                  key={topic.title}
+                  onClick={() => handleHotTopic(topic.title)}
+                  className="w-fit flex items-center bg-white rounded-[14px] px-4 py-1.5 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                >
+                  <Image
+                    src={topic.icon}
+                    width={12}
+                    height={12}
+                    className="h-6 w-6 mr-2 object-contain"
+                    alt={topic.title}
+                  />
+                  {topic.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Bot Response */}
+        <div className="mt-8 rounded-xl overflow-hidden mx-auto">
+          <div className="p-4 h-[400px] overflow-y-auto">
+            {conversation.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-gray-400">
+                <p>
+                  Ask me anything about DeFi strategies or use the quick
+                  commands above!
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {conversation.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${
+                      message.sender === "user"
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                        message.sender === "user"
+                          ? "bg-gray-100 text-gray-800"
+                          : "bg-[#5F79F1] text-white"
+                      }`}
+                    >
+                      <div className="whitespace-pre-wrap">{message.text}</div>
+                      <div
+                        className={`text-xs mt-1 ${
+                          message.sender === "user"
+                            ? "text-gray-500"
+                            : "text-blue-100"
+                        }`}
+                      >
+                        {format(message.timestamp, "HH:mm")}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Loading animation or typing effect */}
+                {loadingBotResponse && (
+                  <div className="flex justify-start">
+                    <div className="bg-[#5F79F1] text-white max-w-[80%] rounded-2xl px-4 py-3">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-150"></div>
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-300"></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Typewriter effect */}
+                {isTyping && typingText && (
+                  <div className="flex justify-start">
+                    <div className="bg-[#5F79F1] text-white max-w-[80%] rounded-2xl px-4 py-3">
+                      <div className="whitespace-pre-wrap">{typingText}</div>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div>
+            )}
           </div>
         </div>
       </div>
