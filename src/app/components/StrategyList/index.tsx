@@ -21,6 +21,7 @@ const strategies = [
     image: "/sonic.svg",
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
+    displayInsufficientBalance: true, // TODO: review hardcoded data
   },
   {
     title: "AAVE Lending Strategy",
