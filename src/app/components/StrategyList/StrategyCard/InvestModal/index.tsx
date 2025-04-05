@@ -62,7 +62,9 @@ export default function InvestModal({
   const handleInvest = async () => {
     if (user) {
       const strategyHandler = getStrategy(strategy.protocol, chainId);
-      await strategyHandler.execute(user, BigInt(amount));
+      const res = await strategyHandler.execute(user, BigInt(amount));
+
+      console.log(res);
 
       handleClose();
     }
