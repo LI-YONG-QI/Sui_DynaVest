@@ -78,7 +78,7 @@ const strategies = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 3.1,
+    apy: 10,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -96,7 +96,7 @@ const strategies = [
 
   {
     title: "stCelo",
-    apy: 3.9,
+    apy: 2,
     risk: {
       level: "Low" as const,
       color: "#E83033",
@@ -130,7 +130,7 @@ const strategies = [
   },
   {
     title: "Kitty",
-    apy: 3.9,
+    apy: 4.3,
     risk: {
       level: "Low" as const,
       color: "#10B981",
@@ -146,15 +146,16 @@ const strategies = [
     chainId: flowMainnet.id,
   },
   {
-    title: "Flow",
-    apy: 3.9,
+    title: "Flow Yield",
+    apy: 23.0,
     risk: {
-      level: "Low" as const,
+      level: "High" as const,
       color: "#10B981",
       bgColor: "rgba(16, 185, 129, 0.3)",
     },
     protocol: "Flow",
-    description: "LST -> Add liquidity",
+    description:
+      "Providing ankrFlow tokens as liquidity to KittyStable allows you to earn both liquid staking rewards and swap fees.",
     image: "/flow.png",
     externalLink: "https://flow.com",
     learnMoreLink: "https://flow.com",
