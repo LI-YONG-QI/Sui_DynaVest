@@ -145,7 +145,7 @@ const Chatroom = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <div className="bg-gray-50 p-4 h-[calc(100%-150px)] overflow-y-auto">
+          <div className="bg-gray-50 p-4 h-[calc(100%-132px)] overflow-y-auto">
             <div className="flex flex-col gap-y-10">
               {messages.map((message) => (
                 <ChatBubble key={message.id} message={message} />
