@@ -24,6 +24,6 @@ export class FlowStrategy extends BaseStrategy {
 
     console.log(result);
 
-    return "Flow strategy executed successfully";
+    return result;
   }
 }

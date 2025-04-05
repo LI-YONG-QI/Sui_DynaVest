@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useAccount, useChainId } from "wagmi";
 import { useWallets } from "@privy-io/react-auth";
+import { toast } from "react-toastify";
 
 import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
@@ -87,9 +88,15 @@ export default function InvestModal({
     if (user) {
       const strategyHandler = getStrategy(strategy.protocol, chainId);
       const parsedAmount = parseUnits(amount, currency.decimals);
-      await strategyHandler.execute(user, parsedAmount);
 
-      handleClose();
+      try {
+        const result = await strategyHandler.execute(user, parsedAmount);
+        toast.success(`Investment successful! ${result}`);
+
+        handleClose();
+      } catch (error) {
+        toast.error("Investment failed!");
+      }
     }
   };
 
