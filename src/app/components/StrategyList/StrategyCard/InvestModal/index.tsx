@@ -1,7 +1,30 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { getRiskColor } from "@/app/utils";
+import { readContract, signTypedData } from "@wagmi/core";
+import { useAccount, useChainId } from "wagmi";
+import type { TypedData } from "viem";
+import type { Address, Hex } from "viem";
 
+import { wagmiConfig as config } from "@/providers/config";
+import { getRiskColor } from "@/app/utils";
+import { ERC20_PERMIT_ABI } from "@/app/abis";
+
+export const PERMIT_TYPES = {
+  Permit: [
+    { name: "owner", type: "address" },
+    { name: "spender", type: "address" },
+    { name: "value", type: "uint256" },
+    { name: "nonce", type: "uint256" },
+    { name: "deadline", type: "uint256" },
+  ],
+} as const satisfies TypedData;
+
+interface RequestParams {
+  user: Address;
+  amount: string;
+  deadline: string;
+  signature: Hex;
+}
 interface InvestModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +44,11 @@ interface InvestModalProps {
   };
 }
 
+// TODO: replace with dynamic data
+const EXECUTOR_ADDRESS = "0x2A386Fb9e19D201A1dAF875fcD5c934c06265b65";
+const cEUR = "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73";
+const PERMIT_EXPIRY = 60000;
+
 export default function InvestModal({
   isOpen,
   onClose,
@@ -29,6 +57,8 @@ export default function InvestModal({
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const chainId = useChainId();
+  const { address: user } = useAccount();
 
   const maxBalance = 100.0; // TODO: use real value
 
@@ -54,10 +84,53 @@ export default function InvestModal({
   };
 
   // Handle investment submission
-  const handleInvest = () => {
-    // TODO: Implement investment logic
-    console.log(`Investing ${amount} USDT in ${strategy.title}`);
-    handleClose();
+  // TODO: replace with dynamic handler
+  const handleInvest = async () => {
+    const timestampInSeconds = Math.floor(Date.now() / 1000);
+    const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
+
+    if (user) {
+      const nonce = await readContract(config, {
+        abi: ERC20_PERMIT_ABI,
+        address: cEUR,
+        functionName: "nonces",
+        args: [user!],
+      });
+
+      const signature = await signTypedData(config, {
+        domain: {
+          name: "cEUR",
+          chainId: chainId,
+          verifyingContract: cEUR,
+          version: "1",
+        },
+        types: PERMIT_TYPES,
+        primaryType: "Permit",
+        message: {
+          owner: user,
+          spender: EXECUTOR_ADDRESS,
+          value: BigInt(amount),
+          nonce: nonce,
+          deadline,
+        },
+      });
+
+      const body: RequestParams = {
+        user,
+        amount,
+        deadline: deadline.toString(),
+        signature,
+      };
+
+      const response = await fetch("/api", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+
+      console.log(await response.json());
+
+      handleClose();
+    }
   };
 
   if (!isOpen) return null;

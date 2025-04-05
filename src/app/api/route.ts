@@ -15,15 +15,18 @@ import {
   AAVE_V3_ABI,
 } from "@/app/abis";
 
-const EXECUTOR_ADDRESS = "0x0000000000000000000000000000000000000000";
+import { ALCHEMY_API_KEY } from "@/providers/config";
+
+// TODO: store address by chain config
+const EXECUTOR_ADDRESS = "0x2A386Fb9e19D201A1dAF875fcD5c934c06265b65";
 const cEUR = "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73";
-const POOL = "0x34c02571094e08E935B8cf8dC10F1Ad6795f1f81";
+const POOL = "0x3E59A31363E2ad014dcbc521c4a0d5757d9f3402";
 
 // TODO: update types
 interface RequestParams {
   user: Address;
-  amount: bigint;
-  deadline: bigint;
+  amount: string;
+  deadline: string;
   signature: Hex;
 }
 
@@ -47,24 +50,27 @@ export async function POST(request: NextRequest) {
 
   const calls = await createAaveCalls(
     body.user,
-    body.amount,
-    body.deadline,
+    BigInt(body.amount),
+    BigInt(body.deadline),
     body.signature
   );
 
+  console.log(body);
+  console.log(calls);
+
   const result = await multiCall(body.user, calls);
 
-  return NextResponse.json({ data: result, status: "success" });
+  return NextResponse.json(result);
 }
 
 function getAdminWallet() {
   const account = privateKeyToAccount(
-    process.env.VITE_ADMIN_PRIVATE_KEY as `0x${string}`
+    process.env.ADMIN_PRIVATE_KEY as `0x${string}`
   );
 
   return createWalletClient({
     chain: celo, // TODO: replace with dynamic chain
-    transport: http(),
+    transport: http(`https://celo-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
     account,
   });
 }
@@ -84,8 +90,7 @@ async function multiCall(
 
   return {
     success: true,
-    transactionHash: tx,
-    message: "策略執行成功！",
+    message: `Success!! Transaction Hash: ${tx}`,
   };
 }
 
@@ -112,12 +117,14 @@ async function createAaveCalls(
     });
   }
 
+  console.log(amount);
+
   //* Step 2  Transfer asset to Executor
   {
     const data = encodeFunctionData({
       abi: ERC20_ABI,
       functionName: "transferFrom",
-      args: [user, EXECUTOR_ADDRESS, amount],
+      args: [user, EXECUTOR_ADDRESS, BigInt(1)],
     });
     calls.push({
       target: cEUR,
@@ -139,7 +146,6 @@ async function createAaveCalls(
   }
 
   //* Step 4  Supply USDC to morpho blue
-
   const data = encodeFunctionData({
     abi: AAVE_V3_ABI,
     functionName: "supply",

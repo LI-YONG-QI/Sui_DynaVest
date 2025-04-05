@@ -1,19 +1,10 @@
 "use client";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createConfig, WagmiProvider } from "@privy-io/wagmi";
-import { mainnet, sepolia } from "viem/chains";
-import { http } from "wagmi";
+import { WagmiProvider } from "@privy-io/wagmi";
+import { wagmiConfig } from "./config";
 
 const queryClient = new QueryClient();
-
-const wagmiConfig = createConfig({
-  chains: [mainnet, sepolia],
-  transports: {
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
-  },
-});
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
