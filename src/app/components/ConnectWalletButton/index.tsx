@@ -4,30 +4,41 @@ import { useDisconnect, useAccount } from "wagmi";
 import { useState, useRef, useEffect } from "react";
 
 export default function ConnectWalletButton() {
-  const { ready, authenticated, logout } = usePrivy();
+  const { ready: privyReady, authenticated, logout } = usePrivy();
   const { address } = useAccount();
   const { login } = useLogin();
   const { disconnect } = useDisconnect();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // business logic
+  const buttonReady = privyReady && !isLoading;
+  const loggedIn = privyReady && authenticated && address;
+
   const handleButtonOnClick = () => {
-    if (ready && !authenticated) {
+    if (!buttonReady) return;
+    if (!loggedIn) {
       login({
         loginMethods: ["wallet"],
         walletChainType: "ethereum-only",
         disableSignup: false,
       });
-    } else if (ready && authenticated) {
-      setIsDropdownOpen(!isDropdownOpen);
+      return;
     }
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleDisconnect = () => {
-    logout();
-    disconnect();
-    setIsDropdownOpen(false);
+  const handleDisconnect = async () => {
+    try {
+      setIsDropdownOpen(false);
+      setIsLoading(true);
+      await logout();
+      disconnect();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // DROPDOWN - close when clicking outside
@@ -49,19 +60,23 @@ export default function ConnectWalletButton() {
 
   return (
     <div
-      className={`relative flex items-center justify-center text-center rounded-t-[10px] bg-gradient-to-r w-[170px] from-[#5F79F1] to-[#FDA4AF] ${
-        isDropdownOpen ? "" : "rounded-b-[10px]"
+      className={`relative flex items-center  w-[170px] justify-center text-center rounded-t-[10px]  ${
+        !isDropdownOpen && "rounded-b-[10px]"
+      } ${
+        buttonReady
+          ? "bg-gradient-to-r from-[#5F79F1] to-[#FDA4AF]"
+          : "bg-gray-300"
       }`}
       ref={dropdownRef}
     >
       <button
-        disabled={!ready}
+        disabled={!buttonReady}
         onClick={handleButtonOnClick}
         className="cursor-pointer flex items-center gap-4 px-4 py-3"
       >
         <div className="flex items-center gap-4">
-          {ready ? (
-            authenticated && address ? (
+          {buttonReady ? (
+            loggedIn ? (
               <div className="flex items-center gap-4 font-[family-name:var(--font-manrope)] font-medium text-base">
                 {/* TODO: Add wallet icon */}
 
@@ -96,7 +111,7 @@ export default function ConnectWalletButton() {
       </button>
 
       {/* DROPDOWN */}
-      {isDropdownOpen && authenticated && (
+      {isDropdownOpen && (
         <div className="absolute top-full rounded-b-[10px] right-0 w-full shadow-lg bg-gradient-to-r from-[#5F79F1] to-[#FDA4AF] p-[1px] z-10 transform origin-top-right transition-all duration-200 ease-out">
           <div className="overflow-hidden">
             <div className="">
