@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { DM_Sans, Inter, Manrope, Plus_Jakarta_Sans, Poppins } from "next/font/google";
+import {
+  DM_Sans,
+  Inter,
+  Manrope,
+  Plus_Jakarta_Sans,
+  Poppins,
+} from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "@/providers";
@@ -58,7 +64,7 @@ export default function RootLayout({
             <div className="bg-gradient-to-br from-[#E6F2FB] via-[#ECE6FB] to-[#E6F2FB]">
               <div className="min-h-screen mx-auto">
                 <Header />
-                <div className="py-10 max-w-7xl mx-auto px-20">{children}</div>
+                <div className="pt-10 max-w-7xl mx-auto px-20">{children}</div>
                 <Chatroom />
               </div>
             </div>

@@ -26,12 +26,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 className="text-[#1E3498]"
               />
             </span>
-            Ask OneVault Bot
+            Ask DynaVest Bot
           </button>
         </div>
       </div>
 
-      <div className="mt-10">{children}</div>
+      <div className="py-10">{children}</div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Message } from "@/app/types";
-import useChatbot from "@/app/hooks/useChatbot";
+import useChatbot from "@/app/hooks/useChatbotResponse";
 import ChatBubble from "./ChatBubble";
 import { useChat } from "@/app/contexts/ChatContext";
 

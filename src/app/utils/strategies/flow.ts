@@ -3,7 +3,7 @@ import { Address } from "viem";
 import { BaseStrategy } from "./base";
 import { FLOW_STRATEGY_ABI } from "@/app/abis/flowStrategy";
 import { wagmiConfig as config } from "@/providers/config";
-import { writeContract } from "@wagmi/core";
+import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 
 export class FlowStrategy extends BaseStrategy {
   public readonly strategy: Address =
@@ -22,8 +22,10 @@ export class FlowStrategy extends BaseStrategy {
       value: amount,
     });
 
-    console.log(result);
+    await waitForTransactionReceipt(config, {
+      hash: result,
+    });
 
-    return "Flow strategy executed successfully";
+    return result;
   }
 }

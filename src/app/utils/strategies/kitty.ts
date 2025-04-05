@@ -16,7 +16,7 @@ export class KittyStrategy extends BaseStrategy {
   }
 
   async execute(user: Address, amount: bigint) {
-    const approveTx = await writeContract(config, {
+    await writeContract(config, {
       address: this.ankrFLOW,
       abi: ERC20_ABI,
       functionName: "approve",
