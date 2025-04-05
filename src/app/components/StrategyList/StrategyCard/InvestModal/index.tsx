@@ -29,7 +29,7 @@ export default function InvestModal({
   isOpen,
   onClose,
   strategy,
-  displayInsufficientBalance = true,
+  displayInsufficientBalance = true, // todo: dynamic
 }: InvestModalProps) {
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
