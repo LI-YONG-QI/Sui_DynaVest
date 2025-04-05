@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DynaVest
+
+Introducing DynaVest, Your DeFAI Agent – an intelligent, fully autonomous system designed to execute, optimize, and adapt DeFi strategies based on your unique risk profile. With a user-friendly interface, it empowers you to interact effortlessly with DeFi protocols while staying up-to-date on the latest trends and insights in real time.
+
+# Deployments
+
+## Celo
+
+- Executor: [0x2a386fb9e19d201a1daf875fcd5c934c06265b65](https://celoscan.io/address/0x2a386fb9e19d201a1daf875fcd5c934c06265b65)
+- LiquidityRouter: [0xfcfc4d0a0d6be5f2f8b7ffb77c1d9eebde97c977](https://celoscan.io/address/0xfcfc4d0a0d6be5f2f8b7ffb77c1d9eebde97c977)
+
+## Flow
+
+- Strategy: [0xe6fe0766ff66b8768181b0f3f46e8e314f9277e0](https://evm.flowscan.io/address/0xE6FE0766FF66B8768181B0f3f46E8e314F9277e0)
 
 ## Getting Started
 
-First, run the development server:
+0. Check the `env.example`
+
+1. Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm run dev
+```
