@@ -3,6 +3,7 @@ export * from "./aave";
 import type { AaveSupportedChains } from "./aave";
 import { AaveV3Strategy } from "./aave";
 import { AnkrFlowStrategy } from "./ankrFlow";
+import { FlowStrategy } from "./flow";
 import { KittyStrategy } from "./kitty";
 import { StCeloStrategy } from "./stCelo";
 
@@ -17,6 +18,8 @@ export function getStrategy(protocol: string, chainId: number) {
       return new AnkrFlowStrategy(chainId);
     case "Kitty":
       return new KittyStrategy(chainId);
+    case "Flow":
+      return new FlowStrategy(chainId);
     default:
       throw new Error("Unsupported protocol");
   }

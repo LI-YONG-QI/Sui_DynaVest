@@ -97,6 +97,20 @@ const strategies = [
     externalLink: "https://kitty.com",
     learnMoreLink: "https://kitty.com",
   },
+  {
+    title: "Flow",
+    apy: 3.9,
+    risk: {
+      level: "Low" as const,
+      color: "#10B981",
+      bgColor: "rgba(16, 185, 129, 0.3)",
+    },
+    protocol: "Flow",
+    description: "LST -> Add liquidity",
+    image: "/sonic.svg",
+    externalLink: "https://flow.com",
+    learnMoreLink: "https://flow.com",
+  },
 ];
 // No results placeholder
 const NoResultsPlaceholder = () => (
