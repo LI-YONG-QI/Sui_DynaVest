@@ -2,15 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { format } from "date-fns";
-
-// Message type definition
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "bot";
-  timestamp: Date;
-}
+import { Message } from "@/app/types";
+import useChatbot from "@/app/hooks/useChatbot";
+import ChatBubble from "./ChatBubble";
 
 interface ChatroomProps {
   isVisible: boolean;
@@ -18,6 +12,7 @@ interface ChatroomProps {
 
 const Chatroom = ({ isVisible }: ChatroomProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
+  // TODO: review the content for welcoming message.
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -28,6 +23,8 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
+    useChatbot();
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -44,7 +41,7 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
     setIsMinimized(!isMinimized);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;
 
     // Add user message
@@ -58,16 +55,20 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
 
-    // Simulate bot response after a short delay
-    setTimeout(() => {
+    try {
+      const botResponse = await sendMessage(inputMessage);
+      if (!botResponse || !botResponse.result) return;
+      // Add bot response
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm processing your request. This is a simulated response for now.",
+        text: botResponse.result,
         sender: "bot",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+    } catch {
+      // TODO: handle AI error
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -149,67 +150,20 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
           <div className="bg-gray-50 p-4 h-[calc(100%-150px)] overflow-y-auto">
             <div className="flex flex-col gap-y-10">
               {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex flex-col ${
-                    message.sender === "user" ? "items-end" : "items-start"
-                  }`}
-                >
-                  <div
-                    className={`flex items-end mb-1 relative ${
-                      message.sender === "user" ? "justify-end" : ""
-                    }`}
-                  >
-                    {/* User icons */}
-                    {message.sender === "bot" && (
-                      <div className="absolute bottom-[-35px] left-0 z-10 flex-shrink-0 mr-2 order-first bg-[#4558AF] rounded-full p-[5px]">
-                        <Image
-                          src="/ask-onevault-bot-icon.png"
-                          alt="Bot"
-                          width={20}
-                          height={20}
-                          className="object-contain"
-                        />
-                      </div>
-                    )}
-                    {message.sender === "user" && (
-                      <div className="flex-shrink-0 ml-2 order-last absolute bottom-[-35px] right-[-10px] z-10">
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-bold">
-                          U
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Timestamp */}
-                    <div
-                      className={`absolute bottom-[-25px] text-[10px] mt-1 text-gray-500 ${
-                        message.sender === "user" ? "right-10" : "left-10"
-                      }`}
-                    >
-                      {format(message.timestamp, "HH:mm")}
-                    </div>
-
-                    {/* Chat bubble */}
-                    <div
-                      className={`relative px-4 py-2 rounded-lg max-w-[250px] ${
-                        message.sender === "user"
-                          ? "bg-gray-200 text-gray-800 rounded-br-none"
-                          : "bg-[#5F79F1] text-white ml-4"
-                      }`}
-                    >
-                      {/* Chat bubble pointer */}
-                      <div
-                        className={`absolute bottom-[-8px] ${
-                          message.sender === "user"
-                            ? "right-0 border-t-16 border-t-gray-200 border-l-16"
-                            : "left-0 border-t-16 border-t-[#5F79F1] border-r-16"
-                        } border-l-transparent border-r-transparent`}
-                      />
-                      <p className="text-sm">{message.text}</p>
-                    </div>
-                  </div>
-                </div>
+                <ChatBubble key={message.id} message={message} />
               ))}
+              {/* Render loading chat when waiting for bot response */}
+              {loadingBotResponse && (
+                <ChatBubble
+                  message={{
+                    id: (Date.now() + 1).toString(),
+                    text: "...",
+                    sender: "bot",
+                    timestamp: new Date(),
+                  }}
+                  isLoading={true}
+                />
+              )}
               <div ref={messagesEndRef} />
             </div>
           </div>
