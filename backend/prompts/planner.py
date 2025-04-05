@@ -16,6 +16,9 @@ high_risk = {
 chat = {
     "intent_type": "chat"
 }
+question = {
+    "intent_type": "question"
+}
 
 
 planner_prompt = f"""
@@ -23,10 +26,10 @@ You are a helpful task planner. Given an INPUT_TEXT, your goal is to determine t
 
 The available task categories are:  
 1. latest_news  
-2. low_risk_strategy  
-3. middle_risk_strategy  
-4. high_risk_strategy  
-5. chat  
+2. low_risk_strategy   
+3. high_risk_strategy  
+4. chat  
+5. question
 
 Your response should be in **JSON format** and must follow the structure provided in the examples below.  
 
@@ -41,19 +44,25 @@ Output 2:
 {low_risk}
 
 Input 3:
-INPUT_TEXT: I want to learn about DeFi, Give me a DeFi Strategy
+INPUT_TEXT: Do you know current DeFi protocols?
 Output 3: 
-{middle_risk}
+{chat}
+
 
 Input 4:
-INPUT_TEXT: I want to earn money, Give me a DeFi Strategy with high APY
+INPUT_TEXT: Which pool has the highest TVL for AAVE on the CELO chain?
 Output 4: 
-{high_risk}
+{question}
 
 Input 5:
-INPUT_TEXT: Do you know current DeFi protocols?
+INPUT_TEXT: Give me a DeFi strategy that can yield a higher APY, regardless of the risk!
 Output 5: 
-{chat}
+{high_risk}
+
+Input 6:
+INPUT_TEXT: Which asset pairs are currently available on AAVE on the Celo network?
+Output 6: 
+{question}
 
 - Carefully analyze the user's INPUT_TEXT.  
 - Choose the most suitable intent type from the five categories. Do not come up with categories that are not in the list.
