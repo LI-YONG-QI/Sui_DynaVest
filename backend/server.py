@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
 import json
-#from crawl4ai import *
 from embedding import get_client, get_embedding, search_from_qdrant
 from models.model import OpenAIModel
 from models.schema import InputData, QueryNews
@@ -94,14 +93,15 @@ async def get_news(data: QueryNews):
 @app.post("/defiInfo")
 async def process_simple_input(data: InputData):
     qclient = get_client()
-    print("user question", data.input_text)
     query_embedding = get_embedding(data.input_text)
-    total_information = search_from_qdrant(qclient, query_embedding, k=8)
+    total_information = search_from_qdrant(qclient, query_embedding, k=10)
+    
     need_info = ""
     for infor in total_information:
         need_info += infor.payload["content"]
         need_info += "\n"
-    qa_model_instance = OpenAIModel(system_prompt=qa_prompt, temperature=0)
+    
+    qa_model_instance = OpenAIModel(system_prompt=planner_prompt, temperature=0)
     prompt = f"INFORMATION:{need_info}\nQUESTION:{data.input_text}\nOUTPUT:"
     output, input_token, output_token = qa_model_instance.generate_string_text(prompt)
     
