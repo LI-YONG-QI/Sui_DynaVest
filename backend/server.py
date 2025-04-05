@@ -94,18 +94,46 @@ async def get_news(data: QueryNews):
 async def process_simple_input(data: InputData):
     qclient = get_client()
     query_embedding = get_embedding(data.input_text)
-    total_information = search_from_qdrant(qclient, query_embedding, k=10)
     
-    need_info = ""
-    for infor in total_information:
-        need_info += infor.payload["content"]
-        need_info += "\n"
+    planner_model_instance = OpenAIModel(system_prompt=planner_prompt, temperature=0)
+    prompt = f"INPUT_TEXT:{data.input_text}\nOUTPUT:"
+    output, input_token, output_token = qa_model_instance.generate_text(prompt)
+    intent_type = json.loads(output)["intent_type"]
     
-    qa_model_instance = OpenAIModel(system_prompt=planner_prompt, temperature=0)
-    prompt = f"INFORMATION:{need_info}\nQUESTION:{data.input_text}\nOUTPUT:"
-    output, input_token, output_token = qa_model_instance.generate_string_text(prompt)
+    if intent_type == "low_risk_strategy":
+        high_risk_return = """
+        Here are some low risk strategies:
+            1. Ankr (Flow)
+            2. StakedCelo (Celo)
+        """
+        return {"result": "Here are some low risk strategies:"}
     
-    print("Answer", output)
-    return {"result": output}
+    elif intent_type == "high_risk_strategy":
+        high_risk_return = """
+        Here are some high risk strategies:
+            1. Provide liquidity to Uniswap pool (Celo)
+            2. Provide liquidity to StableKitty pool (Flow)
+        """
+        return {"result": f"{high_risk_return}" }
+    
+    elif intent_type == "question" or intent_type == "chat":
+        total_information = search_from_qdrant(qclient, query_embedding, k=10)
+    
+        need_info = ""
+        for infor in total_information:
+            need_info += infor.payload["content"]
+            need_info += "\n"
+        qa_model_instance = OpenAIModel(system_prompt=qa_prompt, temperature=0)
+        prompt = f"INFORMATION:{need_info}\nQUESTION:{data.input_text}\nOUTPUT:"
+        output, input_token, output_token = qa_model_instance.generate_string_text(prompt)
+        
+        return {"result": "Here are some high risk strategies:" }
+    elif intent_type == "latest_news":
+        system_prompt = "You are a helpful assistant. Given an INPUT_TEXT, Please answer INPUT_TEXT!"
+        question_model_instance = OpenAIModel(system_prompt=system_prompt, temperature=0)
+        prompt = f"INPUT_TEXT:{data.input_text}\nOUTPUT:"
+        content, annotations, input_tokens_length, output_tokens_length = question_model_instance.generate_with_web_annotations(prompt)
+    
+        return {"result": content}
 
 
