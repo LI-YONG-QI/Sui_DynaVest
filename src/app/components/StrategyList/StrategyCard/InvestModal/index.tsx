@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { useWallets } from "@privy-io/react-auth";
 
 import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
-import { celo, flowMainnet } from "viem/chains";
+import { flowMainnet } from "viem/chains";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -44,7 +44,6 @@ export default function InvestModal({
 
   const chainId = useChainId();
   const [isSupportedChain, setIsSupportedChain] = useState<boolean>(false);
-  const { chains, switchChain, switchChainAsync } = useSwitchChain();
 
   const maxBalance = 100.0; // TODO: use real value
 
