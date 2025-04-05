@@ -3,6 +3,7 @@ import json
 from embedding import get_client, get_embedding, search_from_qdrant
 from models.model import OpenAIModel
 from models.schema import InputData, QueryNews
+from utils.constants import *
 from prompts.summarize import summarize_prompt
 from prompts.planner import planner_prompt
 from prompts.qa import qa_prompt
@@ -117,17 +118,24 @@ async def process_simple_input(data: InputData):
         return {"result": f"{high_risk_return}" }
     
     elif intent_type == "question" or intent_type == "chat":
+        system_prompt = "You are a helpful assistant. Given an INPUT_TEXT, Please answer INPUT_TEXT!"
+        question_model_instance = OpenAIModel(system_prompt=system_prompt, temperature=0)
+        prompt = f"INPUT_TEXT:{data.input_text}\nOUTPUT:"
+        content, annotations, input_tokens_length, output_tokens_length = question_model_instance.generate_with_web_annotations(prompt)
+        
         total_information = search_from_qdrant(qclient, query_embedding, k=10)
-    
+       
         need_info = ""
         for infor in total_information:
             need_info += infor.payload["content"]
             need_info += "\n"
+        
+        information_all = content + "\n" + CONTENT 
         qa_model_instance = OpenAIModel(system_prompt=qa_prompt, temperature=0)
-        prompt = f"INFORMATION:{need_info}\nQUESTION:{data.input_text}\nOUTPUT:"
+        prompt = f"INFORMATION:{information_all}\nQUESTION:{data.input_text}\nOUTPUT:"
         output, input_token, output_token = qa_model_instance.generate_string_text(prompt)
         
-        return {"result": "Here are some high risk strategies:" }
+        return {"result": f"{output}"}
     elif intent_type == "latest_news":
         system_prompt = "You are a helpful assistant. Given an INPUT_TEXT, Please answer INPUT_TEXT!"
         question_model_instance = OpenAIModel(system_prompt=system_prompt, temperature=0)

@@ -56,8 +56,13 @@ Output 4:
 
 Input 5:
 INPUT_TEXT: Give me a DeFi strategy that can yield a higher APY, regardless of the risk!
-Output 2: 
+Output 5: 
 {high_risk}
+
+Input 6:
+INPUT_TEXT: Which asset pairs are currently available on AAVE on the Celo network?
+Output 6: 
+{question}
 
 - Carefully analyze the user's INPUT_TEXT.  
 - Choose the most suitable intent type from the five categories. Do not come up with categories that are not in the list.
