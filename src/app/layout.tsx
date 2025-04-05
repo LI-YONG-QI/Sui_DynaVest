@@ -49,7 +49,7 @@ export default function RootLayout({
           <div className="bg-gradient-to-br from-[#E6F2FB] via-[#ECE6FB] to-[#E6F2FB]">
             <div className="min-h-screen mx-auto">
               <Header />
-              <div className="mt-10 max-w-7xl mx-auto px-20">{children}</div>
+              <div className="py-10 max-w-7xl mx-auto px-20">{children}</div>
             </div>
           </div>
         </Providers>
