@@ -8,7 +8,6 @@ from prompts.summarize import summarize_prompt
 from prompts.planner import planner_prompt
 from prompts.qa import qa_prompt
 from models.model import OpenAIModel
-from utils.get_fear_index import get_fear_and_greed_index
 from utils.google_trends import get_google_trend
 from fastapi.middleware.cors import CORSMiddleware
 # Initialize FastAPI app
@@ -98,16 +97,16 @@ async def process_simple_input(data: InputData):
     
     planner_model_instance = OpenAIModel(system_prompt=planner_prompt, temperature=0)
     prompt = f"INPUT_TEXT:{data.input_text}\nOUTPUT:"
-    output, input_token, output_token = qa_model_instance.generate_text(prompt)
+    output, input_token, output_token = planner_model_instance.generate_text(prompt)
     intent_type = json.loads(output)["intent_type"]
     
     if intent_type == "low_risk_strategy":
-        high_risk_return = """
+        low_risk_return = """
         Here are some low risk strategies:
             1. Ankr (Flow)
             2. StakedCelo (Celo)
         """
-        return {"result": "Here are some low risk strategies:"}
+        return {"result": f"{low_risk_return}"}
     
     elif intent_type == "high_risk_strategy":
         high_risk_return = """
@@ -123,12 +122,11 @@ async def process_simple_input(data: InputData):
         prompt = f"INPUT_TEXT:{data.input_text}\nOUTPUT:"
         content, annotations, input_tokens_length, output_tokens_length = question_model_instance.generate_with_web_annotations(prompt)
         
-        total_information = search_from_qdrant(qclient, query_embedding, k=10)
-       
-        need_info = ""
-        for infor in total_information:
-            need_info += infor.payload["content"]
-            need_info += "\n"
+        #total_information = search_from_qdrant(qclient, query_embedding, k=10)
+        # need_info = ""
+        # for infor in total_information:
+        #     need_info += infor.payload["content"]
+        #     need_info += "\n"
         
         information_all = content + "\n" + CONTENT 
         qa_model_instance = OpenAIModel(system_prompt=qa_prompt, temperature=0)
