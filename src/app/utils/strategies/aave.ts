@@ -82,7 +82,7 @@ export class AaveV3Strategy {
       signature,
     };
 
-    const response = await fetch("/api", {
+    const response = await fetch("/api/aave", {
       method: "POST",
       body: JSON.stringify(body),
     });
