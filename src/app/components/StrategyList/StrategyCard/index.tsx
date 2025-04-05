@@ -17,6 +17,7 @@ interface StrategyCardProps {
   image: string;
   externalLink?: string;
   learnMoreLink?: string;
+  displayInsufficientBalance?: boolean;
 }
 
 export default function StrategyCard({
@@ -28,6 +29,7 @@ export default function StrategyCard({
   image,
   externalLink,
   learnMoreLink,
+  displayInsufficientBalance = false,
 }: StrategyCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -141,6 +143,7 @@ export default function StrategyCard({
           externalLink,
           learnMoreLink,
         }}
+        displayInsufficientBalance={displayInsufficientBalance}
       />
     </>
   );
