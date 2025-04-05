@@ -95,9 +95,9 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
             <Image
               src="/ask-onevault-bot-icon.png"
               alt="Bot"
-              width={24}
-              height={24}
-              className="object-contain"
+              width={48}
+              height={48}
+              className="object-contain w-6 h-6"
             />
           </div>
           <div className="leading-5">
