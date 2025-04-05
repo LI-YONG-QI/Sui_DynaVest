@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 className="text-[#1E3498]"
               />
             </span>
-            Ask OneVault Bot
+            Ask DynaVest Bot
           </button>
         </div>
       </div>

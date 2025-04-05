@@ -1,5 +1,5 @@
 import type { Address } from "viem";
-import { writeContract } from "@wagmi/core";
+import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 
 import { BaseStrategy } from "./base";
 import { wagmiConfig as config } from "@/providers/config";
@@ -24,8 +24,10 @@ export class StCeloStrategy extends BaseStrategy {
       args: [],
     });
 
-    console.log(result);
+    await waitForTransactionReceipt(config, {
+      hash: result,
+    });
 
-    return "Success";
+    return result;
   }
 }
