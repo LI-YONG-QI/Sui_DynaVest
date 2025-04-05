@@ -82,25 +82,25 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
   return (
     <div
       className={`fixed bottom-6 right-6 w-80 sm:w-96 rounded-2xl overflow-hidden shadow-2xl z-50 transition-all duration-300 transform ${
-        isMinimized ? "translate-y-0" : "max-h-[600px] h-[500px] translate-y-0"
+        isMinimized ? "translate-y-0" : "max-h-[600px] h-[550px] translate-y-0"
       }`}
     >
       {/* Header */}
       <div
-        className={`bg-[#5F79F1] text-white flex items-center justify-between px-3 py-2`}
+        className={`bg-[#5F79F1] text-white flex items-center justify-between pl-5 pr-3 py-5`}
       >
         <div className="flex items-center gap-x-3">
           <div className="flex items-center justify-center mt-1">
             <Image
               src="/ask-onevault-bot-icon.png"
               alt="Bot"
-              width={32}
-              height={32}
-              className="rounded-full"
+              width={24}
+              height={24}
+              className="object-contain"
             />
           </div>
-          <div>
-            <h3 className="font-bold text-lg">OneVault Bot</h3>
+          <div className="leading-5">
+            <h3 className="font-bold text-lg leading-5">OneVault Bot</h3>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <span className="text-xs text-green-100">Online</span>
@@ -146,59 +146,68 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <div className="bg-gray-50 p-4 h-[calc(100%-128px)] overflow-y-auto">
-            <div className="flex flex-col gap-4">
+          <div className="bg-gray-50 p-4 h-[calc(100%-150px)] overflow-y-auto">
+            <div className="flex flex-col gap-y-10">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${
-                    message.sender === "user" ? "justify-end" : "justify-start"
+                  className={`flex flex-col ${
+                    message.sender === "user" ? "items-end" : "items-start"
                   }`}
                 >
-                  {message.sender === "bot" && (
-                    <div className="flex-shrink-0 mr-2">
-                      <Image
-                        src="/ask-onevault-bot-icon.png"
-                        alt="Bot"
-                        width={28}
-                        height={28}
-                        className="rounded-full"
-                      />
-                    </div>
-                  )}
                   <div
-                    className={`relative max-w-[80%] px-4 py-2 rounded-lg ${
-                      message.sender === "user"
-                        ? "bg-gray-200 text-gray-800"
-                        : "bg-[#5F79F1] text-white"
+                    className={`flex items-end mb-1 relative ${
+                      message.sender === "user" ? "justify-end" : ""
                     }`}
                   >
-                    {/* Chat bubble pointer */}
+                    {/* User icons */}
+                    {message.sender === "bot" && (
+                      <div className="absolute bottom-[-35px] left-0 z-10 flex-shrink-0 mr-2 order-first bg-[#4558AF] rounded-full p-[5px]">
+                        <Image
+                          src="/ask-onevault-bot-icon.png"
+                          alt="Bot"
+                          width={20}
+                          height={20}
+                          className="object-contain"
+                        />
+                      </div>
+                    )}
+                    {message.sender === "user" && (
+                      <div className="flex-shrink-0 ml-2 order-last absolute bottom-[-35px] right-[-10px] z-10">
+                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-bold">
+                          U
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Timestamp */}
                     <div
-                      className={`absolute top-2 ${
-                        message.sender === "user"
-                          ? "right-full mr-[-6px] border-r-8 border-r-gray-200"
-                          : "left-full ml-[-6px] border-l-8 border-l-[#5F79F1]"
-                      } border-t-transparent border-b-transparent border-t-8 border-b-8`}
-                    ></div>
-                    <p className="text-sm">{message.text}</p>
-                    <div
-                      className={`text-[10px] mt-1 ${
-                        message.sender === "user"
-                          ? "text-gray-500"
-                          : "text-blue-100"
+                      className={`absolute bottom-[-25px] text-[10px] mt-1 text-gray-500 ${
+                        message.sender === "user" ? "right-10" : "left-10"
                       }`}
                     >
                       {format(message.timestamp, "HH:mm")}
                     </div>
-                  </div>
-                  {message.sender === "user" && (
-                    <div className="flex-shrink-0 ml-2">
-                      <div className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs font-bold">
-                        U
-                      </div>
+
+                    {/* Chat bubble */}
+                    <div
+                      className={`relative px-4 py-2 rounded-lg max-w-[250px] ${
+                        message.sender === "user"
+                          ? "bg-gray-200 text-gray-800 rounded-br-none"
+                          : "bg-[#5F79F1] text-white ml-4"
+                      }`}
+                    >
+                      {/* Chat bubble pointer */}
+                      <div
+                        className={`absolute bottom-[-8px] ${
+                          message.sender === "user"
+                            ? "right-0 border-t-16 border-t-gray-200 border-l-16"
+                            : "left-0 border-t-16 border-t-[#5F79F1] border-r-16"
+                        } border-l-transparent border-r-transparent`}
+                      />
+                      <p className="text-sm">{message.text}</p>
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
               <div ref={messagesEndRef} />
@@ -214,7 +223,7 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your message here..."
-                  className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#5F79F1] focus:border-transparent resize-none"
+                  className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#5F79F1] focus:border-transparent resize-none placeholder:text-gray-500 text-gray-500"
                   rows={1}
                 />
               </div>
