@@ -82,6 +82,21 @@ const strategies = [
     externalLink: "https://ankrflow.com",
     learnMoreLink: "https://ankrflow.com",
   },
+  {
+    title: "Kitty",
+    apy: 3.9,
+    risk: {
+      level: "Low" as const,
+      color: "#10B981",
+      bgColor: "rgba(16, 185, 129, 0.3)",
+    },
+    protocol: "Kitty",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/sonic.svg",
+    externalLink: "https://kitty.com",
+    learnMoreLink: "https://kitty.com",
+  },
 ];
 // No results placeholder
 const NoResultsPlaceholder = () => (
