@@ -1,24 +1,29 @@
 "use client";
+
+import Image from "next/image";
 import { useState, FormEvent, KeyboardEvent, useRef } from "react";
+
+const HOT_TOPICS = [
+  {
+    icon: "/atom.svg",
+    title: "Strategy: Give me top-performing DeFi strategies on Base",
+  },
+  {
+    icon: "/uni-hat.svg",
+    title: "Learn: What is a delta-neutral strategy",
+  },
+  {
+    icon: "/bar-chart.svg",
+    title: "Trend: Give me an analysis on current crypto market",
+  },
+];
 
 export default function Home() {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // TODO: Handle Deposit
-  const handleDeposit = () => {
-    console.log("Deposit");
-    setCommand("Deposit 100 USDT to Morpho Finance.");
-    // Focus the input field after setting the command
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 0);
-  };
-
-  // TODO: Handle Withdraw
-  const handleWithdraw = () => {
-    console.log("Withdraw");
-    setCommand("Withdraw 100 USDT from Morpho Finance.");
+  const handleCommand = (command: string) => {
+    setCommand(command);
     // Focus the input field after setting the command
     setTimeout(() => {
       inputRef.current?.focus();
@@ -42,6 +47,15 @@ export default function Home() {
       e.preventDefault();
       handleAskAI(e as unknown as FormEvent);
     }
+  };
+
+  // TODO
+  const handleHotTopic = (topic: string) => {
+    setCommand(topic);
+    // Focus the input field after setting the command
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
   };
 
   return (
@@ -80,13 +94,17 @@ export default function Home() {
           </span>
           <div className="flex gap-2">
             <button
-              onClick={handleDeposit}
+              onClick={() =>
+                handleCommand("Deposit 100 USDT to Morpho Finance")
+              }
               className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
             >
               Deposit
             </button>
             <button
-              onClick={handleWithdraw}
+              onClick={() =>
+                handleCommand("Withdraw 100 USDT from Morpho Finance")
+              }
               className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
             >
               Withdraw
@@ -95,16 +113,26 @@ export default function Home() {
         </div>
 
         {/* Hot Topics */}
-        <div className="w-[441px] mt-12 self-start">
+        <div className="mt-5 self-start">
           <h3 className="text-[#160211] font-[family-name:var(--font-manrope)] font-bold text-2xl mb-4">
             Hot Topics
           </h3>
-          <div className="flex flex-col gap-4">
-            {[1, 2, 3].map((index) => (
-              <div
-                key={index}
-                className="w-full bg-white rounded-[14px] px-2.5 py-1.5 shadow-md"
-              />
+          <div className="flex flex-col gap-3">
+            {HOT_TOPICS.map((topic) => (
+              <button
+                key={topic.title}
+                onClick={() => handleHotTopic(topic.title)}
+                className="w-fit flex items-center bg-white rounded-[14px] px-4 py-1.5 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+              >
+                <Image
+                  src={topic.icon}
+                  width={12}
+                  height={12}
+                  className="h-6 w-6 mr-2 object-contain"
+                  alt={topic.title}
+                />
+                {topic.title}
+              </button>
             ))}
           </div>
         </div>
