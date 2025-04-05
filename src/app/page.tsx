@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
-import useChatbot from "./hooks/useChatbot";
+import useChatbot from "./hooks/useChatbotResponse";
 import { Message } from "./types";
 import { format } from "date-fns";
 
