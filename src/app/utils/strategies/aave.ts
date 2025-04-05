@@ -6,6 +6,7 @@ import { wagmiConfig as config } from "@/providers/config";
 import { ERC20_ABI, ERC20_PERMIT_ABI } from "@/app/abis";
 import { PERMIT_TYPES } from "@/app/utils/types";
 import { PERMIT_EXPIRY } from "../constants";
+import { BaseStrategy } from "./base";
 
 interface SupplyParams {
   user: Address;
@@ -29,12 +30,14 @@ const AAVE_STRATEGY_CONTRACTS: Record<
   },
 };
 
-export class AaveV3Strategy {
+export class AaveV3Strategy extends BaseStrategy {
   public executor: Address;
   public supplyAsset: Address;
   public permitExpiry: number;
 
-  constructor(public readonly chainId: AaveSupportedChains) {
+  constructor(chainId: AaveSupportedChains) {
+    super(chainId);
+
     this.executor = AAVE_STRATEGY_CONTRACTS[chainId].executor;
     this.supplyAsset = AAVE_STRATEGY_CONTRACTS[chainId].supplyAssets;
     this.permitExpiry = PERMIT_EXPIRY;
