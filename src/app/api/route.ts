@@ -55,9 +55,6 @@ export async function POST(request: NextRequest) {
     body.signature
   );
 
-  console.log(body);
-  console.log(calls);
-
   const result = await multiCall(body.user, calls);
 
   return NextResponse.json(result);
@@ -116,8 +113,6 @@ async function createAaveCalls(
       callData: data,
     });
   }
-
-  console.log(amount);
 
   //* Step 2  Transfer asset to Executor
   {
