@@ -6,6 +6,7 @@ import { useWallets } from "@privy-io/react-auth";
 import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
 import { flowMainnet } from "viem/chains";
+import type { Token } from "../index";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ interface InvestModalProps {
     image: string;
     externalLink?: string;
     learnMoreLink?: string;
+    tokens: Token[];
   };
   displayInsufficientBalance?: boolean;
 }
@@ -35,7 +37,7 @@ export default function InvestModal({
 }: InvestModalProps) {
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
-  const [currency, setCurrency] = useState<string>("USDT");
+  const [currency, setCurrency] = useState<string>(strategy.tokens[0].name);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { address: user } = useAccount();
@@ -214,18 +216,24 @@ export default function InvestModal({
                             setShowCurrencyDropdown(!showCurrencyDropdown)
                           }
                         >
-                          {currency === "USDT" ? (
+                          {strategy.tokens.find(
+                            (token) => token.name === currency
+                          ) ? (
                             <Image
-                              src="https://cryptologos.cc/logos/tether-usdt-logo.png"
-                              alt="USDT"
+                              src={
+                                strategy.tokens.find(
+                                  (token) => token.name === currency
+                                )?.icon || ""
+                              }
+                              alt={currency}
                               className="w-6 h-6 object-contain"
                               width={24}
                               height={24}
                             />
                           ) : (
                             <Image
-                              src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
-                              alt="USDC"
+                              src={strategy.tokens[0].icon}
+                              alt={strategy.tokens[0].name}
                               className="w-6 h-6 object-contain"
                               width={24}
                               height={24}
@@ -250,40 +258,26 @@ export default function InvestModal({
 
                         {showCurrencyDropdown && (
                           <div className="absolute right-0 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                            <button
-                              type="button"
-                              className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
-                              onClick={() => {
-                                setCurrency("USDT");
-                                setShowCurrencyDropdown(false);
-                              }}
-                            >
-                              <Image
-                                src="https://cryptologos.cc/logos/tether-usdt-logo.png"
-                                alt="USDT"
-                                width={24}
-                                height={24}
-                                className="w-6 h-6 object-contain"
-                              />
-                              USDT
-                            </button>
-                            <button
-                              type="button"
-                              className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
-                              onClick={() => {
-                                setCurrency("USDC");
-                                setShowCurrencyDropdown(false);
-                              }}
-                            >
-                              <Image
-                                src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
-                                alt="USDC"
-                                width={24}
-                                height={24}
-                                className="w-6 h-6 object-contain"
-                              />
-                              USDC
-                            </button>
+                            {strategy.tokens.map((token) => (
+                              <button
+                                key={token.name}
+                                type="button"
+                                className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
+                                onClick={() => {
+                                  setCurrency(token.name);
+                                  setShowCurrencyDropdown(false);
+                                }}
+                              >
+                                <Image
+                                  src={token.icon}
+                                  alt={token.name}
+                                  width={24}
+                                  height={24}
+                                  className="w-6 h-6 object-contain"
+                                />
+                                {token.name}
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>

@@ -4,6 +4,11 @@ import { useState } from "react";
 import { getRiskColor } from "@/app/utils";
 import InvestModal from "./InvestModal";
 
+export type Token = {
+  name: string;
+  icon: string;
+};
+
 interface StrategyCardProps {
   title: string;
   apy: number;
@@ -17,6 +22,7 @@ interface StrategyCardProps {
   image: string;
   externalLink?: string;
   learnMoreLink?: string;
+  tokens: Token[];
   displayInsufficientBalance?: boolean;
 }
 
@@ -29,6 +35,7 @@ export default function StrategyCard({
   image,
   externalLink,
   learnMoreLink,
+  tokens,
   displayInsufficientBalance = false,
 }: StrategyCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -142,6 +149,7 @@ export default function StrategyCard({
           image,
           externalLink,
           learnMoreLink,
+          tokens,
         }}
         displayInsufficientBalance={displayInsufficientBalance}
       />

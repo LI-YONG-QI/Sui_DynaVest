@@ -6,6 +6,31 @@ import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
 import RiskFilter from "./RiskFilter";
 
+const USDT = {
+  name: "USDT",
+  icon: "https://cryptologos.cc/logos/tether-usdt-logo.png",
+};
+
+const USDC = {
+  name: "USDC",
+  icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
+};
+
+const CELO = {
+  name: "CELO",
+  icon: "https://cryptologos.cc/logos/celo-celo-logo.png",
+};
+
+const FLOW = {
+  name: "FLOW",
+  icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+};
+
+const cEUR = {
+  name: "cEUR",
+  icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+};
+
 const strategies = [
   {
     title: "Morpho Lending Strategy",
@@ -21,7 +46,25 @@ const strategies = [
     image: "/base.png",
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
+    tokens: [USDT, USDC],
     displayInsufficientBalance: true, // TODO: review hardcoded data
+  },
+
+  {
+    title: "Compound Yield",
+    apy: 3.9,
+    risk: {
+      level: "High" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "Compound",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/base.png",
+    externalLink: "https://compound.finance",
+    learnMoreLink: "https://compound.finance",
+    tokens: [USDT, USDC],
   },
   {
     title: "AAVE Lending Strategy",
@@ -37,22 +80,9 @@ const strategies = [
     image: "/celo.png",
     externalLink: "https://aave.com",
     learnMoreLink: "https://aave.com",
+    tokens: [cEUR],
   },
-  {
-    title: "Compound Yield",
-    apy: 3.9,
-    risk: {
-      level: "High" as const,
-      color: "#E83033",
-      bgColor: "rgba(232, 48, 51, 0.3)",
-    },
-    protocol: "Compound",
-    description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/base.png",
-    externalLink: "https://compound.finance",
-    learnMoreLink: "https://compound.finance",
-  },
+
   {
     title: "stCelo",
     apy: 3.9,
@@ -67,6 +97,7 @@ const strategies = [
     image: "/celo.png",
     externalLink: "https://stcelo.com",
     learnMoreLink: "https://stcelo.com",
+    tokens: [CELO],
   },
   {
     title: "Ankr Flow",
@@ -82,6 +113,7 @@ const strategies = [
     image: "/flow.png",
     externalLink: "https://ankrflow.com",
     learnMoreLink: "https://ankrflow.com",
+    tokens: [FLOW],
   },
   {
     title: "Kitty",
@@ -97,6 +129,7 @@ const strategies = [
     image: "/flow.png",
     externalLink: "https://kitty.com",
     learnMoreLink: "https://kitty.com",
+    tokens: [FLOW],
   },
   {
     title: "Flow",
@@ -111,21 +144,7 @@ const strategies = [
     image: "/flow.png",
     externalLink: "https://flow.com",
     learnMoreLink: "https://flow.com",
-  },
-
-  {
-    title: "1inch",
-    apy: 3.9,
-    risk: {
-      level: "Low" as const,
-      color: "#10B981",
-      bgColor: "rgba(16, 185, 129, 0.3)",
-    },
-    protocol: "Flow",
-    description: "LST -> Add liquidity",
-    image: "/flow.png",
-    externalLink: "https://flow.com",
-    learnMoreLink: "https://flow.com",
+    tokens: [FLOW],
   },
 ];
 // No results placeholder
