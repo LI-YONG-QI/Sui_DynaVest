@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      <div className="mt-10">{children}</div>
+      <div className="py-10">{children}</div>
     </div>
   );
 }

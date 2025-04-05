@@ -121,97 +121,99 @@ export default function Home() {
   }, [conversation, isTyping]);
 
   return (
-    <div className="">
-      <div className="">
+    <div className="h-screen flex flex-col">
+      <div className={`flex flex-col ${conversation.length > 0 && "flex-1"}`}>
         <h2 className="text-[48px] font-extrabold font-[family-name:var(--font-manrope)] text-[#141A21] mb-8 text-center">
           DeFAI Strategies Advisor
         </h2>
 
-        {/* Search Bar */}
-        <form
-          onSubmit={handleAskAI}
-          className="flex justify-between items-center w-full px-5 py-2.5 border border-[#5F79F1]/30 rounded-lg bg-white"
-        >
-          <input
-            ref={inputRef}
-            value={command}
-            onChange={(e) => setCommand(e.target.value)}
-            onKeyDown={handleKeyPress}
-            className="outline-none text-[#A0ACC5] font-[family-name:var(--font-manrope)] font-medium text-base w-[90%]"
-            placeholder="Ask OneVault AI anything. Make DeFi investment easy and simple."
-          />
-          <button
-            type="submit"
-            disabled={command.trim() === ""}
-            className="bg-[#5F79F1] disabled:bg-[#5F79F1]/50 text-white px-5 py-3 rounded-lg font-[family-name:var(--font-manrope)] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Ask AI
-          </button>
-        </form>
-
-        {/* Commands Section */}
-        <div className="flex items-center gap-2 mt-5 self-start">
-          <span className="text-black font-[family-name:var(--font-manrope)] text-sm">
-            Commands
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() =>
-                handleCommand("Deposit 100 USDT to Morpho Finance")
-              }
-              className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
+        {conversation.length === 0 ? (
+          <>
+            {/* Pre-chat View */}
+            {/* Initial Search Bar */}
+            <form
+              onSubmit={handleAskAI}
+              className="flex justify-between items-center w-full px-5 py-2.5 border border-[#5F79F1]/30 rounded-lg bg-white"
             >
-              Deposit
-            </button>
-            <button
-              onClick={() =>
-                handleCommand("Withdraw 100 USDT from Morpho Finance")
-              }
-              className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
-            >
-              Withdraw
-            </button>
-          </div>
-        </div>
+              <input
+                ref={inputRef}
+                value={command}
+                onChange={(e) => setCommand(e.target.value)}
+                onKeyDown={handleKeyPress}
+                className="outline-none text-[#A0ACC5] font-[family-name:var(--font-manrope)] font-medium text-base w-[90%]"
+                placeholder="Ask OneVault AI anything. Make DeFi investment easy and simple."
+              />
+              <button
+                type="submit"
+                disabled={command.trim() === ""}
+                className="bg-[#5F79F1] disabled:bg-[#5F79F1]/50 text-white px-5 py-3 rounded-lg font-[family-name:var(--font-manrope)] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Ask AI
+              </button>
+            </form>
 
-        {/* Hot Topics */}
-        {conversation.length === 0 && (
-          <div className="mt-5 self-start">
-            <h3 className="text-[#160211] font-[family-name:var(--font-manrope)] font-bold text-2xl mb-4">
-              Hot Topics
-            </h3>
-            <div className="flex flex-col gap-3">
-              {HOT_TOPICS.map((topic) => (
+            {/* Commands Section */}
+            <div className="flex items-center gap-2 mt-5 self-start">
+              <span className="text-black font-[family-name:var(--font-manrope)] text-sm">
+                Commands
+              </span>
+              <div className="flex gap-2">
                 <button
-                  key={topic.title}
-                  onClick={() => handleHotTopic(topic.title)}
-                  className="w-fit flex items-center bg-white rounded-[14px] px-4 py-1.5 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() =>
+                    handleCommand("Deposit 100 USDT to Morpho Finance")
+                  }
+                  className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
                 >
-                  <Image
-                    src={topic.icon}
-                    width={12}
-                    height={12}
-                    className="h-6 w-6 mr-2 object-contain"
-                    alt={topic.title}
-                  />
-                  {topic.title}
+                  Deposit
                 </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Bot Response */}
-        <div className="mt-8 rounded-xl overflow-hidden mx-auto">
-          <div className="p-4 h-[400px] overflow-y-auto">
-            {conversation.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-gray-400">
-                <p>
-                  Ask me anything about DeFi strategies or use the quick
-                  commands above!
-                </p>
+                <button
+                  onClick={() =>
+                    handleCommand("Withdraw 100 USDT from Morpho Finance")
+                  }
+                  className="cursor-pointer px-[13px] py-[5px] bg-[#F3F5F6] rounded-lg text-[#444444] text-[10px] font-semibold font-[family-name:var(--font-inter)] shadow-sm"
+                >
+                  Withdraw
+                </button>
               </div>
-            ) : (
+            </div>
+
+            {/* Hot Topics */}
+            <div className="mt-5 self-start">
+              <h3 className="text-[#160211] font-[family-name:var(--font-manrope)] font-bold text-2xl mb-4">
+                Hot Topics
+              </h3>
+              <div className="flex flex-col gap-3">
+                {HOT_TOPICS.map((topic) => (
+                  <button
+                    key={topic.title}
+                    onClick={() => handleHotTopic(topic.title)}
+                    className="w-fit flex items-center bg-white rounded-[14px] px-4 py-1.5 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                  >
+                    <Image
+                      src={topic.icon}
+                      width={12}
+                      height={12}
+                      className="h-6 w-6 mr-2 object-contain"
+                      alt={topic.title}
+                    />
+                    {topic.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Empty State */}
+            <div className="mt-20 flex items-center justify-center text-gray-400">
+              <p>
+                Ask me anything about DeFi strategies or use the quick commands
+                above!
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Chat View */}
+            <div className="flex-1 overflow-y-auto px-4 py-6">
               <div className="flex flex-col gap-6">
                 {conversation.map((message) => (
                   <div
@@ -267,9 +269,46 @@ export default function Home() {
 
                 <div ref={messagesEndRef} />
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+
+            {/* Input Box at Bottom */}
+            <div className="p-4 border-t border-gray-200 bg-white rounded-xl">
+              <form
+                onSubmit={handleAskAI}
+                className="flex justify-between items-center gap-2"
+              >
+                <input
+                  ref={inputRef}
+                  value={command}
+                  onChange={(e) => setCommand(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  className="flex-1 outline-none border border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-[family-name:var(--font-manrope)]"
+                  placeholder="Type your message..."
+                />
+                <button
+                  type="submit"
+                  disabled={command.trim() === ""}
+                  className="bg-[#5F79F1] disabled:bg-[#5F79F1]/50 text-white p-3 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
+              </form>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
