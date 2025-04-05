@@ -91,5 +91,7 @@ export class AaveV3Strategy extends BaseStrategy {
     });
 
     console.log(await response.json());
+
+    return "Success";
   }
 }
