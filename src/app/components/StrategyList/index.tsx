@@ -18,7 +18,7 @@ const strategies = [
     protocol: "Morpho",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/base.png",
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
   },
@@ -33,7 +33,7 @@ const strategies = [
     protocol: "AAVE",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/celo.png",
     externalLink: "https://aave.com",
     learnMoreLink: "https://aave.com",
   },
@@ -48,7 +48,7 @@ const strategies = [
     protocol: "Compound",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/base.png",
     externalLink: "https://compound.finance",
     learnMoreLink: "https://compound.finance",
   },
@@ -63,7 +63,7 @@ const strategies = [
     protocol: "stCelo",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/celo.png",
     externalLink: "https://stcelo.com",
     learnMoreLink: "https://stcelo.com",
   },
@@ -78,7 +78,7 @@ const strategies = [
     protocol: "ankrFlow",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/flow.png",
     externalLink: "https://ankrflow.com",
     learnMoreLink: "https://ankrflow.com",
   },
@@ -93,7 +93,7 @@ const strategies = [
     protocol: "Kitty",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/flow.png",
     externalLink: "https://kitty.com",
     learnMoreLink: "https://kitty.com",
   },
@@ -107,7 +107,7 @@ const strategies = [
     },
     protocol: "Flow",
     description: "LST -> Add liquidity",
-    image: "/sonic.svg",
+    image: "/flow.png",
     externalLink: "https://flow.com",
     learnMoreLink: "https://flow.com",
   },

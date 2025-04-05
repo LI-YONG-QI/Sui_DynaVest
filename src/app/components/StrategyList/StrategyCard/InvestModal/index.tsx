@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useWallets } from "@privy-io/react-auth";
 
 import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
+import { celo, flowMainnet } from "viem/chains";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -36,8 +38,13 @@ export default function InvestModal({
   const [currency, setCurrency] = useState<string>("USDT");
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const chainId = useChainId();
   const { address: user } = useAccount();
+
+  const { wallets } = useWallets();
+
+  const chainId = useChainId();
+  const [isSupportedChain, setIsSupportedChain] = useState<boolean>(false);
+  const { chains, switchChain, switchChainAsync } = useSwitchChain();
 
   const maxBalance = 100.0; // TODO: use real value
 
@@ -62,13 +69,22 @@ export default function InvestModal({
     }, 300); // Match this with the CSS transition duration
   };
 
+  const handleSwitchChain = async () => {
+    try {
+      const wallet = wallets[0];
+      await wallet.switchChain(flowMainnet.id);
+
+      setIsSupportedChain(true);
+    } catch (error) {
+      console.error("Failed to switch chain:", error);
+    }
+  };
+
   // Handle investment submission
   const handleInvest = async () => {
     if (user) {
       const strategyHandler = getStrategy(strategy.protocol, chainId);
-      const res = await strategyHandler.execute(user, BigInt(amount));
-
-      console.log(res);
+      await strategyHandler.execute(user, BigInt(amount));
 
       handleClose();
     }
