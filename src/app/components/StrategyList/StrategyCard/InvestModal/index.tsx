@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useAccount, useChainId } from "wagmi";
@@ -88,7 +90,7 @@ export default function InvestModal({
       toast.success(`Switched chain to ${strategy.chainId}`);
 
       setIsSupportedChain(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to switch chain:", error);
     }
   };

@@ -11,10 +11,11 @@ export class AnkrFlowStrategy extends BaseStrategy {
     super(chainId);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async execute(user: Address, amount: bigint) {
     const result = await sendTransaction(config, {
       to: this.ANKR_CORE,
-      value: BigInt(100),
+      value: amount,
       data: "0xac76d450" as Hex,
     });
 

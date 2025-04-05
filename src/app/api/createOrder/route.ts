@@ -1,6 +1,19 @@
-import { SDK, HashLock, PrivateKeyProviderConnector, NetworkEnum } from "@1inch/cross-chain-sdk";
+/* eslint-disable */
+
+import {
+  SDK,
+  HashLock,
+  PrivateKeyProviderConnector,
+  NetworkEnum,
+} from "@1inch/cross-chain-sdk";
 import { Web3 } from "web3";
-import { solidityPackedKeccak256, randomBytes, Contract, Wallet, JsonRpcProvider } from "ethers";
+import {
+  solidityPackedKeccak256,
+  randomBytes,
+  Contract,
+  Wallet,
+  JsonRpcProvider,
+} from "ethers";
 import dotenv from "dotenv";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,9 +27,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { amount } = body;
-    
+
     if (!amount) {
-      return NextResponse.json({ error: "Missing token amount in request body" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing token amount in request body" },
+        { status: 400 }
+      );
     }
 
     const {
@@ -27,11 +43,18 @@ export async function POST(request: NextRequest) {
     } = process.env;
 
     if (!makerPrivateKey || !makerAddress || !nodeUrl || !devPortalApiKey) {
-      return NextResponse.json({ error: "Missing required environment variables." }, { status: 500 });
+      return NextResponse.json(
+        { error: "Missing required environment variables." },
+        { status: 500 }
+      );
     }
 
-    const web3Instance = new Web3(nodeUrl);
-    const blockchainProvider = new PrivateKeyProviderConnector(makerPrivateKey, web3Instance);
+    const web3Instance = new Web3(nodeUrl) as any;
+
+    const blockchainProvider = new PrivateKeyProviderConnector(
+      makerPrivateKey,
+      web3Instance
+    );
 
     const sdk = new SDK({
       url: "https://api.1inch.dev/fusion-plus",
@@ -74,10 +97,14 @@ export async function POST(request: NextRequest) {
 
     try {
       const provider = new JsonRpcProvider(nodeUrl);
-      const tokenContract = new Contract(srcTokenAddress, approveABI, new Wallet(makerPrivateKey, provider));
+      const tokenContract = new Contract(
+        srcTokenAddress,
+        approveABI,
+        new Wallet(makerPrivateKey, provider)
+      );
       await tokenContract.approve(
         "0x111111125421ca6dc452d289314280a0f8842a65",
-        (2n ** 256n - 1n)
+        BigInt(2) ** BigInt(256) - BigInt(1)
       );
     } catch (error: any) {
       console.error("Error during token approval:", error);
@@ -100,7 +127,9 @@ export async function POST(request: NextRequest) {
     const quote = await sdk.getQuote(params);
     const secretsCount = quote.getPreset().secretsCount;
 
-    const secrets = Array.from({ length: secretsCount }).map(() => getRandomBytes32());
+    const secrets = Array.from({ length: secretsCount }).map(() =>
+      getRandomBytes32()
+    );
     const secretHashes = secrets.map((secret) => HashLock.hashSecret(secret));
 
     const hashLock =
@@ -108,8 +137,11 @@ export async function POST(request: NextRequest) {
         ? HashLock.forSingleFill(secrets[0])
         : HashLock.forMultipleFills(
             secretHashes.map((secretHash, i) =>
-              solidityPackedKeccak256(["uint64", "bytes32"], [i, secretHash.toString()])
-            )
+              solidityPackedKeccak256(
+                ["uint64", "bytes32"],
+                [i, secretHash.toString()]
+              )
+            ) as any
           );
 
     console.log("Received Fusion+ quote from 1inch API");
@@ -124,7 +156,10 @@ export async function POST(request: NextRequest) {
     } catch (error: any) {
       console.error("Error during order processing:", error);
       return NextResponse.json(
-        { error: "Order processing failed", details: JSON.stringify(error, null, 2) },
+        {
+          error: "Order processing failed",
+          details: JSON.stringify(error, null, 2),
+        },
         { status: 500 }
       );
     }
@@ -133,7 +168,9 @@ export async function POST(request: NextRequest) {
     console.log("Order successfully placed");
 
     const intervalId = setInterval(async () => {
-      console.log(`Polling for fills until order status is set to "executed"...`);
+      console.log(
+        `Polling for fills until order status is set to "executed"...`
+      );
       try {
         const orderStatus = await sdk.getOrderStatus(orderHash);
         if (orderStatus.status === "executed") {
@@ -150,7 +187,9 @@ export async function POST(request: NextRequest) {
           for (const fill of fillsObject.fills) {
             try {
               await sdk.submitSecret(orderHash, secrets[fill.idx]);
-              console.log(`Fill found! Submitted secret: ${secretHashes[fill.idx]}`);
+              console.log(
+                `Fill found! Submitted secret: ${secretHashes[fill.idx]}`
+              );
             } catch (error: any) {
               console.error("Error submitting secret:", error);
             }
@@ -171,7 +210,10 @@ export async function POST(request: NextRequest) {
       }
     }, 5000);
 
-    return NextResponse.json({ message: "Order successfully placed", orderHash });
+    return NextResponse.json({
+      message: "Order successfully placed",
+      orderHash,
+    });
   } catch (error: any) {
     console.error("Unexpected error:", error);
     return NextResponse.json(

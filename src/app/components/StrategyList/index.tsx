@@ -109,6 +109,7 @@ const strategies = [
     externalLink: "https://stcelo.com",
     learnMoreLink: "https://stcelo.com",
     tokens: [CELO],
+    chainId: celo.id,
   },
   {
     title: "Ankr Flow",
