@@ -1,10 +1,42 @@
 import Image from "next/image";
+import { ToastContainer } from "react-toastify";
+
 import StrategyCard from "./StrategyCard";
 import { useState, useMemo, useRef } from "react";
 import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
 import RiskFilter from "./RiskFilter";
+
+const USDT = {
+  name: "USDT",
+  icon: "https://cryptologos.cc/logos/tether-usdt-logo.png",
+  decimals: 6,
+};
+
+const USDC = {
+  name: "USDC",
+  icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
+  decimals: 6,
+};
+
+const CELO = {
+  name: "CELO",
+  icon: "https://cryptologos.cc/logos/celo-celo-logo.png",
+  decimals: 18,
+};
+
+const FLOW = {
+  name: "FLOW",
+  icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+  decimals: 18,
+};
+
+const cEUR = {
+  name: "cEUR",
+  icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+  decimals: 18,
+};
 
 const strategies = [
   {
@@ -18,10 +50,28 @@ const strategies = [
     protocol: "Morpho",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/base.png",
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
+    tokens: [USDT, USDC],
     displayInsufficientBalance: true, // TODO: review hardcoded data
+  },
+
+  {
+    title: "Compound Yield",
+    apy: 3.9,
+    risk: {
+      level: "High" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "Compound",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/base.png",
+    externalLink: "https://compound.finance",
+    learnMoreLink: "https://compound.finance",
+    tokens: [USDT, USDC],
   },
   {
     title: "AAVE Lending Strategy",
@@ -34,25 +84,12 @@ const strategies = [
     protocol: "AAVE",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/celo.png",
     externalLink: "https://aave.com",
     learnMoreLink: "https://aave.com",
+    tokens: [cEUR],
   },
-  {
-    title: "Compound Yield",
-    apy: 3.9,
-    risk: {
-      level: "High" as const,
-      color: "#E83033",
-      bgColor: "rgba(232, 48, 51, 0.3)",
-    },
-    protocol: "Compound",
-    description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
-    externalLink: "https://compound.finance",
-    learnMoreLink: "https://compound.finance",
-  },
+
   {
     title: "stCelo",
     apy: 3.9,
@@ -64,9 +101,10 @@ const strategies = [
     protocol: "stCelo",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/celo.png",
     externalLink: "https://stcelo.com",
     learnMoreLink: "https://stcelo.com",
+    tokens: [CELO],
   },
   {
     title: "Ankr Flow",
@@ -79,9 +117,10 @@ const strategies = [
     protocol: "ankrFlow",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/flow.png",
     externalLink: "https://ankrflow.com",
     learnMoreLink: "https://ankrflow.com",
+    tokens: [FLOW],
   },
   {
     title: "Kitty",
@@ -94,9 +133,10 @@ const strategies = [
     protocol: "Kitty",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/sonic.svg",
+    image: "/flow.png",
     externalLink: "https://kitty.com",
     learnMoreLink: "https://kitty.com",
+    tokens: [FLOW],
   },
   {
     title: "Flow",
@@ -108,9 +148,10 @@ const strategies = [
     },
     protocol: "Flow",
     description: "LST -> Add liquidity",
-    image: "/sonic.svg",
+    image: "/flow.png",
     externalLink: "https://flow.com",
     learnMoreLink: "https://flow.com",
+    tokens: [FLOW],
   },
 ];
 // No results placeholder
@@ -254,6 +295,7 @@ export default function StrategyList() {
           )}
         </>
       )}
+      <ToastContainer position="bottom-right" />
     </div>
   );
 }

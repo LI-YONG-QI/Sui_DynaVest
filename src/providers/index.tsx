@@ -3,6 +3,7 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { wagmiConfig } from "./config";
+import { celo, flowMainnet, sepolia, mainnet } from "viem/chains";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         embeddedWallets: {
           createOnLogin: "users-without-wallets",
         },
+        supportedChains: [celo, flowMainnet, mainnet, sepolia],
       }}
     >
       <QueryClientProvider client={queryClient}>
