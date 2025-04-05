@@ -95,7 +95,7 @@ export default function InvestModal({
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 bg-gray-200 rounded-full p-2 hover:bg-gray-300 transition-colors"
+            className="absolute top-4 right-4 bg-transparent border-black border-solid border-2 rounded-full p-1 hover:bg-gray-300 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -214,10 +214,12 @@ export default function InvestModal({
                             setShowCurrencyDropdown(false);
                           }}
                         >
-                          <img
+                          <Image
                             src="https://cryptologos.cc/logos/tether-usdt-logo.png"
                             alt="USDT"
-                            className="w-6 h-6"
+                            width={24}
+                            height={24}
+                            className="w-6 h-6 object-contain"
                           />
                           USDT
                         </button>
@@ -229,10 +231,12 @@ export default function InvestModal({
                             setShowCurrencyDropdown(false);
                           }}
                         >
-                          <img
+                          <Image
                             src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
                             alt="USDC"
-                            className="w-6 h-6"
+                            width={24}
+                            height={24}
+                            className="w-6 h-6 object-contain"
                           />
                           USDC
                         </button>
@@ -260,8 +264,9 @@ export default function InvestModal({
             {/* Invest button */}
             <button
               type="button"
+              disabled={!amount}
               onClick={handleInvest}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               Invest
             </button>
