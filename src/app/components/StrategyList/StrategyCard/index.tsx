@@ -7,6 +7,7 @@ import InvestModal from "./InvestModal";
 export type Token = {
   name: string;
   icon: string;
+  decimals: number;
 };
 
 interface StrategyCardProps {

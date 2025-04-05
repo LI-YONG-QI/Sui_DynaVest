@@ -7,6 +7,7 @@ import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
 import { flowMainnet } from "viem/chains";
 import type { Token } from "../index";
+import { parseUnits } from "viem";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ export default function InvestModal({
 }: InvestModalProps) {
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
-  const [currency, setCurrency] = useState<string>(strategy.tokens[0].name);
+  const [currency, setCurrency] = useState<Token>(strategy.tokens[0]);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { address: user } = useAccount();
@@ -85,7 +86,8 @@ export default function InvestModal({
   const handleInvest = async () => {
     if (user) {
       const strategyHandler = getStrategy(strategy.protocol, chainId);
-      await strategyHandler.execute(user, BigInt(amount));
+      const parsedAmount = parseUnits(amount, currency.decimals);
+      await strategyHandler.execute(user, parsedAmount);
 
       handleClose();
     }
@@ -216,30 +218,14 @@ export default function InvestModal({
                             setShowCurrencyDropdown(!showCurrencyDropdown)
                           }
                         >
-                          {strategy.tokens.find(
-                            (token) => token.name === currency
-                          ) ? (
-                            <Image
-                              src={
-                                strategy.tokens.find(
-                                  (token) => token.name === currency
-                                )?.icon || ""
-                              }
-                              alt={currency}
-                              className="w-6 h-6 object-contain"
-                              width={24}
-                              height={24}
-                            />
-                          ) : (
-                            <Image
-                              src={strategy.tokens[0].icon}
-                              alt={strategy.tokens[0].name}
-                              className="w-6 h-6 object-contain"
-                              width={24}
-                              height={24}
-                            />
-                          )}
-                          {currency}
+                          <Image
+                            src={currency.icon}
+                            alt={currency.name}
+                            className="w-6 h-6 object-contain"
+                            width={24}
+                            height={24}
+                          />
+                          {currency.name}
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5 ml-1"
@@ -264,7 +250,7 @@ export default function InvestModal({
                                 type="button"
                                 className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
                                 onClick={() => {
-                                  setCurrency(token.name);
+                                  setCurrency(token);
                                   setShowCurrencyDropdown(false);
                                 }}
                               >
@@ -285,7 +271,7 @@ export default function InvestModal({
                     <div className="flex items-center px-4 pb-2">
                       <div className="flex items-center">
                         <span className="text-sm text-gray-500">
-                          Balance: {maxBalance.toFixed(2)} {currency}
+                          Balance: {maxBalance.toFixed(2)} {currency.name}
                         </span>
                         <button
                           type="button"
@@ -301,10 +287,12 @@ export default function InvestModal({
                   <button
                     type="button"
                     disabled={!amount}
-                    onClick={handleInvest}
+                    onClick={
+                      isSupportedChain ? handleInvest : handleSwitchChain
+                    }
                     className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                   >
-                    Invest
+                    {isSupportedChain ? "Invest" : "Switch Chain"}
                   </button>
                 </div>
               )}

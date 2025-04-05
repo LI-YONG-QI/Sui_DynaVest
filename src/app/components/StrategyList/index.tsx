@@ -9,26 +9,31 @@ import RiskFilter from "./RiskFilter";
 const USDT = {
   name: "USDT",
   icon: "https://cryptologos.cc/logos/tether-usdt-logo.png",
+  decimals: 6,
 };
 
 const USDC = {
   name: "USDC",
   icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
+  decimals: 6,
 };
 
 const CELO = {
   name: "CELO",
   icon: "https://cryptologos.cc/logos/celo-celo-logo.png",
+  decimals: 18,
 };
 
 const FLOW = {
   name: "FLOW",
   icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+  decimals: 18,
 };
 
 const cEUR = {
   name: "cEUR",
   icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+  decimals: 18,
 };
 
 const strategies = [
