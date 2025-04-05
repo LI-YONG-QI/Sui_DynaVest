@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useAccount, useChainId } from "wagmi";
+
 import { getRiskColor } from "@/app/utils";
+import { getStrategy } from "@/app/utils/strategies";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -29,6 +32,8 @@ export default function InvestModal({
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const chainId = useChainId();
+  const { address: user } = useAccount();
 
   const maxBalance = 100.0; // TODO: use real value
 
@@ -54,10 +59,13 @@ export default function InvestModal({
   };
 
   // Handle investment submission
-  const handleInvest = () => {
-    // TODO: Implement investment logic
-    console.log(`Investing ${amount} USDT in ${strategy.title}`);
-    handleClose();
+  const handleInvest = async () => {
+    if (user) {
+      const strategyHandler = getStrategy(strategy.protocol, chainId);
+      await strategyHandler.execute(user, BigInt(amount));
+
+      handleClose();
+    }
   };
 
   if (!isOpen) return null;

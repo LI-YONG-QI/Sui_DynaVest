@@ -52,6 +52,21 @@ const strategies = [
     externalLink: "https://compound.finance",
     learnMoreLink: "https://compound.finance",
   },
+  {
+    title: "stCelo",
+    apy: 3.9,
+    risk: {
+      level: "Low" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "stCelo",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/sonic.svg",
+    externalLink: "https://stcelo.com",
+    learnMoreLink: "https://stcelo.com",
+  },
 ];
 // No results placeholder
 const NoResultsPlaceholder = () => (
