@@ -67,6 +67,21 @@ const strategies = [
     externalLink: "https://stcelo.com",
     learnMoreLink: "https://stcelo.com",
   },
+  {
+    title: "Ankr Flow",
+    apy: 3.9,
+    risk: {
+      level: "Low" as const,
+      color: "#10B981",
+      bgColor: "rgba(16, 185, 129, 0.3)",
+    },
+    protocol: "ankrFlow",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/sonic.svg",
+    externalLink: "https://ankrflow.com",
+    learnMoreLink: "https://ankrflow.com",
+  },
 ];
 // No results placeholder
 const NoResultsPlaceholder = () => (
