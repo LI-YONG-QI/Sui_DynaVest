@@ -31,6 +31,8 @@ export default function InvestModal({
 }: InvestModalProps) {
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
+  const [currency, setCurrency] = useState<string>("USDT");
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const chainId = useChainId();
   const { address: user } = useAccount();
@@ -149,20 +151,99 @@ export default function InvestModal({
             {/* Amount input */}
             <div className="mb-6">
               <div className="bg-gray-100 rounded-md border border-gray-300">
-                <input
-                  type="text"
-                  name="amount"
-                  id="amount"
-                  className="bg-transparent text-gray-500 block w-full px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-0 placeholder:text-gray-500"
-                  placeholder="0.00 USDT"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  style={{ fontSize: "18px" }}
-                />
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    name="amount"
+                    id="amount"
+                    className="bg-transparent text-gray-500 block px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-0 placeholder:text-gray-500"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                  {/* Custom dropdown with icons */}
+                  <div className="ml-auto min-w-[100px] relative">
+                    <button
+                      type="button"
+                      className="bg-transparent flex items-center gap-2 px-4 py-2 text-lg font-semibold focus:outline-none rounded-md hover:bg-gray-200"
+                      onClick={() =>
+                        setShowCurrencyDropdown(!showCurrencyDropdown)
+                      }
+                    >
+                      {currency === "USDT" ? (
+                        <Image
+                          src="https://cryptologos.cc/logos/tether-usdt-logo.png"
+                          alt="USDT"
+                          className="w-6 h-6 object-contain"
+                          width={24}
+                          height={24}
+                        />
+                      ) : (
+                        <Image
+                          src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+                          alt="USDC"
+                          className="w-6 h-6 object-contain"
+                          width={24}
+                          height={24}
+                        />
+                      )}
+                      {currency}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 ml-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+
+                    {showCurrencyDropdown && (
+                      <div className="absolute right-0 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                        <button
+                          type="button"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
+                          onClick={() => {
+                            setCurrency("USDT");
+                            setShowCurrencyDropdown(false);
+                          }}
+                        >
+                          <img
+                            src="https://cryptologos.cc/logos/tether-usdt-logo.png"
+                            alt="USDT"
+                            className="w-6 h-6"
+                          />
+                          USDT
+                        </button>
+                        <button
+                          type="button"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
+                          onClick={() => {
+                            setCurrency("USDC");
+                            setShowCurrencyDropdown(false);
+                          }}
+                        >
+                          <img
+                            src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+                            alt="USDC"
+                            className="w-6 h-6"
+                          />
+                          USDC
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <div className="flex items-center px-4 pb-2">
                   <div className="flex items-center">
                     <span className="text-sm text-gray-500">
-                      Balance: {maxBalance.toFixed(2)} USDT
+                      Balance: {maxBalance.toFixed(2)} {currency}
                     </span>
                     <button
                       type="button"
