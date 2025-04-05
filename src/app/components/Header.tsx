@@ -26,7 +26,7 @@ export default function Header() {
           href="/"
           className="text-[#5F79F1] text-[22px] font-[family-name:var(--font-lily-script)]"
         >
-          OneVault
+          DynaVest
         </Link>
       </div>
 

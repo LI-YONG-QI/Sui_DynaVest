@@ -7,6 +7,7 @@ import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
 import RiskFilter from "./RiskFilter";
+import { celo, flowMainnet } from "viem/chains";
 
 const USDT = {
   name: "USDT",
@@ -54,6 +55,7 @@ const strategies = [
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
     tokens: [USDT, USDC],
+    chainId: 8453,
     displayInsufficientBalance: true, // TODO: review hardcoded data
   },
 
@@ -72,6 +74,7 @@ const strategies = [
     externalLink: "https://compound.finance",
     learnMoreLink: "https://compound.finance",
     tokens: [USDT, USDC],
+    chainId: 8453,
   },
   {
     title: "AAVE Lending Strategy",
@@ -88,6 +91,7 @@ const strategies = [
     externalLink: "https://aave.com",
     learnMoreLink: "https://aave.com",
     tokens: [cEUR],
+    chainId: celo.id,
   },
 
   {
@@ -121,6 +125,7 @@ const strategies = [
     externalLink: "https://ankrflow.com",
     learnMoreLink: "https://ankrflow.com",
     tokens: [FLOW],
+    chainId: flowMainnet.id,
   },
   {
     title: "Kitty",
@@ -137,6 +142,7 @@ const strategies = [
     externalLink: "https://kitty.com",
     learnMoreLink: "https://kitty.com",
     tokens: [FLOW],
+    chainId: flowMainnet.id,
   },
   {
     title: "Flow",
@@ -152,6 +158,7 @@ const strategies = [
     externalLink: "https://flow.com",
     learnMoreLink: "https://flow.com",
     tokens: [FLOW],
+    chainId: flowMainnet.id,
   },
 ];
 // No results placeholder

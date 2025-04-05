@@ -3,12 +3,11 @@ import Image from "next/image";
 import { useAccount, useChainId } from "wagmi";
 import { useWallets } from "@privy-io/react-auth";
 import { toast } from "react-toastify";
+import { parseUnits } from "viem";
 
 import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
-import { flowMainnet } from "viem/chains";
 import type { Token } from "../index";
-import { parseUnits } from "viem";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -26,6 +25,7 @@ interface InvestModalProps {
     image: string;
     externalLink?: string;
     learnMoreLink?: string;
+    chainId: number;
     tokens: Token[];
   };
   displayInsufficientBalance?: boolean;
@@ -58,6 +58,14 @@ export default function InvestModal({
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (chainId === strategy.chainId) {
+      setIsSupportedChain(true);
+    } else {
+      setIsSupportedChain(false);
+    }
+  }, [chainId]);
+
   // Handle setting max amount
   const handleSetMax = () => {
     setAmount(maxBalance.toString());
@@ -75,7 +83,9 @@ export default function InvestModal({
   const handleSwitchChain = async () => {
     try {
       const wallet = wallets[0];
-      await wallet.switchChain(flowMainnet.id);
+      await wallet.switchChain(strategy.chainId);
+
+      toast.success(`Switched chain to ${strategy.chainId}`);
 
       setIsSupportedChain(true);
     } catch (error) {
@@ -293,7 +303,6 @@ export default function InvestModal({
                   {/* Invest button */}
                   <button
                     type="button"
-                    disabled={!amount}
                     onClick={
                       isSupportedChain ? handleInvest : handleSwitchChain
                     }
