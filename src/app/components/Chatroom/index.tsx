@@ -5,12 +5,10 @@ import Image from "next/image";
 import { Message } from "@/app/types";
 import useChatbot from "@/app/hooks/useChatbot";
 import ChatBubble from "./ChatBubble";
+import { useChat } from "@/app/contexts/ChatContext";
 
-interface ChatroomProps {
-  isVisible: boolean;
-}
-
-const Chatroom = ({ isVisible }: ChatroomProps) => {
+const Chatroom = () => {
+  const { showChat } = useChat();
   const [isMinimized, setIsMinimized] = useState(false);
   // TODO: review the content for welcoming message.
   const [messages, setMessages] = useState<Message[]>([
@@ -32,10 +30,10 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
   };
 
   useEffect(() => {
-    if (isVisible && !isMinimized) {
+    if (showChat && !isMinimized) {
       scrollToBottom();
     }
-  }, [messages, isVisible, isMinimized]);
+  }, [messages, showChat, isMinimized]);
 
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
@@ -78,17 +76,17 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
     }
   };
 
-  if (!isVisible) return null;
+  if (!showChat) return null;
 
   return (
     <div
       className={`fixed bottom-6 right-6 w-80 sm:w-96 rounded-2xl overflow-hidden shadow-2xl z-50 transition-all duration-300 transform ${
-        isMinimized ? "translate-y-0" : "max-h-[600px] h-[550px] translate-y-0"
+        isMinimized ? "translate-y-0" : "max-h-[600px] h-[500px] translate-y-0"
       }`}
     >
       {/* Header */}
       <div
-        className={`bg-[#5F79F1] text-white flex items-center justify-between pl-5 pr-3 py-5`}
+        className={`bg-[#5F79F1] text-white flex items-center justify-between px-3 py-2`}
       >
         <div className="flex items-center gap-x-3">
           <div className="flex items-center justify-center mt-1">
@@ -101,7 +99,7 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
             />
           </div>
           <div className="leading-5">
-            <h3 className="font-bold text-lg leading-5">OneVault Bot</h3>
+            <h3 className="font-bold text-lg">OneVault Bot</h3>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <span className="text-xs text-green-100">Online</span>
@@ -177,7 +175,7 @@ const Chatroom = ({ isVisible }: ChatroomProps) => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your message here..."
-                  className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#5F79F1] focus:border-transparent resize-none placeholder:text-gray-500 text-gray-500"
+                  className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#5F79F1] focus:border-transparent resize-none"
                   rows={1}
                 />
               </div>

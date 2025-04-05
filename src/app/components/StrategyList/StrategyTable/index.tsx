@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { getRiskColor } from "@/app/utils";
+import { useChat } from "@/app/contexts/ChatContext";
 
 interface StrategyTableProps {
   strategies: Array<{
@@ -22,6 +23,7 @@ interface StrategyTableProps {
 
 export default function StrategyTable({ strategies }: StrategyTableProps) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const { toggleChat } = useChat();
 
   // Sort strategies by APY
   const sortedStrategies = [...strategies].sort((a, b) => {
@@ -201,7 +203,10 @@ export default function StrategyTable({ strategies }: StrategyTableProps) {
                   <button className="bg-[#5F79F1] text-white px-3 py-1.5 rounded-sm font-medium">
                     Deposit
                   </button>
-                  <button className="bg-[#5F79F1] text-white px-3 py-1.5 rounded-sm font-medium">
+                  <button
+                    onClick={toggleChat}
+                    className="bg-[#5F79F1] text-white px-3 py-1.5 rounded-sm font-medium"
+                  >
                     Ask AI
                   </button>
                 </div>
