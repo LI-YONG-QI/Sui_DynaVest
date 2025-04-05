@@ -1,3 +1,6 @@
+## Important notice
+This repository was strictly developed within the official hackathon timeframe. All commits reflect real-time progress during the event. No pre-hackathon development was involved. Please check commits details for a comprehensive understanding of the development process.
+
 # DynaVest
 
 Introducing DynaVest, Your DeFAI Agent – an intelligent, fully autonomous system designed to execute, optimize, and adapt DeFi strategies based on your unique risk profile. With a user-friendly interface, it empowers you to interact effortlessly with DeFi protocols while staying up-to-date on the latest trends and insights in real time.
