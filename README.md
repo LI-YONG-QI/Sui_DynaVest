@@ -5,6 +5,9 @@ This repository was strictly developed within the official hackathon timeframe. 
 
 Introducing DynaVest, Your DeFAI Agent – an intelligent, fully autonomous system designed to execute, optimize, and adapt DeFi strategies based on your unique risk profile. With a user-friendly interface, it empowers you to interact effortlessly with DeFi protocols while staying up-to-date on the latest trends and insights in real time.
 
+# Contract Code
+https://github.com/LI-YONG-QI/agentic-hack
+
 # Deployments
 
 ## Celo
