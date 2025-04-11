@@ -5,6 +5,7 @@ import {
   Manrope,
   Plus_Jakarta_Sans,
   Poppins,
+  Bricolage_Grotesque,
 } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -44,6 +45,12 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-bricolage-grotesque",
+});
+
 export const metadata: Metadata = {
   title: "OneVault - DeFi Investment Made Easy",
   description: "Make DeFi investment easy and simple with OneVault AI",
@@ -57,7 +64,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${lilyScript.variable} ${dmSans.variable} ${inter.variable} ${manrope.variable} ${plusJakarta.variable} ${poppins.variable} antialiased`}
+        className={`${lilyScript.variable} ${dmSans.variable} ${inter.variable} ${manrope.variable} ${plusJakarta.variable} ${poppins.variable} ${bricolageGrotesque.variable} antialiased`}
       >
         <ChatProvider>
           <Providers>
