@@ -9,7 +9,8 @@ import { parseUnits } from "viem";
 
 import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
-import type { Token } from "../index";
+import type { Token } from "@/app/utils/types";
+import useCurrency from "@/app/hooks/useCurrency";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export default function InvestModal({
 }: InvestModalProps) {
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
-  const [currency, setCurrency] = useState<Token>(strategy.tokens[0]);
+  // const [currency, setCurrency] = useState<Token>(strategy.tokens[0]);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [orderHash, setOrderHash] = useState<string | null>(null);
@@ -49,13 +50,12 @@ export default function InvestModal({
   const [swapError, setSwapError] = useState<string | null>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { address: user } = useAccount();
-
   const { wallets } = useWallets();
-
   const chainId = useChainId();
   const [isSupportedChain, setIsSupportedChain] = useState<boolean>(false);
+  const { currency, setCurrency, balance } = useCurrency(strategy.tokens);
 
-  const maxBalance = 100.0; // TODO: use real value
+  const maxBalance = balance;
 
   // Reset closing state when modal opens
   useEffect(() => {

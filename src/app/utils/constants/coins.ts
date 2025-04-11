@@ -1,4 +1,4 @@
-import { celo, base } from "viem/chains";
+import { base } from "viem/chains";
 import type { Token } from "../types";
 
 export const USDT: Token = {
@@ -7,7 +7,7 @@ export const USDT: Token = {
   decimals: 6,
   isNativeToken: false,
   chains: {
-    [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    [base.id]: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
   },
 };
 
@@ -17,7 +17,6 @@ export const USDC: Token = {
   decimals: 6,
   isNativeToken: false,
   chains: {
-    [celo.id]: "0x471EcE3750Da237f93B8E339c536989b89d2Fb44",
     [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   },
 };
@@ -28,7 +27,6 @@ export const CELO: Token = {
   decimals: 18,
   isNativeToken: false,
   chains: {
-    [celo.id]: "0x471EcE3750Da237f93B8E339c536989b89d2Fb44",
     [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   },
 };
@@ -39,7 +37,6 @@ export const FLOW: Token = {
   decimals: 18,
   isNativeToken: false,
   chains: {
-    [celo.id]: "0x471EcE3750Da237f93B8E339c536989b89d2Fb44",
     [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   },
 };
@@ -50,7 +47,6 @@ export const cEUR: Token = {
   decimals: 18,
   isNativeToken: false,
   chains: {
-    [celo.id]: "0x471EcE3750Da237f93B8E339c536989b89d2Fb44",
     [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   },
 };
