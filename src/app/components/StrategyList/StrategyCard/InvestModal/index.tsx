@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useAccount, useChainId } from "wagmi";
-import { useWallets } from "@privy-io/react-auth";
 import { toast } from "react-toastify";
 import { parseUnits } from "viem";
 
@@ -11,6 +10,7 @@ import { getRiskColor } from "@/app/utils";
 import { getStrategy } from "@/app/utils/strategies";
 import type { Token } from "@/app/utils/types";
 import useCurrency from "@/app/hooks/useCurrency";
+import useSwitchChain from "@/app/hooks/useSwitchChain";
 
 interface InvestModalProps {
   isOpen: boolean;
@@ -42,18 +42,20 @@ export default function InvestModal({
 }: InvestModalProps) {
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
-  // const [currency, setCurrency] = useState<Token>(strategy.tokens[0]);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [orderHash, setOrderHash] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [swapError, setSwapError] = useState<string | null>(null);
+
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { address: user } = useAccount();
-  const { wallets } = useWallets();
   const chainId = useChainId();
-  const [isSupportedChain, setIsSupportedChain] = useState<boolean>(false);
   const { currency, setCurrency, balance } = useCurrency(strategy.tokens);
+  const { handleSwitchChain, isSupportedChain } = useSwitchChain(
+    strategy.chainId
+  );
 
   const maxBalance = balance;
 
@@ -63,14 +65,6 @@ export default function InvestModal({
       setIsClosing(false);
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (chainId === strategy.chainId) {
-      setIsSupportedChain(true);
-    } else {
-      setIsSupportedChain(false);
-    }
-  }, [chainId]);
 
   // Handle setting max amount
   const handleSetMax = () => {
@@ -84,19 +78,6 @@ export default function InvestModal({
       onClose();
       setIsClosing(false);
     }, 300); // Match this with the CSS transition duration
-  };
-
-  const handleSwitchChain = async () => {
-    try {
-      const wallet = wallets[0];
-      await wallet.switchChain(strategy.chainId);
-
-      toast.success(`Switched chain to ${strategy.chainId}`);
-
-      setIsSupportedChain(true);
-    } catch (error: any) {
-      console.error("Failed to switch chain:", error);
-    }
   };
 
   // Handle investment submission
