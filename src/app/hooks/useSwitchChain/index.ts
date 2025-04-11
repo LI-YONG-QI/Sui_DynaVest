@@ -14,8 +14,6 @@ export default function useSwitchChain(targetChainId: number) {
       await wallet.switchChain(targetChainId);
 
       toast.success(`Switched chain to ${targetChainId}`);
-
-      setIsSupportedChain(true);
     } catch (error: unknown) {
       console.error("Failed to switch chain:", error);
     }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { MoonLoader } from "react-spinners";
 
 import { getRiskColor } from "@/app/utils";
 import type { InvestStrategy } from "@/app/utils/types";
@@ -32,12 +33,14 @@ export default function InvestModal({
   const [swapError, setSwapError] = useState<string | null>(null);
 
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { isSupportedChain } = useSwitchChain(strategy.chainId);
   const {
     currency,
     setCurrency,
     balance: maxBalance,
+    isLoadingBalance,
   } = useCurrency(strategy.tokens);
-  const { isSupportedChain } = useSwitchChain(strategy.chainId);
 
   // Reset closing state when modal opens
   useEffect(() => {
@@ -45,6 +48,10 @@ export default function InvestModal({
       setIsClosing(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    setAmount("");
+  }, [currency]);
 
   // Handle setting max amount
   const handleSetMax = () => {
@@ -278,17 +285,25 @@ export default function InvestModal({
                       </div>
                     </div>
                     <div className="flex items-center px-4 pb-2">
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-500">
-                          Balance:{" "}
-                          {isSupportedChain ? maxBalance.toFixed(2) : "NaN"}{" "}
-                          {currency.name}
+                      <div className="flex items-center w-full">
+                        <span className="flex items-center  gap-2 text-sm text-gray-500">
+                          <span>Balance: </span>
+                          <div>
+                            {isLoadingBalance ? (
+                              <MoonLoader size={10} />
+                            ) : isSupportedChain ? (
+                              maxBalance.toFixed(2)
+                            ) : (
+                              "NaN"
+                            )}
+                          </div>
+                          <span>{currency.name}</span>
                         </span>
                         <button
                           type="button"
                           onClick={handleSetMax}
-                          disabled={!isSupportedChain}
-                          className="text-sm font-medium text-[#5F79F1] hover:text-[#4A64DC] focus:outline-none ml-1 border-0 bg-transparent cursor-pointer"
+                          disabled={!isSupportedChain || isLoadingBalance}
+                          className="text-sm font-medium text-[#5F79F1] hover:text-[#4A64DC] focus:outline-none ml-2 border-0 bg-transparent cursor-pointer disabled:opacity-50"
                         >
                           MAX
                         </button>

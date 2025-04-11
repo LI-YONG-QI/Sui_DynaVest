@@ -1,4 +1,4 @@
-import { celo, flowMainnet } from "viem/chains";
+import { celo, flowMainnet, base } from "viem/chains";
 
 import { USDC, USDT, CELO, FLOW, cEUR } from "./coins";
 import type { StrategyMetadata } from "../types";
@@ -19,7 +19,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
     tokens: [USDT, USDC],
-    chainId: 8453,
+    chainId: base.id,
     displayInsufficientBalance: true, // TODO: review hardcoded data
   },
 
@@ -38,7 +38,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     externalLink: "https://compound.finance",
     learnMoreLink: "https://compound.finance",
     tokens: [USDT, USDC],
-    chainId: 8453,
+    chainId: base.id,
   },
   {
     title: "AAVE Lending Strategy",

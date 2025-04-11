@@ -11,28 +11,35 @@ export default function useCurrency(tokens: Token[]) {
   const chainId = useChainId();
   const [currency, setCurrency] = useState<Token>(tokens[0]);
   const [balance, setBalance] = useState<number>(0);
+  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
+
+  const fetchBalance = async () => {
+    if (user) {
+      try {
+        setIsLoadingBalance(true);
+        setBalance(0);
+
+        const params = {
+          address: user,
+          ...(currency.isNativeToken
+            ? {}
+            : { token: currency.chains?.[chainId] }),
+        };
+
+        const { value, decimals } = await getBalance(config, params);
+        setBalance(Number(formatUnits(value, decimals)));
+      } catch (error) {
+        console.error("Error fetching balance:", error);
+        setBalance(0);
+      } finally {
+        setIsLoadingBalance(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchBalance = async () => {
-      if (user) {
-        try {
-          const params = {
-            address: user,
-            ...(currency.isNativeToken
-              ? {}
-              : { token: currency.chains?.[chainId] }),
-          };
-
-          const { value, decimals } = await getBalance(config, params);
-          setBalance(Number(formatUnits(value, decimals)));
-        } catch (error) {
-          console.error("Error fetching balance:", error);
-        }
-      }
-    };
-
     fetchBalance();
   }, [user, chainId, currency]);
 
-  return { currency, setCurrency, balance };
+  return { currency, setCurrency, balance, fetchBalance, isLoadingBalance };
 }
