@@ -4,15 +4,18 @@ import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { BaseStrategy } from "./base";
 import { wagmiConfig as config } from "@/providers/config";
 import { STAKED_CELO_ABI } from "@/app/abis/stakeCelo";
+import {
+  StCeloSupportedChains,
+  ST_CELO_CONTRACTS,
+} from "../constants/protocols";
 
 export class StCeloStrategy extends BaseStrategy {
   public manager: Address;
 
-  constructor(chainId: number) {
+  constructor(chainId: StCeloSupportedChains) {
     super(chainId);
 
-    // TODO: by chain config (celo mainnet by default)
-    this.manager = "0x0239b96D10a434a56CC9E09383077A0490cF9398";
+    this.manager = ST_CELO_CONTRACTS[chainId].manager;
   }
 
   async execute(user: Address, amount: bigint) {
