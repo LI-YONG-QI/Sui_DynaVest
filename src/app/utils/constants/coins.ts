@@ -1,4 +1,4 @@
-import { base } from "viem/chains";
+import { base, celo } from "viem/chains";
 import type { Token } from "../types";
 
 export const USDT: Token = {
@@ -27,7 +27,7 @@ export const CELO: Token = {
   decimals: 18,
   isNativeToken: false,
   chains: {
-    [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    [celo.id]: "0x471EcE3750Da237f93B8E339c536989b8978a438",
   },
 };
 
@@ -35,10 +35,7 @@ export const FLOW: Token = {
   name: "FLOW",
   icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
   decimals: 18,
-  isNativeToken: false,
-  chains: {
-    [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-  },
+  isNativeToken: true,
 };
 
 export const cEUR: Token = {
@@ -47,6 +44,6 @@ export const cEUR: Token = {
   decimals: 18,
   isNativeToken: false,
   chains: {
-    [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    [celo.id]: "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73",
   },
 };
