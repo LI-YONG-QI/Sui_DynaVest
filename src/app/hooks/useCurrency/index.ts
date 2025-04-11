@@ -16,11 +16,14 @@ export default function useCurrency(tokens: Token[]) {
     const fetchBalance = async () => {
       if (user) {
         try {
-          const { value, decimals } = await getBalance(config, {
+          const params = {
             address: user,
-            token: currency.chains?.[chainId],
-          });
+            ...(currency.isNativeToken
+              ? {}
+              : { token: currency.chains?.[chainId] }),
+          };
 
+          const { value, decimals } = await getBalance(config, params);
           setBalance(Number(formatUnits(value, decimals)));
         } catch (error) {
           console.error("Error fetching balance:", error);
