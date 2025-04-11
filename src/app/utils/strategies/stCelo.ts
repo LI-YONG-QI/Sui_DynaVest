@@ -11,7 +11,7 @@ export class StCeloStrategy extends BaseStrategy {
   constructor(chainId: number) {
     super(chainId);
 
-    // TODO: by chain config
+    // TODO: by chain config (celo mainnet by default)
     this.manager = "0x0239b96D10a434a56CC9E09383077A0490cF9398";
   }
 
