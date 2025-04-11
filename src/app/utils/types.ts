@@ -28,6 +28,23 @@ export type StrategyMetadata = {
   displayInsufficientBalance?: boolean;
 };
 
+export type InvestStrategy = {
+  title: string;
+  apy: number;
+  risk: {
+    level: "Low" | "Medium" | "High";
+    color: string;
+    bgColor: string;
+  };
+  protocol: string;
+  description: string;
+  image: string;
+  externalLink?: string;
+  learnMoreLink?: string;
+  chainId: number;
+  tokens: Token[];
+};
+
 export type Token = {
   name: string;
   icon: string;

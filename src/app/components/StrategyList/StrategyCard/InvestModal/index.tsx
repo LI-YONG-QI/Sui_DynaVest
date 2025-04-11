@@ -2,35 +2,17 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useAccount, useChainId } from "wagmi";
-import { toast } from "react-toastify";
-import { parseUnits } from "viem";
 
 import { getRiskColor } from "@/app/utils";
-import { getStrategy } from "@/app/utils/strategies";
-import type { Token } from "@/app/utils/types";
+import type { InvestStrategy } from "@/app/utils/types";
 import useCurrency from "@/app/hooks/useCurrency";
 import useSwitchChain from "@/app/hooks/useSwitchChain";
+import InvestModalButton from "./button";
 
 interface InvestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  strategy: {
-    title: string;
-    apy: number;
-    risk: {
-      level: "Low" | "Medium" | "High";
-      color: string;
-      bgColor: string;
-    };
-    protocol: string;
-    description: string;
-    image: string;
-    externalLink?: string;
-    learnMoreLink?: string;
-    chainId: number;
-    tokens: Token[];
-  };
+  strategy: InvestStrategy;
   displayInsufficientBalance?: boolean;
 }
 
@@ -50,16 +32,12 @@ export default function InvestModal({
   const [swapError, setSwapError] = useState<string | null>(null);
 
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { address: user } = useAccount();
-  const chainId = useChainId();
-  const { currency, setCurrency, balance } = useCurrency(strategy.tokens);
   const {
-    handleSwitchChain,
-    isSupportedChain,
-    ready: isWalletReady,
-  } = useSwitchChain(strategy.chainId);
-
-  const maxBalance = balance;
+    currency,
+    setCurrency,
+    balance: maxBalance,
+  } = useCurrency(strategy.tokens);
+  const { isSupportedChain } = useSwitchChain(strategy.chainId);
 
   // Reset closing state when modal opens
   useEffect(() => {
@@ -80,23 +58,6 @@ export default function InvestModal({
       onClose();
       setIsClosing(false);
     }, 300); // Match this with the CSS transition duration
-  };
-
-  // Handle investment submission
-  const handleInvest = async () => {
-    if (user) {
-      const strategyHandler = getStrategy(strategy.protocol, chainId);
-      const parsedAmount = parseUnits(amount, currency.decimals);
-
-      try {
-        const result = await strategyHandler.execute(user, parsedAmount);
-        toast.success(`Investment successful! ${result}`);
-
-        handleClose();
-      } catch (error) {
-        toast.error("Investment failed!");
-      }
-    }
   };
 
   // Handle swap submission
@@ -319,11 +280,14 @@ export default function InvestModal({
                     <div className="flex items-center px-4 pb-2">
                       <div className="flex items-center">
                         <span className="text-sm text-gray-500">
-                          Balance: {maxBalance.toFixed(2)} {currency.name}
+                          Balance:{" "}
+                          {isSupportedChain ? maxBalance.toFixed(2) : "NaN"}{" "}
+                          {currency.name}
                         </span>
                         <button
                           type="button"
                           onClick={handleSetMax}
+                          disabled={!isSupportedChain}
                           className="text-sm font-medium text-[#5F79F1] hover:text-[#4A64DC] focus:outline-none ml-1 border-0 bg-transparent cursor-pointer"
                         >
                           MAX
@@ -332,24 +296,12 @@ export default function InvestModal({
                     </div>
                   </div>
                   {/* Invest button */}
-                  {isWalletReady ? (
-                    <button
-                      type="button"
-                      onClick={
-                        isSupportedChain ? handleInvest : handleSwitchChain
-                      }
-                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                    >
-                      {isSupportedChain ? "Invest" : "Switch Chain"}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                    >
-                      Loading...
-                    </button>
-                  )}
+                  <InvestModalButton
+                    currency={currency}
+                    strategy={strategy}
+                    amount={amount}
+                    handleClose={handleClose}
+                  />
                 </div>
               )}
             </div>
