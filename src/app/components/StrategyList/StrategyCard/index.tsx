@@ -1,14 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { getRiskColor } from "@/app/utils";
-import InvestModal from "./InvestModal";
 
-export type Token = {
-  name: string;
-  icon: string;
-  decimals: number;
-};
+import InvestModal from "./InvestModal";
+import { getRiskColor } from "@/app/utils";
+import type { Token } from "@/app/utils/types";
 
 interface StrategyCardProps {
   title: string;

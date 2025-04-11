@@ -10,6 +10,7 @@ import { useChat } from "@/app/contexts/ChatContext";
 const Chatroom = () => {
   const { showChat } = useChat();
   const [isMinimized, setIsMinimized] = useState(false);
+
   // TODO: review the content for welcoming message.
   const [messages, setMessages] = useState<Message[]>([
     {

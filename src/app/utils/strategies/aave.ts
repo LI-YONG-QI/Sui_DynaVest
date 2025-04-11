@@ -7,6 +7,10 @@ import { ERC20_ABI, ERC20_PERMIT_ABI } from "@/app/abis";
 import { PERMIT_TYPES } from "@/app/utils/types";
 import { PERMIT_EXPIRY } from "../constants";
 import { BaseStrategy } from "./base";
+import {
+  AAVE_CONTRACTS,
+  AaveSupportedChains,
+} from "../constants/protocols/";
 
 interface SupplyParams {
   user: Address;
@@ -14,21 +18,6 @@ interface SupplyParams {
   deadline: string;
   signature: Hex;
 }
-
-export type AaveSupportedChains = 42220;
-
-const AAVE_STRATEGY_CONTRACTS: Record<
-  AaveSupportedChains,
-  {
-    executor: Address;
-    supplyAssets: Address;
-  }
-> = {
-  42220: {
-    executor: "0x2A386Fb9e19D201A1dAF875fcD5c934c06265b65",
-    supplyAssets: "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73",
-  },
-};
 
 export class AaveV3Strategy extends BaseStrategy {
   public executor: Address;
@@ -38,8 +27,8 @@ export class AaveV3Strategy extends BaseStrategy {
   constructor(chainId: AaveSupportedChains) {
     super(chainId);
 
-    this.executor = AAVE_STRATEGY_CONTRACTS[chainId].executor;
-    this.supplyAsset = AAVE_STRATEGY_CONTRACTS[chainId].supplyAssets;
+    this.executor = AAVE_CONTRACTS[chainId].executor;
+    this.supplyAsset = AAVE_CONTRACTS[chainId].supplyAssets;
     this.permitExpiry = PERMIT_EXPIRY;
   }
 

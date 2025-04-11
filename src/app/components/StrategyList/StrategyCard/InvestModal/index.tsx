@@ -2,34 +2,18 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useAccount, useChainId } from "wagmi";
-import { useWallets } from "@privy-io/react-auth";
-import { toast } from "react-toastify";
-import { parseUnits } from "viem";
+import { MoonLoader } from "react-spinners";
 
 import { getRiskColor } from "@/app/utils";
-import { getStrategy } from "@/app/utils/strategies";
-import type { Token } from "../index";
+import type { InvestStrategy } from "@/app/utils/types";
+import useCurrency from "@/app/hooks/useCurrency";
+import useSwitchChain from "@/app/hooks/useSwitchChain";
+import InvestModalButton from "./button";
 
 interface InvestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  strategy: {
-    title: string;
-    apy: number;
-    risk: {
-      level: "Low" | "Medium" | "High";
-      color: string;
-      bgColor: string;
-    };
-    protocol: string;
-    description: string;
-    image: string;
-    externalLink?: string;
-    learnMoreLink?: string;
-    chainId: number;
-    tokens: Token[];
-  };
+  strategy: InvestStrategy;
   displayInsufficientBalance?: boolean;
 }
 
@@ -41,21 +25,22 @@ export default function InvestModal({
 }: InvestModalProps) {
   const [amount, setAmount] = useState<string>("");
   const [isClosing, setIsClosing] = useState(false);
-  const [currency, setCurrency] = useState<Token>(strategy.tokens[0]);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [orderHash, setOrderHash] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [swapError, setSwapError] = useState<string | null>(null);
+
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { address: user } = useAccount();
 
-  const { wallets } = useWallets();
-
-  const chainId = useChainId();
-  const [isSupportedChain, setIsSupportedChain] = useState<boolean>(false);
-
-  const maxBalance = 100.0; // TODO: use real value
+  const { isSupportedChain } = useSwitchChain(strategy.chainId);
+  const {
+    currency,
+    setCurrency,
+    balance: maxBalance,
+    isLoadingBalance,
+  } = useCurrency(strategy.tokens);
 
   // Reset closing state when modal opens
   useEffect(() => {
@@ -65,12 +50,8 @@ export default function InvestModal({
   }, [isOpen]);
 
   useEffect(() => {
-    if (chainId === strategy.chainId) {
-      setIsSupportedChain(true);
-    } else {
-      setIsSupportedChain(false);
-    }
-  }, [chainId]);
+    setAmount("");
+  }, [currency]);
 
   // Handle setting max amount
   const handleSetMax = () => {
@@ -84,36 +65,6 @@ export default function InvestModal({
       onClose();
       setIsClosing(false);
     }, 300); // Match this with the CSS transition duration
-  };
-
-  const handleSwitchChain = async () => {
-    try {
-      const wallet = wallets[0];
-      await wallet.switchChain(strategy.chainId);
-
-      toast.success(`Switched chain to ${strategy.chainId}`);
-
-      setIsSupportedChain(true);
-    } catch (error: any) {
-      console.error("Failed to switch chain:", error);
-    }
-  };
-
-  // Handle investment submission
-  const handleInvest = async () => {
-    if (user) {
-      const strategyHandler = getStrategy(strategy.protocol, chainId);
-      const parsedAmount = parseUnits(amount, currency.decimals);
-
-      try {
-        const result = await strategyHandler.execute(user, parsedAmount);
-        toast.success(`Investment successful! ${result}`);
-
-        handleClose();
-      } catch (error) {
-        toast.error("Investment failed!");
-      }
-    }
   };
 
   // Handle swap submission
@@ -334,14 +285,25 @@ export default function InvestModal({
                       </div>
                     </div>
                     <div className="flex items-center px-4 pb-2">
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-500">
-                          Balance: {maxBalance.toFixed(2)} {currency.name}
+                      <div className="flex items-center w-full">
+                        <span className="flex items-center  gap-2 text-sm text-gray-500">
+                          <span>Balance: </span>
+                          <div>
+                            {isLoadingBalance ? (
+                              <MoonLoader size={10} />
+                            ) : isSupportedChain ? (
+                              maxBalance.toFixed(2)
+                            ) : (
+                              "NaN"
+                            )}
+                          </div>
+                          <span>{currency.name}</span>
                         </span>
                         <button
                           type="button"
                           onClick={handleSetMax}
-                          className="text-sm font-medium text-[#5F79F1] hover:text-[#4A64DC] focus:outline-none ml-1 border-0 bg-transparent cursor-pointer"
+                          disabled={!isSupportedChain || isLoadingBalance}
+                          className="text-sm font-medium text-[#5F79F1] hover:text-[#4A64DC] focus:outline-none ml-2 border-0 bg-transparent cursor-pointer disabled:opacity-50"
                         >
                           MAX
                         </button>
@@ -349,15 +311,12 @@ export default function InvestModal({
                     </div>
                   </div>
                   {/* Invest button */}
-                  <button
-                    type="button"
-                    onClick={
-                      isSupportedChain ? handleInvest : handleSwitchChain
-                    }
-                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                  >
-                    {isSupportedChain ? "Invest" : "Switch Chain"}
-                  </button>
+                  <InvestModalButton
+                    currency={currency}
+                    strategy={strategy}
+                    amount={amount}
+                    handleClose={handleClose}
+                  />
                 </div>
               )}
             </div>
