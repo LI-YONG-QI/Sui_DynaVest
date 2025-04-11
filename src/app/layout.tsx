@@ -68,7 +68,12 @@ export default function RootLayout({
       >
         <ChatProvider>
           <Providers>
-            <div className="bg-gradient-to-br from-[#E6F2FB] via-[#ECE6FB] to-[#E6F2FB]">
+            <div
+              style={{
+                background:
+                  "linear-gradient(-59.08deg, #E6F2FB 0%, #EBE7FB 55%, #E6F2FB 100%)",
+              }}
+            >
               <div className="min-h-screen mx-auto">
                 <Header />
                 <div className="pt-10 max-w-7xl mx-auto px-20">{children}</div>
