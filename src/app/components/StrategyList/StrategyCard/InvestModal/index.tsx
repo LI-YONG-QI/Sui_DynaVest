@@ -53,9 +53,11 @@ export default function InvestModal({
   const { address: user } = useAccount();
   const chainId = useChainId();
   const { currency, setCurrency, balance } = useCurrency(strategy.tokens);
-  const { handleSwitchChain, isSupportedChain } = useSwitchChain(
-    strategy.chainId
-  );
+  const {
+    handleSwitchChain,
+    isSupportedChain,
+    ready: isWalletReady,
+  } = useSwitchChain(strategy.chainId);
 
   const maxBalance = balance;
 
@@ -330,15 +332,24 @@ export default function InvestModal({
                     </div>
                   </div>
                   {/* Invest button */}
-                  <button
-                    type="button"
-                    onClick={
-                      isSupportedChain ? handleInvest : handleSwitchChain
-                    }
-                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                  >
-                    {isSupportedChain ? "Invest" : "Switch Chain"}
-                  </button>
+                  {isWalletReady ? (
+                    <button
+                      type="button"
+                      onClick={
+                        isSupportedChain ? handleInvest : handleSwitchChain
+                      }
+                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    >
+                      {isSupportedChain ? "Invest" : "Switch Chain"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    >
+                      Loading...
+                    </button>
+                  )}
                 </div>
               )}
             </div>

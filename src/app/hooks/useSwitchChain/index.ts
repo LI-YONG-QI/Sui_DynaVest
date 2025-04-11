@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useChainId } from "wagmi";
 
 export default function useSwitchChain(targetChainId: number) {
-  const { wallets } = useWallets();
+  const { wallets, ready } = useWallets();
   const chainId = useChainId();
   const [isSupportedChain, setIsSupportedChain] = useState<boolean>(false);
 
@@ -27,7 +27,7 @@ export default function useSwitchChain(targetChainId: number) {
     } else {
       setIsSupportedChain(false);
     }
-  }, [chainId, targetChainId]);
+  }, [chainId, targetChainId, ready]);
 
-  return { handleSwitchChain, isSupportedChain };
+  return { handleSwitchChain, isSupportedChain, ready };
 }

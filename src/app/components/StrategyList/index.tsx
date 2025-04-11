@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { ToastContainer } from "react-toastify";
+import { useState, useMemo, useRef } from "react";
 
 import StrategyCard from "./StrategyCard";
-import { useState, useMemo, useRef } from "react";
 import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
