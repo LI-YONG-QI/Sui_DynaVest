@@ -17,6 +17,11 @@ import { AnkrFlowStrategy } from "./ankrFlow";
 import { FlowStrategy } from "./flow";
 import { KittyStrategy } from "./kitty";
 import { StCeloStrategy } from "./stCelo";
+import {
+  MORPHO_CONTRACTS,
+  MorphoSupportedChains,
+} from "../constants/protocols/morpho";
+import { MorphoSupplyingStrategy } from "./morpho";
 
 // Helper function to validate if chainId is supported for a specific protocol
 function isChainIdSupported(protocol: string, chainId: number): boolean {
@@ -32,6 +37,8 @@ function isChainIdSupported(protocol: string, chainId: number): boolean {
       return Object.keys(KITTY_CONTRACTS).map(Number).includes(chainId);
     case "Flow":
       return chainId === flowMainnet.id; // Flow only supports flowMainnet for now
+    case "Morpho":
+      return Object.keys(MORPHO_CONTRACTS).map(Number).includes(chainId);
     default:
       return false;
   }
@@ -54,6 +61,8 @@ export function getStrategy(protocol: string, chainId: number) {
       return new KittyStrategy(chainId as KittySupportedChains);
     case "Flow":
       return new FlowStrategy(chainId);
+    case "Morpho":
+      return new MorphoSupplyingStrategy(chainId as MorphoSupportedChains);
     default:
       throw new Error("Unsupported protocol");
   }

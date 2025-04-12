@@ -1,0 +1,85 @@
+import { Address, Hex } from "viem";
+import { signTypedData } from "@wagmi/core";
+import { ERC20_PERMIT_ABI } from "@/app/abis";
+import { PERMIT_TYPES } from "@/app/utils/types";
+
+import { BaseStrategy } from "./base";
+import { PERMIT_EXPIRY, USDC } from "../constants";
+import {
+  MORPHO_CONTRACTS,
+  MorphoSupportedChains,
+} from "../constants/protocols/morpho";
+
+import { readContract } from "@wagmi/core";
+import { wagmiConfig as config } from "@/providers/config";
+import { DYNAVEST_CONTRACTS } from "../constants/protocols/dynaVest";
+
+export interface MorphoParams {
+  chainId: number;
+  user: Address;
+  amount: string;
+  deadline: string;
+  signature: Hex;
+}
+
+export class MorphoSupplyingStrategy extends BaseStrategy {
+  public readonly morpho: Address;
+  public readonly executor: Address;
+
+  constructor(chainId: MorphoSupportedChains) {
+    super(chainId);
+
+    this.morpho = MORPHO_CONTRACTS[chainId].morpho;
+    this.executor = DYNAVEST_CONTRACTS[chainId].executor;
+  }
+
+  async execute(user: Address, amount: bigint): Promise<string> {
+    // TODO: mock usdc address
+    const usdc = USDC.chains![this.chainId];
+
+    const timestampInSeconds = Math.floor(Date.now() / 1000);
+    const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
+
+    const nonce = await readContract(config, {
+      abi: ERC20_PERMIT_ABI,
+      address: usdc,
+      functionName: "nonces",
+      args: [user!],
+    });
+
+    const signature = await signTypedData(config, {
+      domain: {
+        name: "USD Coin",
+        chainId: this.chainId,
+        verifyingContract: usdc,
+        version: "2",
+      },
+      types: PERMIT_TYPES,
+      primaryType: "Permit",
+      message: {
+        owner: user,
+        spender: this.executor,
+        value: amount,
+        nonce: nonce!,
+        deadline,
+      },
+    });
+
+    const body: MorphoParams = {
+      chainId: this.chainId,
+      user,
+      amount: amount.toString(),
+      deadline: deadline.toString(),
+      signature,
+    };
+
+    const response = await fetch("/api/morpho", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+
+    console.log(await response.json());
+
+    return "Success";
+  }
+}
