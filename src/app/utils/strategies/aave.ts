@@ -10,8 +10,8 @@ import { BaseStrategy } from "./base";
 import {
   AAVE_CONTRACTS,
   AaveSupportedChains,
+  DYNAVEST_CONTRACTS,
 } from "../constants/protocols/";
-
 interface SupplyParams {
   user: Address;
   amount: string;
@@ -27,7 +27,7 @@ export class AaveV3Strategy extends BaseStrategy {
   constructor(chainId: AaveSupportedChains) {
     super(chainId);
 
-    this.executor = AAVE_CONTRACTS[chainId].executor;
+    this.executor = DYNAVEST_CONTRACTS[chainId].executor;
     this.supplyAsset = AAVE_CONTRACTS[chainId].supplyAssets;
     this.permitExpiry = PERMIT_EXPIRY;
   }

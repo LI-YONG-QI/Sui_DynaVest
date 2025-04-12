@@ -1,38 +1,24 @@
 import "server-only";
 
-import {
-  Address,
-  encodeFunctionData,
-  extractChain,
-  Hex,
-  parseSignature,
-  toHex,
-} from "viem";
-import { base } from "viem/chains";
+import { Address, encodeFunctionData, Hex, parseSignature, toHex } from "viem";
 import { readContract } from "@wagmi/core";
+import { base } from "viem/chains";
 
-import {
-  ERC20_ABI,
-  ERC20_PERMIT_ABI,
-  EXECUTOR_ABI,
-  MORPHO_ABI,
-} from "@/app/abis";
-import type { Call, ExecutionResult } from "./types";
+import { ERC20_ABI, ERC20_PERMIT_ABI, MORPHO_ABI } from "@/app/abis";
+import type { Call } from "./types";
 import {
   MORPHO_CONTRACTS,
   MorphoSupportedChains,
-  DYNAVEST_CONTRACTS,
 } from "@/app/utils/constants/protocols";
 import { USDC } from "@/app/utils/constants";
 import { wagmiConfig as config } from "@/providers/config";
-import { getAdminWallet } from "./utils";
+import { BaseStrategy } from "./base";
 
-export class MorphoSupplyingStrategy {
-  private readonly executor: Address;
+export class MorphoSupplyingStrategy extends BaseStrategy {
   private readonly morpho: Address;
 
-  constructor(private readonly chainId: MorphoSupportedChains) {
-    this.executor = DYNAVEST_CONTRACTS[chainId].executor;
+  constructor(chainId: MorphoSupportedChains) {
+    super(chainId);
     this.morpho = MORPHO_CONTRACTS[chainId].morpho;
   }
 
@@ -104,23 +90,6 @@ export class MorphoSupplyingStrategy {
     }
 
     return calls;
-  }
-
-  async multiCall(user: Address, calls: Call[]): Promise<ExecutionResult> {
-    const chain = extractChain({ chains: [base], id: this.chainId });
-    const adminWallet = getAdminWallet(chain);
-
-    const tx = await adminWallet.writeContract({
-      abi: EXECUTOR_ABI,
-      address: this.executor,
-      functionName: "execute",
-      args: [calls, user],
-    });
-
-    return {
-      success: true,
-      message: `Success!! Transaction Hash: ${tx}`,
-    };
   }
 
   private async getMarketParams(marketId: Hex) {
