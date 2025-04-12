@@ -10,26 +10,22 @@ import {
   KittySupportedChains,
 } from "../constants/protocols/kitty";
 
-export class KittyStrategy extends BaseStrategy {
+export class KittyStrategy extends BaseStrategy<KittySupportedChains> {
   public readonly kitty: Address;
-  public readonly ankrFLOW: Address;
 
-  constructor(chainId: KittySupportedChains) {
+  constructor(chainId: number) {
     super(chainId);
 
-    this.kitty = KITTY_CONTRACTS[chainId].kitty;
-    this.ankrFLOW = KITTY_CONTRACTS[chainId].ankrFLOW;
+    this.kitty = KITTY_CONTRACTS[this.chainId].kitty;
   }
 
-  async execute(user: Address, amount: bigint) {
+  async execute(user: Address, asset: Address, amount: bigint) {
     await writeContract(config, {
-      address: this.ankrFLOW,
+      address: asset,
       abi: ERC20_ABI,
       functionName: "approve",
       args: [this.kitty, amount],
     });
-
-    console.log("Approved Success");
 
     const result = await writeContract(config, {
       address: this.kitty,
@@ -41,5 +37,9 @@ export class KittyStrategy extends BaseStrategy {
     console.log(result);
 
     return "Kitty strategy executed successfully";
+  }
+
+  isSupported(chainId: number): boolean {
+    return Object.keys(KITTY_CONTRACTS).map(Number).includes(chainId);
   }
 }

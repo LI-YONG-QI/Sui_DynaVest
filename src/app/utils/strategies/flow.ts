@@ -1,11 +1,14 @@
 import { Address } from "viem";
+import { flowMainnet } from "viem/chains";
 
 import { BaseStrategy } from "./base";
 import { FLOW_STRATEGY_ABI } from "@/app/abis/flowStrategy";
 import { wagmiConfig as config } from "@/providers/config";
 import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 
-export class FlowStrategy extends BaseStrategy {
+type FlowSupportedChains = typeof flowMainnet.id;
+
+export class FlowStrategy extends BaseStrategy<FlowSupportedChains> {
   public readonly strategy: Address =
     "0xe6fe0766ff66b8768181b0f3f46e8e314f9277e0";
 
@@ -13,7 +16,11 @@ export class FlowStrategy extends BaseStrategy {
     super(chainId);
   }
 
-  async execute(user: Address, amount: bigint) {
+  async execute(
+    user: Address,
+    _asset: Address,
+    amount: bigint
+  ): Promise<string> {
     const result = await writeContract(config, {
       address: this.strategy,
       abi: FLOW_STRATEGY_ABI,
@@ -27,5 +34,9 @@ export class FlowStrategy extends BaseStrategy {
     });
 
     return result;
+  }
+
+  isSupported(chainId: number): boolean {
+    return chainId === flowMainnet.id;
   }
 }

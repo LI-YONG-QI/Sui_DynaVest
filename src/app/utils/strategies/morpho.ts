@@ -4,7 +4,7 @@ import { ERC20_PERMIT_ABI } from "@/app/abis";
 import { PERMIT_TYPES } from "@/app/utils/types";
 
 import { BaseStrategy } from "./base";
-import { PERMIT_EXPIRY, USDC } from "../constants";
+import { PERMIT_EXPIRY } from "../constants";
 import {
   MORPHO_CONTRACTS,
   MorphoSupportedChains,
@@ -33,16 +33,17 @@ export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains>
     this.executor = DYNAVEST_CONTRACTS[this.chainId].executor;
   }
 
-  async execute(user: Address, amount: bigint): Promise<string> {
-    // TODO: mock usdc address
-    const usdc = USDC.chains![this.chainId];
-
+  async execute(
+    user: Address,
+    asset: Address,
+    amount: bigint
+  ): Promise<string> {
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
 
     const nonce = await readContract(config, {
       abi: ERC20_PERMIT_ABI,
-      address: usdc,
+      address: asset,
       functionName: "nonces",
       args: [user!],
     });
@@ -51,7 +52,7 @@ export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains>
       domain: {
         name: "USD Coin",
         chainId: this.chainId,
-        verifyingContract: usdc,
+        verifyingContract: asset,
         version: "2",
       },
       types: PERMIT_TYPES,

@@ -8,13 +8,12 @@ import { ERC20_ABI, ERC20_PERMIT_ABI } from "../abis";
 
 export class AaveV3Strategy extends BaseStrategy {
   private readonly pool: Address;
-  private readonly supplyAssets: Address;
 
   constructor(chainId: AaveSupportedChains) {
     super(chainId);
 
     this.pool = AAVE_CONTRACTS[chainId].pool;
-    this.supplyAssets = AAVE_CONTRACTS[chainId].supplyAssets;
+    this.supplyAssets = AAVE_CONTRACTS[chainId].supplyAssets; // TODO: supply asset should be as parameter
   }
 
   async buildCalls(

@@ -11,7 +11,11 @@ export abstract class BaseStrategy<T extends number> {
     }
   }
 
-  abstract execute(user: Address, amount: bigint): Promise<string>;
+  abstract execute(
+    user: Address,
+    asset: Address,
+    amount: bigint
+  ): Promise<string>;
 
   abstract isSupported(chainId: number): boolean;
 }

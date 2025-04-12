@@ -21,31 +21,29 @@ interface SupplyParams {
 
 export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
   public executor: Address;
-  public supplyAsset: Address; // TODO: supply assert dynamically
   public permitExpiry: number;
 
   constructor(chainId: AaveSupportedChains) {
     super(chainId);
 
     this.executor = DYNAVEST_CONTRACTS[chainId].executor;
-    this.supplyAsset = AAVE_CONTRACTS[chainId].supplyAssets;
     this.permitExpiry = PERMIT_EXPIRY;
   }
 
-  async execute(user: Address, amount: bigint) {
+  async execute(user: Address, asset: Address, amount: bigint) {
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
 
     const nonce = await readContract(config, {
       abi: ERC20_PERMIT_ABI,
-      address: this.supplyAsset,
+      address: asset,
       functionName: "nonces",
       args: [user!],
     });
 
     const symbol = await readContract(config, {
       abi: ERC20_ABI,
-      address: this.supplyAsset,
+      address: asset,
       functionName: "symbol",
     });
 
@@ -53,7 +51,7 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
       domain: {
         name: symbol,
         chainId: this.chainId,
-        verifyingContract: this.supplyAsset,
+        verifyingContract: asset,
         version: "1",
       },
       types: PERMIT_TYPES,
