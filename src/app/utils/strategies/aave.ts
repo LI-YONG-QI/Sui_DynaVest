@@ -21,7 +21,7 @@ interface SupplyParams {
 
 export class AaveV3Strategy extends BaseStrategy {
   public executor: Address;
-  public supplyAsset: Address;
+  public supplyAsset: Address; // TODO: supply assert dynamically
   public permitExpiry: number;
 
   constructor(chainId: AaveSupportedChains) {

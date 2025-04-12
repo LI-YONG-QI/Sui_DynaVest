@@ -5,7 +5,25 @@ import type { StrategyMetadata } from "../types";
 
 export const STRATEGIES_METADATA: StrategyMetadata[] = [
   {
-    title: "Morpho Lending Strategy",
+    title: "1inch Swap",
+    apy: 2.4,
+    risk: {
+      level: "Low" as const,
+      color: "#10B981",
+      bgColor: "rgba(16, 185, 129, 0.3)",
+    },
+    protocol: "1inch",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/base.png",
+    externalLink: "https://morpho.org",
+    learnMoreLink: "https://morpho.org",
+    tokens: [USDT, USDC],
+    chainId: base.id,
+    displayInsufficientBalance: true, // TODO: review hardcoded data
+  },
+  {
+    title: "Morpho Supplying",
     apy: 2.4,
     risk: {
       level: "Low" as const,
@@ -20,9 +38,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     learnMoreLink: "https://morpho.org",
     tokens: [USDT, USDC],
     chainId: base.id,
-    displayInsufficientBalance: true, // TODO: review hardcoded data
   },
-
   {
     title: "Compound Yield",
     apy: 3.9,
