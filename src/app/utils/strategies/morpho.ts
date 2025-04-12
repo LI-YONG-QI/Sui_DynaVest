@@ -22,15 +22,15 @@ export interface MorphoParams {
   signature: Hex;
 }
 
-export class MorphoSupplyingStrategy extends BaseStrategy {
+export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains> {
   public readonly morpho: Address;
   public readonly executor: Address;
 
-  constructor(chainId: MorphoSupportedChains) {
+  constructor(chainId: number) {
     super(chainId);
 
-    this.morpho = MORPHO_CONTRACTS[chainId].morpho;
-    this.executor = DYNAVEST_CONTRACTS[chainId].executor;
+    this.morpho = MORPHO_CONTRACTS[this.chainId].morpho;
+    this.executor = DYNAVEST_CONTRACTS[this.chainId].executor;
   }
 
   async execute(user: Address, amount: bigint): Promise<string> {
@@ -81,5 +81,9 @@ export class MorphoSupplyingStrategy extends BaseStrategy {
     console.log(await response.json());
 
     return "Success";
+  }
+
+  isSupported(chainId: number): boolean {
+    return Object.keys(MORPHO_CONTRACTS).map(Number).includes(chainId);
   }
 }

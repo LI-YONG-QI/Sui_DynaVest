@@ -19,7 +19,7 @@ interface SupplyParams {
   signature: Hex;
 }
 
-export class AaveV3Strategy extends BaseStrategy {
+export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
   public executor: Address;
   public supplyAsset: Address; // TODO: supply assert dynamically
   public permitExpiry: number;
@@ -82,5 +82,9 @@ export class AaveV3Strategy extends BaseStrategy {
     console.log(await response.json());
 
     return "Success";
+  }
+
+  isSupported(chainId: number): boolean {
+    return Object.keys(AAVE_CONTRACTS).map(Number).includes(chainId);
   }
 }
