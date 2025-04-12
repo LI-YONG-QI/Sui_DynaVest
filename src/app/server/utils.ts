@@ -5,7 +5,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { http } from "wagmi";
 
 import { ALCHEMY_API_KEY } from "@/providers/config";
-import { EXECUTOR_ABI } from "../abis";
+import { EXECUTOR_ABI } from "@/app/abis";
 import type { ExecutionResult, Call } from "./types";
 
 export function getAdminWallet(chain: Chain) {

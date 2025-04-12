@@ -1,6 +1,5 @@
 import "server-only";
 
-import { getAdminWallet } from "./utils";
 import {
   Address,
   encodeFunctionData,
@@ -9,17 +8,24 @@ import {
   parseSignature,
   toHex,
 } from "viem";
-import { ERC20_ABI, ERC20_PERMIT_ABI, EXECUTOR_ABI, MORPHO_ABI } from "../abis";
+import { base } from "viem/chains";
+import { readContract } from "@wagmi/core";
+
+import {
+  ERC20_ABI,
+  ERC20_PERMIT_ABI,
+  EXECUTOR_ABI,
+  MORPHO_ABI,
+} from "@/app/abis";
 import type { Call, ExecutionResult } from "./types";
-import { DYNAVEST_CONTRACTS } from "../utils/constants/protocols/dynaVest";
 import {
   MORPHO_CONTRACTS,
   MorphoSupportedChains,
-} from "../utils/constants/protocols/morpho";
-import { base } from "viem/chains";
-import { readContract } from "@wagmi/core";
+  DYNAVEST_CONTRACTS,
+} from "@/app/utils/constants/protocols";
+import { USDC } from "@/app/utils/constants";
 import { wagmiConfig as config } from "@/providers/config";
-import { USDC } from "../utils/constants";
+import { getAdminWallet } from "./utils";
 
 export class MorphoSupplyingStrategy {
   private readonly executor: Address;
