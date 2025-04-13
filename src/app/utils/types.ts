@@ -11,6 +11,7 @@ export const PERMIT_TYPES = {
 } as const satisfies TypedData;
 
 export type Protocol =
+  | "1inch"
   | "AAVE"
   | "stCelo"
   | "ankrFlow"
