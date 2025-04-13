@@ -4,25 +4,7 @@ import { useState } from "react";
 
 import InvestModal from "./InvestModal";
 import { getRiskColor } from "@/app/utils";
-import type { Token, Protocol } from "@/app/utils/types";
-
-interface StrategyCardProps {
-  title: string;
-  apy: number;
-  risk: {
-    level: "Low" | "Medium" | "High";
-    color: string;
-    bgColor: string;
-  };
-  protocol: Protocol;
-  description: string;
-  image: string;
-  externalLink?: string;
-  learnMoreLink?: string;
-  tokens: Token[];
-  chainId: number;
-  displayInsufficientBalance?: boolean;
-}
+import type { StrategyMetadata } from "@/app/utils/types";
 
 export default function StrategyCard({
   title,
@@ -36,7 +18,7 @@ export default function StrategyCard({
   tokens,
   chainId,
   displayInsufficientBalance = false,
-}: StrategyCardProps) {
+}: StrategyMetadata) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Extract the base description without "Learn More" text

@@ -21,22 +21,7 @@ export type Protocol =
   | "Uniswap"
   | "Bsc Aave";
 
-// TODO: update StrategyMetadata & InvestStrategy & StrategyCardProps
-export type StrategyMetadata = {
-  title: string;
-  apy: number;
-  risk: {
-    level: "Low" | "Medium" | "High";
-    color: string;
-    bgColor: string;
-  };
-  protocol: Protocol;
-  description: string;
-  image: string;
-  externalLink?: string;
-  learnMoreLink?: string;
-  tokens: Token[];
-  chainId: number;
+export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;
 };
 
