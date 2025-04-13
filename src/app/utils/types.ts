@@ -20,6 +20,8 @@ export type Protocol =
   | "Morpho"
   | "Uniswap"
   | "Bsc Aave";
+
+// TODO: update StrategyMetadata & InvestStrategy & StrategyCardProps
 export type StrategyMetadata = {
   title: string;
   apy: number;
