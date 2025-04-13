@@ -6,18 +6,18 @@ import type { Call } from "./types";
 import { AAVE_V3_ABI } from "../abis";
 import { ERC20_ABI, ERC20_PERMIT_ABI } from "../abis";
 
-export class AaveV3Strategy extends BaseStrategy {
+export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
   private readonly pool: Address;
 
   constructor(chainId: AaveSupportedChains) {
     super(chainId);
 
     this.pool = AAVE_CONTRACTS[chainId].pool;
-    this.supplyAssets = AAVE_CONTRACTS[chainId].supplyAssets; // TODO: supply asset should be as parameter
   }
 
   async buildCalls(
     user: Address,
+    asset: Address,
     amount: bigint,
     deadline: bigint,
     signature: Hex
@@ -34,7 +34,7 @@ export class AaveV3Strategy extends BaseStrategy {
         args: [user, this.executor, amount, deadline, Number(v), r, s],
       });
       calls.push({
-        target: this.supplyAssets,
+        target: asset,
         callData: data,
       });
     }
@@ -44,10 +44,10 @@ export class AaveV3Strategy extends BaseStrategy {
       const data = encodeFunctionData({
         abi: ERC20_ABI,
         functionName: "transferFrom",
-        args: [user, this.executor, BigInt(1)],
+        args: [user, this.executor, amount],
       });
       calls.push({
-        target: this.supplyAssets,
+        target: asset,
         callData: data,
       });
     }
@@ -60,7 +60,7 @@ export class AaveV3Strategy extends BaseStrategy {
         args: [this.pool, amount],
       });
       calls.push({
-        target: this.supplyAssets,
+        target: asset,
         callData: data,
       });
     }
@@ -69,7 +69,7 @@ export class AaveV3Strategy extends BaseStrategy {
     const data = encodeFunctionData({
       abi: AAVE_V3_ABI,
       functionName: "supply",
-      args: [this.supplyAssets, amount, user, 0],
+      args: [asset, amount, user, 0],
     });
     calls.push({
       target: this.pool,

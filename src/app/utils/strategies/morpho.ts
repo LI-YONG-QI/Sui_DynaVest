@@ -17,6 +17,7 @@ import { DYNAVEST_CONTRACTS } from "../constants/protocols/dynaVest";
 export interface MorphoParams {
   chainId: number;
   user: Address;
+  asset: Address;
   amount: string;
   deadline: string;
   signature: Hex;
@@ -69,6 +70,7 @@ export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains>
     const body: MorphoParams = {
       chainId: this.chainId,
       user,
+      asset,
       amount: amount.toString(),
       deadline: deadline.toString(),
       signature,

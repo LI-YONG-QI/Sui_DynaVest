@@ -4,7 +4,6 @@ import type { Address, Chain } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { http } from "wagmi";
 
-import { ALCHEMY_API_KEY } from "@/providers/config";
 import { EXECUTOR_ABI } from "@/app/abis";
 import type { ExecutionResult, Call } from "./types";
 
@@ -15,7 +14,7 @@ export function getAdminWallet(chain: Chain) {
 
   return createWalletClient({
     chain: chain,
-    transport: http(`https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
+    transport: http(),
     account,
   });
 }

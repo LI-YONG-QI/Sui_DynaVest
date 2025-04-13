@@ -10,10 +10,12 @@ import {
   DynaVestSupportedChains,
 } from "@/app/utils/constants/protocols/dynaVest";
 
-export class BaseStrategy {
+export abstract class BaseStrategy<T extends DynaVestSupportedChains> {
   public readonly executor: Address;
+  public readonly chainId: T;
 
-  constructor(public readonly chainId: DynaVestSupportedChains) {
+  constructor(chainId: T) {
+    this.chainId = chainId;
     this.executor = DYNAVEST_CONTRACTS[chainId].executor;
   }
 

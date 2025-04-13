@@ -12,8 +12,11 @@ import {
   AaveSupportedChains,
   DYNAVEST_CONTRACTS,
 } from "../constants/protocols/";
-interface SupplyParams {
+
+export interface AaveParams {
+  chainId: AaveSupportedChains;
   user: Address;
+  asset: Address;
   amount: string;
   deadline: string;
   signature: Hex;
@@ -65,8 +68,10 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
       },
     });
 
-    const body: SupplyParams = {
+    const body: AaveParams = {
+      chainId: this.chainId,
       user,
+      asset,
       amount: amount.toString(),
       deadline: deadline.toString(),
       signature,

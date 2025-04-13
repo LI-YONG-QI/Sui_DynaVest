@@ -2,7 +2,6 @@ import "server-only";
 
 import { Address, encodeFunctionData, Hex, parseSignature, toHex } from "viem";
 import { readContract } from "@wagmi/core";
-import { base } from "viem/chains";
 
 import { ERC20_ABI, ERC20_PERMIT_ABI, MORPHO_ABI } from "@/app/abis";
 import type { Call } from "./types";
@@ -10,11 +9,10 @@ import {
   MORPHO_CONTRACTS,
   MorphoSupportedChains,
 } from "@/app/utils/constants/protocols";
-import { USDC } from "@/app/utils/constants";
 import { wagmiConfig as config } from "@/providers/config";
 import { BaseStrategy } from "./base";
 
-export class MorphoSupplyingStrategy extends BaseStrategy {
+export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains> {
   private readonly morpho: Address;
 
   constructor(chainId: MorphoSupportedChains) {
@@ -24,6 +22,7 @@ export class MorphoSupplyingStrategy extends BaseStrategy {
 
   async buildCalls(
     user: Address,
+    asset: Address,
     amount: bigint,
     deadline: bigint,
     signature: Hex
@@ -31,7 +30,6 @@ export class MorphoSupplyingStrategy extends BaseStrategy {
     const calls: Call[] = [];
 
     const { r, s, v } = parseSignature(signature);
-    const supplyAsset = USDC.chains![base.id]; // TODO: mock usdc address
 
     //* Step 1  USDC Permit
     {
@@ -41,7 +39,7 @@ export class MorphoSupplyingStrategy extends BaseStrategy {
         args: [user, this.executor, amount, deadline, Number(v), r, s],
       });
       calls.push({
-        target: supplyAsset,
+        target: asset,
         callData: data,
       });
     }
@@ -54,7 +52,7 @@ export class MorphoSupplyingStrategy extends BaseStrategy {
         args: [user, this.executor, amount],
       });
       calls.push({
-        target: supplyAsset,
+        target: asset,
         callData: data,
       });
     }
@@ -67,7 +65,7 @@ export class MorphoSupplyingStrategy extends BaseStrategy {
         args: [this.morpho, amount],
       });
       calls.push({
-        target: supplyAsset,
+        target: asset,
         callData: data,
       });
     }
