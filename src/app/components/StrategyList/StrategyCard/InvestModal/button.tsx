@@ -1,10 +1,9 @@
-import { Token } from "@/app/utils/types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount, useChainId } from "wagmi";
 import { parseUnits } from "viem";
 
-import type { InvestStrategy } from "@/app/utils/types";
+import { Token, InvestStrategy } from "@/app/utils/types";
 import { getStrategy } from "@/app/utils/strategies";
 import useSwitchChain from "@/app/hooks/useSwitchChain";
 

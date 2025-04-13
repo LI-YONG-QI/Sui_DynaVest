@@ -10,9 +10,10 @@ import { MorphoSupplyingStrategy } from "./morpho";
 import { BaseStrategy } from "./base";
 import { UniswapV3Strategy } from "./uniswap";
 import { BscAaveV3Strategy } from "./bsc";
+import { Protocol } from "../types";
 
 export function getStrategy(
-  protocol: string,
+  protocol: Protocol,
   chainId: number
 ): BaseStrategy<number> {
   // The type casting here is safe because we've already verified the chainId is supported
