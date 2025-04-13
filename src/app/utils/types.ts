@@ -18,7 +18,7 @@ export type StrategyMetadata = {
     color: string;
     bgColor: string;
   };
-  protocol: string;
+  protocol: string; // TODO: create protocol type
   description: string;
   image: string;
   externalLink?: string;

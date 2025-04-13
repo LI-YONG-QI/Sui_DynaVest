@@ -1,4 +1,4 @@
-import { celo, flowMainnet, base } from "viem/chains";
+import { celo, flowMainnet, base, bsc } from "viem/chains";
 
 import { USDC, USDT, CELO, FLOW, cEUR } from "./coins";
 import type { StrategyMetadata } from "../types";
@@ -141,5 +141,22 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     learnMoreLink: "https://flow.com",
     tokens: [FLOW],
     chainId: flowMainnet.id,
+  },
+  {
+    title: "Aave Lending Strategy",
+    apy: 2.4,
+    risk: {
+      level: "Low" as const,
+      color: "#10B981",
+      bgColor: "rgba(16, 185, 129, 0.3)",
+    },
+    protocol: "Bsc Aave",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/bnb.svg",
+    externalLink: "https://bsc.com",
+    learnMoreLink: "https://bsc.com",
+    tokens: [USDC],
+    chainId: bsc.id,
   },
 ];

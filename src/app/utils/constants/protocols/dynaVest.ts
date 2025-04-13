@@ -1,5 +1,5 @@
 import { Address } from "viem";
-import { base, celo } from "viem/chains";
+import { base, bsc, celo } from "viem/chains";
 import { MorphoSupportedChains } from "./morpho";
 import { AaveSupportedChains } from "./aave";
 
@@ -18,5 +18,8 @@ export const DYNAVEST_CONTRACTS: Record<
   },
   [celo.id]: {
     executor: "0x2a386fb9e19d201a1daf875fcd5c934c06265b65",
+  },
+  [bsc.id]: {
+    executor: "0xE6FE0766FF66B8768181B0f3f46E8e314F9277e0   ",
   },
 };
