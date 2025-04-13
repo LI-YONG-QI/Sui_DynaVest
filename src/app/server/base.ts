@@ -1,5 +1,5 @@
 import { EXECUTOR_ABI } from "@/app/abis";
-import { base, flowMainnet, celo } from "viem/chains";
+import { base, flowMainnet, celo, bsc } from "viem/chains";
 import { extractChain } from "viem";
 import type { Address } from "viem";
 
@@ -21,9 +21,10 @@ export abstract class BaseStrategy<T extends DynaVestSupportedChains> {
 
   async multiCall(user: Address, calls: Call[]): Promise<ExecutionResult> {
     const chain = extractChain({
-      chains: [base, celo, flowMainnet], // TODO: bound chain with constants
+      chains: [base, celo, flowMainnet, bsc], // TODO: bound chain with constants
       id: this.chainId,
     });
+
     const adminWallet = getAdminWallet(chain);
 
     const tx = await adminWallet.writeContract({

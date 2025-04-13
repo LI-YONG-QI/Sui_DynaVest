@@ -28,7 +28,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         embeddedWallets: {
           createOnLogin: "users-without-wallets",
         },
-        supportedChains: [...wagmiConfig.chains], //! Explicitly set supported chains
+        supportedChains: [...wagmiConfig.chains],
       }}
     >
       <QueryClientProvider client={queryClient}>

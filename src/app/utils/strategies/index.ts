@@ -1,79 +1,40 @@
 export * from "./aave";
 
-import { StCeloSupportedChains } from "../constants/protocols/stCelo";
-import { AnkrSupportedChains } from "../constants/protocols/ankr";
-import { KittySupportedChains } from "../constants/protocols/kitty";
-import { flowMainnet, mainnet } from "viem/chains";
-import {
-  AaveSupportedChains,
-  AAVE_CONTRACTS,
-} from "../constants/protocols/aave";
-import { ST_CELO_CONTRACTS } from "../constants/protocols/stCelo";
-import { ANKR_CONTRACTS } from "../constants/protocols/ankr";
-import { KITTY_CONTRACTS } from "../constants/protocols/kitty";
-
 import { AaveV3Strategy } from "./aave";
 import { AnkrFlowStrategy } from "./ankrFlow";
 import { FlowStrategy } from "./flow";
 import { KittyStrategy } from "./kitty";
 import { StCeloStrategy } from "./stCelo";
-import {
-  MORPHO_CONTRACTS,
-  MorphoSupportedChains,
-} from "../constants/protocols/morpho";
+
 import { MorphoSupplyingStrategy } from "./morpho";
 import { BaseStrategy } from "./base";
 import { UniswapV3Strategy } from "./uniswap";
-
-// Helper function to validate if chainId is supported for a specific protocol
-function isChainIdSupported(protocol: string, chainId: number): boolean {
-  switch (protocol) {
-    case "AAVE":
-      // Check if the chainId exists as a key in AAVE_CONTRACTS
-      return Object.keys(AAVE_CONTRACTS).map(Number).includes(chainId);
-    case "stCelo":
-      return Object.keys(ST_CELO_CONTRACTS).map(Number).includes(chainId);
-    case "ankrFlow":
-      return Object.keys(ANKR_CONTRACTS).map(Number).includes(chainId);
-    case "Kitty":
-      return Object.keys(KITTY_CONTRACTS).map(Number).includes(chainId);
-    case "Flow":
-      return chainId === flowMainnet.id; // Flow only supports flowMainnet for now
-    case "Morpho":
-      return Object.keys(MORPHO_CONTRACTS).map(Number).includes(chainId);
-    case "Uniswap":
-      return chainId === mainnet.id;
-    default:
-      return false;
-  }
-}
+import { BscAaveV3Strategy } from "./bsc";
+import { Protocol } from "../types";
 
 export function getStrategy(
-  protocol: string,
+  protocol: Protocol,
   chainId: number
 ): BaseStrategy<number> {
-  // Check if the chainId is supported for the requested protocol
-  if (!isChainIdSupported(protocol, chainId)) {
-    throw new Error(`Unsupported chain ID ${chainId} for protocol ${protocol}`);
-  }
-
   // The type casting here is safe because we've already verified the chainId is supported
   // for the specific protocol with isChainIdSupported
   switch (protocol) {
     case "AAVE":
-      return new AaveV3Strategy(chainId as AaveSupportedChains);
+      return new AaveV3Strategy(chainId);
     case "stCelo":
-      return new StCeloStrategy(chainId as StCeloSupportedChains);
+      return new StCeloStrategy(chainId);
     case "ankrFlow":
-      return new AnkrFlowStrategy(chainId as AnkrSupportedChains);
+      return new AnkrFlowStrategy(chainId);
     case "Kitty":
-      return new KittyStrategy(chainId as KittySupportedChains);
+      return new KittyStrategy(chainId);
     case "Flow":
-      return new FlowStrategy(chainId as typeof flowMainnet.id);
+      return new FlowStrategy(chainId);
     case "Morpho":
-      return new MorphoSupplyingStrategy(chainId as MorphoSupportedChains);
+      return new MorphoSupplyingStrategy(chainId);
     case "Uniswap":
-      return new UniswapV3Strategy(chainId as typeof mainnet.id);
+      return new UniswapV3Strategy(chainId);
+    case "Bsc Aave":
+      return new BscAaveV3Strategy(chainId);
     default:
       throw new Error("Unsupported protocol");
   }

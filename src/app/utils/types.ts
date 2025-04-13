@@ -10,6 +10,16 @@ export const PERMIT_TYPES = {
   ],
 } as const satisfies TypedData;
 
+export type Protocol =
+  | "1inch"
+  | "AAVE"
+  | "stCelo"
+  | "ankrFlow"
+  | "Kitty"
+  | "Flow"
+  | "Morpho"
+  | "Uniswap"
+  | "Bsc Aave";
 export type StrategyMetadata = {
   title: string;
   apy: number;
@@ -18,7 +28,7 @@ export type StrategyMetadata = {
     color: string;
     bgColor: string;
   };
-  protocol: string;
+  protocol: Protocol;
   description: string;
   image: string;
   externalLink?: string;
@@ -36,7 +46,7 @@ export type InvestStrategy = {
     color: string;
     bgColor: string;
   };
-  protocol: string;
+  protocol: Protocol;
   description: string;
   image: string;
   externalLink?: string;

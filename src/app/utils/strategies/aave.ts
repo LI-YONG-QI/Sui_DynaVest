@@ -26,10 +26,10 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
   public executor: Address;
   public permitExpiry: number;
 
-  constructor(chainId: AaveSupportedChains) {
+  constructor(chainId: number) {
     super(chainId);
 
-    this.executor = DYNAVEST_CONTRACTS[chainId].executor;
+    this.executor = DYNAVEST_CONTRACTS[this.chainId].executor;
     this.permitExpiry = PERMIT_EXPIRY;
   }
 
@@ -82,9 +82,9 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
       body: JSON.stringify(body),
     });
 
-    console.log(await response.json());
+    const res = await response.json();
 
-    return "Success";
+    return res.message;
   }
 
   isSupported(chainId: number): boolean {
