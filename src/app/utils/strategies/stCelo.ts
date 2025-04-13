@@ -9,16 +9,20 @@ import {
   ST_CELO_CONTRACTS,
 } from "../constants/protocols";
 
-export class StCeloStrategy extends BaseStrategy {
+export class StCeloStrategy extends BaseStrategy<StCeloSupportedChains> {
   public manager: Address;
 
-  constructor(chainId: StCeloSupportedChains) {
+  constructor(chainId: number) {
     super(chainId);
 
-    this.manager = ST_CELO_CONTRACTS[chainId].manager;
+    this.manager = ST_CELO_CONTRACTS[this.chainId].manager;
   }
 
-  async execute(user: Address, amount: bigint) {
+  async execute(
+    user: Address,
+    _asset: Address,
+    amount: bigint
+  ): Promise<string> {
     const result = await writeContract(config, {
       abi: STAKED_CELO_ABI,
       address: this.manager,
@@ -32,5 +36,9 @@ export class StCeloStrategy extends BaseStrategy {
     });
 
     return result;
+  }
+
+  isSupported(chainId: number): boolean {
+    return Object.keys(ST_CELO_CONTRACTS).map(Number).includes(chainId);
   }
 }

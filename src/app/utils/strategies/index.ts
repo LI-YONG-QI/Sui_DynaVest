@@ -3,7 +3,7 @@ export * from "./aave";
 import { StCeloSupportedChains } from "../constants/protocols/stCelo";
 import { AnkrSupportedChains } from "../constants/protocols/ankr";
 import { KittySupportedChains } from "../constants/protocols/kitty";
-import { flowMainnet } from "viem/chains";
+import { flowMainnet, mainnet } from "viem/chains";
 import {
   AaveSupportedChains,
   AAVE_CONTRACTS,
@@ -22,6 +22,8 @@ import {
   MorphoSupportedChains,
 } from "../constants/protocols/morpho";
 import { MorphoSupplyingStrategy } from "./morpho";
+import { BaseStrategy } from "./base";
+import { UniswapV3Strategy } from "./uniswap";
 
 // Helper function to validate if chainId is supported for a specific protocol
 function isChainIdSupported(protocol: string, chainId: number): boolean {
@@ -39,17 +41,24 @@ function isChainIdSupported(protocol: string, chainId: number): boolean {
       return chainId === flowMainnet.id; // Flow only supports flowMainnet for now
     case "Morpho":
       return Object.keys(MORPHO_CONTRACTS).map(Number).includes(chainId);
+    case "Uniswap":
+      return chainId === mainnet.id;
     default:
       return false;
   }
 }
 
-export function getStrategy(protocol: string, chainId: number) {
+export function getStrategy(
+  protocol: string,
+  chainId: number
+): BaseStrategy<number> {
   // Check if the chainId is supported for the requested protocol
   if (!isChainIdSupported(protocol, chainId)) {
     throw new Error(`Unsupported chain ID ${chainId} for protocol ${protocol}`);
   }
 
+  // The type casting here is safe because we've already verified the chainId is supported
+  // for the specific protocol with isChainIdSupported
   switch (protocol) {
     case "AAVE":
       return new AaveV3Strategy(chainId as AaveSupportedChains);
@@ -60,9 +69,11 @@ export function getStrategy(protocol: string, chainId: number) {
     case "Kitty":
       return new KittyStrategy(chainId as KittySupportedChains);
     case "Flow":
-      return new FlowStrategy(chainId);
+      return new FlowStrategy(chainId as typeof flowMainnet.id);
     case "Morpho":
       return new MorphoSupplyingStrategy(chainId as MorphoSupportedChains);
+    case "Uniswap":
+      return new UniswapV3Strategy(chainId as typeof mainnet.id);
     default:
       throw new Error("Unsupported protocol");
   }

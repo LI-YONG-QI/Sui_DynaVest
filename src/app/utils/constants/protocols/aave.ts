@@ -6,12 +6,10 @@ export type AaveSupportedChains = typeof celo.id;
 export const AAVE_CONTRACTS: Record<
   AaveSupportedChains,
   {
-    executor: Address;
-    supplyAssets: Address;
+    pool: Address;
   }
 > = {
   [celo.id]: {
-    executor: "0x2A386Fb9e19D201A1dAF875fcD5c934c06265b65",
-    supplyAssets: "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73",
+    pool: "0x3E59A31363E2ad014dcbc521c4a0d5757d9f3402", // TODO: cEUR pool bound
   },
 };

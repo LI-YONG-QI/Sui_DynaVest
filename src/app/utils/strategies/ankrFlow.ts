@@ -7,16 +7,20 @@ import {
   AnkrSupportedChains,
 } from "../constants/protocols/ankr";
 
-export class AnkrFlowStrategy extends BaseStrategy {
+export class AnkrFlowStrategy extends BaseStrategy<AnkrSupportedChains> {
   public readonly ANKR_CORE: Address;
 
-  constructor(chainId: AnkrSupportedChains) {
+  constructor(chainId: number) {
     super(chainId);
-    this.ANKR_CORE = ANKR_CONTRACTS[chainId].ankrFLOW;
+    this.ANKR_CORE = ANKR_CONTRACTS[this.chainId].ankrFLOW;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async execute(user: Address, amount: bigint) {
+  async execute(
+    user: Address,
+    _asset: Address,
+    amount: bigint
+  ): Promise<string> {
     const result = await sendTransaction(config, {
       to: this.ANKR_CORE,
       value: amount,
@@ -26,5 +30,9 @@ export class AnkrFlowStrategy extends BaseStrategy {
     console.log(result);
 
     return "AnkrFlow strategy executed successfully";
+  }
+
+  isSupported(chainId: number): boolean {
+    return Object.keys(ANKR_CONTRACTS).map(Number).includes(chainId);
   }
 }

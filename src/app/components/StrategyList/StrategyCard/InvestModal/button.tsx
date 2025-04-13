@@ -59,7 +59,11 @@ export default function InvestModalButton({
       const parsedAmount = parseUnits(amount, currency.decimals);
 
       try {
-        const result = await strategyHandler.execute(user, parsedAmount);
+        const result = await strategyHandler.execute(
+          user,
+          currency.chains![chainId],
+          parsedAmount
+        );
         toast.success(`Investment successful! ${result}`);
 
         handleClose();
