@@ -15,7 +15,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "1inch",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/base.png",
+    image: "/crypto-icons/base.png",
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
     tokens: [USDT, USDC],
@@ -33,7 +33,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "Morpho",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/base.png",
+    image: "/crypto-icons/base.png",
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
     tokens: [USDT, USDC],
@@ -67,7 +67,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "AAVE",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/celo.png",
+    image: "/crypto-icons/celo.svg",
     externalLink: "https://aave.com",
     learnMoreLink: "https://aave.com",
     tokens: [cEUR],
@@ -85,7 +85,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "stCelo",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/celo.png",
+    image: "/crypto-icons/celo.svg",
     externalLink: "https://stcelo.com",
     learnMoreLink: "https://stcelo.com",
     tokens: [CELO],
@@ -102,7 +102,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "ankrFlow",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/flow.png",
+    image: "/crypto-icons/flow.svg",
     externalLink: "https://ankrflow.com",
     learnMoreLink: "https://ankrflow.com",
     tokens: [FLOW],
@@ -119,7 +119,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "Kitty",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/flow.png",
+    image: "/crypto-icons/flow.svg",
     externalLink: "https://kitty.com",
     learnMoreLink: "https://kitty.com",
     tokens: [FLOW],
@@ -136,7 +136,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "Flow",
     description:
       "Providing ankrFlow tokens as liquidity to KittyStable allows you to earn both liquid staking rewards and swap fees.",
-    image: "/flow.png",
+    image: "/crypto-icons/flow.svg",
     externalLink: "https://flow.com",
     learnMoreLink: "https://flow.com",
     tokens: [FLOW],
@@ -153,7 +153,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     protocol: "Bsc Aave",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/bnb.svg",
+    image: "/crypto-icons/bnb.svg",
     externalLink: "https://bsc.com",
     learnMoreLink: "https://bsc.com",
     tokens: [USDC],

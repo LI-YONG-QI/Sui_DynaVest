@@ -3,7 +3,7 @@ import type { Token } from "../types";
 
 export const USDT: Token = {
   name: "USDT",
-  icon: "https://cryptologos.cc/logos/tether-usdt-logo.png",
+  icon: "/crypto-icons/usdt.svg",
   decimals: 6,
   isNativeToken: false,
   chains: {
@@ -13,7 +13,7 @@ export const USDT: Token = {
 
 export const USDC: Token = {
   name: "USDC",
-  icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
+  icon: "/crypto-icons/usdc.svg",
   decimals: 6,
   isNativeToken: false,
   chains: {
@@ -24,7 +24,7 @@ export const USDC: Token = {
 
 export const CELO: Token = {
   name: "CELO",
-  icon: "https://cryptologos.cc/logos/celo-celo-logo.png",
+  icon: "/crypto-icons/celo.svg",
   decimals: 18,
   isNativeToken: false,
   chains: {
@@ -34,14 +34,14 @@ export const CELO: Token = {
 
 export const FLOW: Token = {
   name: "FLOW",
-  icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+  icon: "/crypto-icons/flow.svg",
   decimals: 18,
   isNativeToken: true,
 };
 
 export const cEUR: Token = {
   name: "cEUR",
-  icon: "https://cryptologos.cc/logos/flow-flow-logo.png",
+  icon: "/crypto-icons/cEUR.png",
   decimals: 18,
   isNativeToken: false,
   chains: {
