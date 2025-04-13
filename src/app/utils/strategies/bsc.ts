@@ -11,11 +11,11 @@ export class BscAaveV3Strategy extends BaseStrategy<typeof bsc.id> {
   public readonly executor: Address;
   public readonly pool: Address;
 
-  constructor(chainId: typeof bsc.id) {
+  constructor(chainId: number) {
     super(chainId);
 
-    this.executor = DYNAVEST_CONTRACTS[chainId].executor;
-    this.pool = AAVE_CONTRACTS[chainId].pool;
+    this.executor = DYNAVEST_CONTRACTS[this.chainId].executor;
+    this.pool = AAVE_CONTRACTS[this.chainId].pool;
   }
 
   async execute(user: Address, asset: Address, amount: bigint) {

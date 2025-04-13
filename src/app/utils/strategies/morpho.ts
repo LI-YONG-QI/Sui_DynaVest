@@ -81,9 +81,9 @@ export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains>
       body: JSON.stringify(body),
     });
 
-    console.log(await response.json());
+    const result = await response.json();
 
-    return "Success";
+    return result.message;
   }
 
   isSupported(chainId: number): boolean {
