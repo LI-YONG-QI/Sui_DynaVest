@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import InvestModal from "./InvestModal";
 import { getRiskColor } from "@/app/utils";
-import type { Token } from "@/app/utils/types";
+import type { Token, Protocol } from "@/app/utils/types";
 
 interface StrategyCardProps {
   title: string;
@@ -14,7 +14,7 @@ interface StrategyCardProps {
     color: string;
     bgColor: string;
   };
-  protocol: string;
+  protocol: Protocol;
   description: string;
   image: string;
   externalLink?: string;

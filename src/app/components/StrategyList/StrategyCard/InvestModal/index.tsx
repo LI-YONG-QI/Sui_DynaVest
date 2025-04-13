@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { MoonLoader } from "react-spinners";
