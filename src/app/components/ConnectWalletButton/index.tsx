@@ -4,7 +4,7 @@ import { useDisconnect, useAccount } from "wagmi";
 import { useState, useRef, useEffect } from "react";
 
 export default function ConnectWalletButton() {
-  const { ready: privyReady, authenticated, logout } = usePrivy();
+  const { ready: privyReady, authenticated, logout, linkWallet } = usePrivy();
   const { address } = useAccount();
   const { login } = useLogin();
   const { disconnect } = useDisconnect();
@@ -19,11 +19,17 @@ export default function ConnectWalletButton() {
   const handleButtonOnClick = () => {
     if (!buttonReady) return;
     if (!loggedIn) {
-      login({
-        loginMethods: ["wallet"],
-        walletChainType: "ethereum-only",
-        disableSignup: false,
-      });
+      if (authenticated) {
+        // User is authenticated but wallet not connected, use linkWallet instead
+        linkWallet();
+      } else {
+        // User is not authenticated, use regular login
+        login({
+          loginMethods: ["wallet"],
+          walletChainType: "ethereum-only",
+          disableSignup: false,
+        });
+      }
       return;
     }
     setIsDropdownOpen(!isDropdownOpen);
