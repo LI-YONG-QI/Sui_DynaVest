@@ -36,7 +36,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     image: "/crypto-icons/base.png",
     externalLink: "https://morpho.org",
     learnMoreLink: "https://morpho.org",
-    tokens: [USDT, USDC],
+    tokens: [USDC],
     chainId: base.id,
   },
   {
