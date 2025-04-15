@@ -1,5 +1,5 @@
 import { Address } from "viem";
-import { base, bsc, celo, flowMainnet } from "viem/chains";
+import { arbitrum, base, bsc, celo, flowMainnet } from "viem/chains";
 import { wagmiConfig } from "@/providers/config";
 
 export type DynaVestSupportedChains = (typeof wagmiConfig.chains)[number]["id"];
@@ -17,9 +17,12 @@ export const DYNAVEST_CONTRACTS: Record<
     executor: "0x2a386fb9e19d201a1daf875fcd5c934c06265b65",
   },
   [bsc.id]: {
-    executor: "0xE6FE0766FF66B8768181B0f3f46E8e314F9277e0   ",
+    executor: "0xE6FE0766FF66B8768181B0f3f46E8e314F9277e0",
   },
   [flowMainnet.id]: {
-    executor: "0xE6FE0766FF66B8768181B0f3f46E8e314F9277e0   ",
+    executor: "0xE6FE0766FF66B8768181B0f3f46E8e314F9277e0",
+  },
+  [arbitrum.id]: {
+    executor: "0xe82810A810097732F97D9DD6bF66eb1E7D23f97E",
   },
 };

@@ -3,7 +3,7 @@ import type { Address, Hex } from "viem";
 import { readContract } from "@wagmi/core";
 
 import { wagmiConfig as config } from "@/providers/config";
-import { ERC20_ABI, ERC20_PERMIT_ABI } from "@/app/abis";
+import { ERC20_PERMIT_ABI } from "@/app/abis";
 import { PERMIT_TYPES } from "@/app/utils/types";
 import { PERMIT_EXPIRY } from "../constants";
 import { BaseStrategy } from "./base";
@@ -37,6 +37,8 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
 
+    console.log("hello");
+
     const nonce = await readContract(config, {
       abi: ERC20_PERMIT_ABI,
       address: asset,
@@ -44,18 +46,13 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
       args: [user!],
     });
 
-    const symbol = await readContract(config, {
-      abi: ERC20_ABI,
-      address: asset,
-      functionName: "symbol",
-    });
-
+    // TODO: only USDC is supported (solution: Permit2)
     const signature = await signTypedData(config, {
       domain: {
-        name: symbol,
+        name: "USD Coin",
         chainId: this.chainId,
         verifyingContract: asset,
-        version: "1",
+        version: "2",
       },
       types: PERMIT_TYPES,
       primaryType: "Permit",

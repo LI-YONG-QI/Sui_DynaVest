@@ -9,6 +9,7 @@ import {
   DYNAVEST_CONTRACTS,
   DynaVestSupportedChains,
 } from "@/app/utils/constants/protocols/dynaVest";
+import { wagmiConfig } from "@/providers/config";
 
 export abstract class BaseStrategy<T extends DynaVestSupportedChains> {
   public readonly executor: Address;
@@ -21,7 +22,7 @@ export abstract class BaseStrategy<T extends DynaVestSupportedChains> {
 
   async multiCall(user: Address, calls: Call[]): Promise<ExecutionResult> {
     const chain = extractChain({
-      chains: [base, celo, flowMainnet, bsc], // TODO: bound chain with constants
+      chains: wagmiConfig.chains,
       id: this.chainId,
     });
 

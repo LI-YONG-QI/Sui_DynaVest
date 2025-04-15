@@ -49,6 +49,7 @@ export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains>
       args: [user!],
     });
 
+    // TODO: only USDC is supported (solution: Permit2)
     const signature = await signTypedData(config, {
       domain: {
         name: "USD Coin",

@@ -1,4 +1,4 @@
-import { base, bsc, celo } from "viem/chains";
+import { base, bsc, celo, arbitrum } from "viem/chains";
 import type { Token } from "../types";
 
 export const USDT: Token = {
@@ -19,6 +19,7 @@ export const USDC: Token = {
   chains: {
     [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     [bsc.id]: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+    [arbitrum.id]: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
   },
 };
 
