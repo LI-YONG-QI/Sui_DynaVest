@@ -1,11 +1,11 @@
 import { createConfig } from "@privy-io/wagmi";
-import { celo, flowMainnet, base, bsc } from "viem/chains";
+import { celo, flowMainnet, base, bsc, arbitrum } from "viem/chains";
 import { http } from "wagmi";
 
 export const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 
 export const wagmiConfig = createConfig({
-  chains: [celo, base, flowMainnet, bsc],
+  chains: [celo, base, flowMainnet, bsc, arbitrum],
   transports: {
     [celo.id]: http(`https://celo-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
     [flowMainnet.id]: http(
@@ -13,5 +13,8 @@ export const wagmiConfig = createConfig({
     ),
     [base.id]: http(`https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
     [bsc.id]: http(`https://bnb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
+    [arbitrum.id]: http(
+      `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+    ),
   },
 });

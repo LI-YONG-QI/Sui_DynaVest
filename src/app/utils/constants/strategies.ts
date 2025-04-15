@@ -1,4 +1,4 @@
-import { celo, flowMainnet, base, bsc } from "viem/chains";
+import { celo, flowMainnet, base, bsc, arbitrum } from "viem/chains";
 
 import { USDC, USDT, CELO, FLOW, cEUR } from "./coins";
 import type { StrategyMetadata } from "../types";
@@ -39,23 +39,57 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     tokens: [USDT, USDC],
     chainId: base.id,
   },
-  // {
-  //   title: "Compound Yield",
-  //   apy: 3.9,
-  //   risk: {
-  //     level: "High" as const,
-  //     color: "#E83033",
-  //     bgColor: "rgba(232, 48, 51, 0.3)",
-  //   },
-  //   protocol: "Compound",
-  //   description:
-  //     "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-  //   image: "/base.png",
-  //   externalLink: "https://compound.finance",
-  //   learnMoreLink: "https://compound.finance",
-  //   tokens: [USDT, USDC],
-  //   chainId: base.id,
-  // },
+  {
+    title: "AAVE Lending Strategy",
+    apy: 10,
+    risk: {
+      level: "Medium" as const,
+      color: "#B9AB15",
+      bgColor: "rgba(230, 212, 9, 0.3)",
+    },
+    protocol: "AAVE",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/crypto-icons/base.png",
+    externalLink: "https://aave.com",
+    learnMoreLink: "https://aave.com",
+    tokens: [USDC],
+    chainId: base.id,
+  },
+  {
+    title: "AAVE Lending Strategy",
+    apy: 10,
+    risk: {
+      level: "Medium" as const,
+      color: "#B9AB15",
+      bgColor: "rgba(230, 212, 9, 0.3)",
+    },
+    protocol: "AAVE",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/crypto-icons/arb.svg",
+    externalLink: "https://aave.com",
+    learnMoreLink: "https://aave.com",
+    tokens: [USDC],
+    chainId: arbitrum.id,
+  },
+  {
+    title: "AAVE Lending Strategy",
+    apy: 2.4,
+    risk: {
+      level: "Low" as const,
+      color: "#10B981",
+      bgColor: "rgba(16, 185, 129, 0.3)",
+    },
+    protocol: "Bsc Aave",
+    description:
+      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+    image: "/crypto-icons/bnb.svg",
+    externalLink: "https://bsc.com",
+    learnMoreLink: "https://bsc.com",
+    tokens: [USDC],
+    chainId: bsc.id,
+  },
   {
     title: "AAVE Lending Strategy",
     apy: 10,
@@ -141,22 +175,5 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     learnMoreLink: "https://flow.com",
     tokens: [FLOW],
     chainId: flowMainnet.id,
-  },
-  {
-    title: "Aave Lending Strategy",
-    apy: 2.4,
-    risk: {
-      level: "Low" as const,
-      color: "#10B981",
-      bgColor: "rgba(16, 185, 129, 0.3)",
-    },
-    protocol: "Bsc Aave",
-    description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/crypto-icons/bnb.svg",
-    externalLink: "https://bsc.com",
-    learnMoreLink: "https://bsc.com",
-    tokens: [USDC],
-    chainId: bsc.id,
   },
 ];

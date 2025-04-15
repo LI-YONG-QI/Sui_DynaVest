@@ -1,7 +1,11 @@
 import { Address } from "viem";
-import { bsc, celo } from "viem/chains";
+import { arbitrum, base, bsc, celo } from "viem/chains";
 
-export type AaveSupportedChains = typeof celo.id | typeof bsc.id;
+export type AaveSupportedChains =
+  | typeof celo.id
+  | typeof bsc.id
+  | typeof arbitrum.id
+  | typeof base.id;
 
 export const AAVE_CONTRACTS: Record<
   AaveSupportedChains,
@@ -10,9 +14,15 @@ export const AAVE_CONTRACTS: Record<
   }
 > = {
   [celo.id]: {
-    pool: "0x3E59A31363E2ad014dcbc521c4a0d5757d9f3402", // TODO: cEUR pool bound
+    pool: "0x3E59A31363E2ad014dcbc521c4a0d5757d9f3402",
   },
   [bsc.id]: {
     pool: "0x6807dc923806fE8Fd134338EABCA509979a7e0cB",
+  },
+  [arbitrum.id]: {
+    pool: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
+  },
+  [base.id]: {
+    pool: "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5",
   },
 };
