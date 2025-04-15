@@ -10,12 +10,49 @@ export default function useSwitchChain(targetChainId: number) {
 
   const handleSwitchChain = async () => {
     try {
-      const wallet = wallets[0];
-      await wallet.switchChain(targetChainId);
+      if (!wallets || wallets.length === 0) {
+        toast.error("No wallet found. Please connect a wallet first.");
+        return;
+      }
 
+      const wallet = wallets[0];
+
+      // Check if wallet supports chain switching
+      if (!wallet.switchChain) {
+        toast.error("This wallet doesn't support chain switching");
+        return;
+      }
+
+      // Add a small delay before switching chains
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      await wallet.switchChain(targetChainId);
       toast.success(`Switched chain to ${targetChainId}`);
     } catch (error: unknown) {
       console.error("Failed to switch chain:", error);
+
+      // Handle specific error messages
+      if (error instanceof Error) {
+        if (
+          error.message.includes("rejected") ||
+          error.message.includes("denied")
+        ) {
+          toast.error("Chain switch was rejected by the user");
+        } else if (
+          error.message.includes("already processing") ||
+          error.message.includes("pending")
+        ) {
+          toast.warning(
+            "Another request is in progress. Please try again after it completes."
+          );
+        } else {
+          toast.error(`Failed to switch chain: ${error.message}`);
+        }
+      } else {
+        toast.error(
+          "Failed to switch chain. Please try manually switching in your wallet."
+        );
+      }
     }
   };
 
