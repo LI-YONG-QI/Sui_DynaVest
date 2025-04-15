@@ -1,5 +1,4 @@
 import { EXECUTOR_ABI } from "@/app/abis";
-import { base, flowMainnet, celo, bsc } from "viem/chains";
 import { extractChain } from "viem";
 import type { Address } from "viem";
 
