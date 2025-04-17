@@ -1,7 +1,10 @@
 import { Address } from "viem";
-import { base } from "viem/chains";
+import { arbitrum, base, bsc } from "viem/chains";
 
-export type UniswapSupportedChains = typeof base.id;
+export type UniswapSupportedChains =
+  | typeof base.id
+  | typeof bsc.id
+  | typeof arbitrum.id;
 
 // Uniswap protocol contract addresses for each network
 export const UNISWAP_CONTRACTS: Record<
@@ -15,30 +18,12 @@ export const UNISWAP_CONTRACTS: Record<
     swapRouter: "0x2626664c2603336E57B271c5C0b26F421741e481",
     nftManager: "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
   },
+  [arbitrum.id]: {
+    swapRouter: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+    nftManager: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
+  },
+  [bsc.id]: {
+    swapRouter: "0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2",
+    nftManager: "0x7b8A01B39D58278b5DE7e48c8449c9f4F5170613",
+  },
 };
-
-// Pool fee tiers available in Uniswap V3
-export enum PoolFee {
-  LOWEST = 100, // 0.01%
-  LOW = 500, // 0.05%
-  MEDIUM = 3000, // 0.3%
-  HIGH = 10000, // 1%
-}
-
-// Commands for Universal Router
-export enum UniswapCommand {
-  V3_SWAP_EXACT_IN = 0x00,
-  V3_SWAP_EXACT_OUT = 0x01,
-  PERMIT2_TRANSFER_FROM = 0x02,
-  PERMIT2_PERMIT_BATCH = 0x03,
-  SWEEP = 0x04,
-  TRANSFER = 0x05,
-  PAY_PORTION = 0x06,
-  V2_SWAP_EXACT_IN = 0x08,
-  V2_SWAP_EXACT_OUT = 0x09,
-  PERMIT2_PERMIT = 0x0a,
-  WRAP_ETH = 0x0b,
-  UNWRAP_WETH = 0x0c,
-  PERMIT2_TRANSFER_FROM_BATCH = 0x0d,
-  BALANCE_CHECK_ERC20 = 0x0e,
-}

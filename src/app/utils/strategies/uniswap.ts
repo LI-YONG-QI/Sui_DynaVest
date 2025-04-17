@@ -2,7 +2,7 @@
 
 import { Address } from "viem";
 import { mainnet } from "viem/chains";
-import { writeContract } from "@wagmi/core";
+import { readContract, writeContract } from "@wagmi/core";
 
 import { BaseStrategy } from "./base";
 import {
@@ -11,8 +11,39 @@ import {
 } from "../constants/protocols/uniswap";
 import { wagmiConfig as config } from "@/providers/config";
 import { ERC20_ABI, NFT_MANAGER_ABI } from "@/app/abis";
-import { cbBTC } from "@/app/utils/constants/coins";
+import { USDT } from "@/app/utils/constants/coins";
 import { PERMIT_EXPIRY } from "../constants";
+
+/**
+ * Compares two addresses lexicographically
+ * @param addressA First address
+ * @param addressB Second address
+ * @returns negative if addressA < addressB, positive if addressA > addressB, 0 if equal
+ */
+export function compareAddresses(addressA: Address, addressB: Address): number {
+  // Convert to lowercase to ensure consistent comparison
+  const a = addressA.toLowerCase();
+  const b = addressB.toLowerCase();
+
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
+/**
+ * Returns addresses sorted in ascending order
+ * @param addressA First address
+ * @param addressB Second address
+ * @returns [smallerAddress, largerAddress]
+ */
+export function sortAddresses(
+  addressA: Address,
+  addressB: Address
+): [Address, Address] {
+  return compareAddresses(addressA, addressB) < 0
+    ? [addressA, addressB]
+    : [addressB, addressA];
+}
 
 export class UniswapV3Strategy extends BaseStrategy<UniswapSupportedChains> {
   public readonly swapRouter: Address;
@@ -35,19 +66,42 @@ export class UniswapV3Strategy extends BaseStrategy<UniswapSupportedChains> {
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
 
-    await writeContract(config, {
+    const assetAllowance = await readContract(config, {
       abi: ERC20_ABI,
       address: asset,
-      functionName: "approve",
-      args: [this.nftManager, amount],
+      functionName: "allowance",
+      args: [user, this.nftManager],
     });
 
-    await writeContract(config, {
+    if (assetAllowance < amount) {
+      await writeContract(config, {
+        abi: ERC20_ABI,
+        address: asset,
+        functionName: "approve",
+        args: [this.nftManager, amount],
+      });
+    }
+
+    const usdtAllowance = await readContract(config, {
       abi: ERC20_ABI,
-      address: cbBTC.chains![this.chainId],
-      functionName: "approve",
-      args: [this.nftManager, amount],
+      address: USDT.chains![this.chainId],
+      functionName: "allowance",
+      args: [user, this.nftManager],
     });
+
+    if (usdtAllowance < amount * BigInt(2)) {
+      await writeContract(config, {
+        abi: ERC20_ABI,
+        address: USDT.chains![this.chainId],
+        functionName: "approve",
+        args: [this.nftManager, amount * BigInt(2)],
+      });
+    }
+
+    const [token0, token1] = this.sortAddresses(
+      asset,
+      USDT.chains![this.chainId]
+    );
 
     const tx = await writeContract(config, {
       abi: NFT_MANAGER_ABI,
@@ -55,15 +109,15 @@ export class UniswapV3Strategy extends BaseStrategy<UniswapSupportedChains> {
       functionName: "mint",
       args: [
         {
-          token0: asset,
-          token1: cbBTC.chains![this.chainId],
+          token0,
+          token1,
           fee: 100,
           tickLower: -887220,
           tickUpper: 887220,
           amount0Desired: amount,
-          amount1Desired: amount,
-          amount0Min: BigInt(0),
-          amount1Min: BigInt(0),
+          amount1Desired: amount * BigInt(2), // TODO: calculate the valid amount of token1
+          amount0Min: BigInt(0), // TODO: add min amount
+          amount1Min: BigInt(0), // TODO: add min amount
           recipient: user,
           deadline,
         },
@@ -75,5 +129,24 @@ export class UniswapV3Strategy extends BaseStrategy<UniswapSupportedChains> {
 
   isSupported(chainId: number): boolean {
     return Object.keys(UNISWAP_CONTRACTS).map(Number).includes(chainId);
+  }
+
+  private compareAddresses(addressA: Address, addressB: Address): number {
+    // Convert to lowercase to ensure consistent comparison
+    const a = addressA.toLowerCase();
+    const b = addressB.toLowerCase();
+
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+  }
+
+  private sortAddresses(
+    addressA: Address,
+    addressB: Address
+  ): [Address, Address] {
+    return this.compareAddresses(addressA, addressB) < 0
+      ? [addressA, addressB]
+      : [addressB, addressA];
   }
 }
