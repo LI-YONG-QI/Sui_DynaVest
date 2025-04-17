@@ -1,11 +1,12 @@
 import { Address } from "viem";
-import { arbitrum, base, bsc, celo } from "viem/chains";
+import { arbitrum, base, bsc, celo, polygon } from "viem/chains";
 
 export type AaveSupportedChains =
   | typeof celo.id
   | typeof bsc.id
   | typeof arbitrum.id
-  | typeof base.id;
+  | typeof base.id
+  | typeof polygon.id;
 
 export const AAVE_CONTRACTS: Record<
   AaveSupportedChains,
@@ -24,5 +25,8 @@ export const AAVE_CONTRACTS: Record<
   },
   [base.id]: {
     pool: "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5",
+  },
+  [polygon.id]: {
+    pool: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
   },
 };
