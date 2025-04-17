@@ -80,7 +80,6 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
     });
 
     const res = await response.json();
-
     return res.message;
   }
 

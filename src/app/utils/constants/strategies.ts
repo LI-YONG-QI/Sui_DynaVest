@@ -107,7 +107,23 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     tokens: [cEUR],
     chainId: celo.id,
   },
-
+  {
+    title: "Uniswap",
+    apy: 2.4,
+    risk: {
+      level: "High" as const,
+      color: "",
+      bgColor: "",
+    },
+    protocol: "Uniswap",
+    description:
+      "Provide liquidity to Uniswap V3 USDC/cbBTC pool with full range",
+    image: "/crypto-icons/base.png",
+    externalLink: "https://uniswap.org",
+    learnMoreLink: "https://uniswap.org",
+    tokens: [USDC],
+    chainId: base.id,
+  },
   {
     title: "stCelo",
     apy: 2,

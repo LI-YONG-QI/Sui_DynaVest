@@ -23,6 +23,16 @@ export const USDC: Token = {
   },
 };
 
+export const cbBTC: Token = {
+  name: "cbBTC",
+  icon: "/crypto-icons/cbBTC.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [base.id]: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+  },
+};
+
 export const CELO: Token = {
   name: "CELO",
   icon: "/crypto-icons/celo.svg",
