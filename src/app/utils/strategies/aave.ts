@@ -37,8 +37,6 @@ export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
     const timestampInSeconds = Math.floor(Date.now() / 1000);
     const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
 
-    console.log("hello");
-
     const nonce = await readContract(config, {
       abi: ERC20_PERMIT_ABI,
       address: asset,

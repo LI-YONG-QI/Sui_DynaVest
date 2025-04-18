@@ -42,7 +42,7 @@ export class LSTStrategy extends BaseStrategy<LSTSupportedChains> {
 
       return tx;
     } else {
-      throw new Error("Asset is not supported"); // TODO: ERC20 does not support yet.
+      throw new Error("Asset is not supported"); // TODO: ERC20 doesn't support yet.
     }
   }
 

@@ -20,7 +20,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     learnMoreLink: "https://morpho.org",
     tokens: [USDT, USDC],
     chainId: base.id,
-    displayInsufficientBalance: true, // TODO: review hardcoded data
+    displayInsufficientBalance: true,
   },
   {
     title: "Morpho Supplying",

@@ -56,7 +56,7 @@ export class UniswapV3Strategy extends BaseStrategy<UniswapSupportedChains> {
     this.nftManager = UNISWAP_CONTRACTS[this.chainId].nftManager;
   }
 
-  // TODO: only support USDC/cbBTC, and user must have both
+  // TODO: only support USDC/USDT, and user must have both
   async execute(
     user: Address,
     asset: Address,
