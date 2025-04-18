@@ -19,7 +19,8 @@ export type Protocol =
   | "Flow"
   | "Morpho"
   | "Uniswap"
-  | "Bsc Aave";
+  | "Bsc Aave"
+  | "LST";
 
 export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;
