@@ -33,6 +33,13 @@ export const ETH: Token = {
   isNativeToken: true,
 };
 
+export const BNB: Token = {
+  name: "BNB",
+  icon: "/crypto-icons/bnb.svg",
+  decimals: 18,
+  isNativeToken: true,
+};
+
 export const wstETH: Token = {
   name: "wstETH",
   icon: "/crypto-icons/weth.svg",
@@ -102,13 +109,23 @@ export const WETH: Token = {
   },
 };
 
+export const WBNB: Token = {
+  name: "WBNB",
+  icon: "/crypto-icons/bnb.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [bsc.id]: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+  },
+};
+
 export function getWrappedToken(token: Token): Token {
   if (token.isNativeToken) {
     switch (token.name) {
       case "ETH":
         return WETH;
-      case "FLOW":
-        return wbETH; // TODO: add flow wrapped token
+      case "BNB":
+        return WBNB;
       default:
         throw new Error("Token does't have wrapped token");
     }

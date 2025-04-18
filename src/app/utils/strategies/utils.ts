@@ -10,6 +10,7 @@ import { MorphoSupplyingStrategy } from "./morpho";
 import { UniswapV3Strategy } from "./uniswap";
 import { BscAaveV3Strategy } from "./bsc";
 import { LSTStrategy } from "./lst";
+import { BscLstStrategy } from "./bscLst";
 
 export function getDeadline(): bigint {
   const timestampInSeconds = Math.floor(Date.now() / 1000);
@@ -37,10 +38,12 @@ export function getStrategy(
       return new MorphoSupplyingStrategy(chainId);
     case "Uniswap":
       return new UniswapV3Strategy(chainId);
-    case "Bsc Aave":
+    case "BSC Aave":
       return new BscAaveV3Strategy(chainId);
     case "LST":
       return new LSTStrategy(chainId);
+    case "BSC LST":
+      return new BscLstStrategy(chainId);
     default:
       throw new Error("Unsupported protocol");
   }
