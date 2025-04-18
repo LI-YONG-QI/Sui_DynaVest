@@ -12,7 +12,7 @@ import {
 import { wagmiConfig as config } from "@/providers/config";
 import { ERC20_ABI, NFT_MANAGER_ABI } from "@/app/abis";
 import { USDT } from "@/app/utils/constants/coins";
-import { PERMIT_EXPIRY } from "../constants";
+import { getDeadline } from "./utils";
 
 /**
  * Compares two addresses lexicographically
@@ -56,15 +56,13 @@ export class UniswapV3Strategy extends BaseStrategy<UniswapSupportedChains> {
     this.nftManager = UNISWAP_CONTRACTS[this.chainId].nftManager;
   }
 
-  // TODO: only support USDC/cbBTC, and user must have both
+  // TODO: only support USDC/USDT, and user must have both
   async execute(
     user: Address,
     asset: Address,
     amount: bigint
   ): Promise<string> {
-    // TODO: build util function
-    const timestampInSeconds = Math.floor(Date.now() / 1000);
-    const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
+    const deadline = getDeadline();
 
     const assetAllowance = await readContract(config, {
       abi: ERC20_ABI,

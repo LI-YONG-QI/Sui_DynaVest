@@ -19,11 +19,11 @@ export const UNISWAP_CONTRACTS: Record<
     nftManager: "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
   },
   [arbitrum.id]: {
-    swapRouter: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+    swapRouter: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
     nftManager: "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
   },
   [bsc.id]: {
-    swapRouter: "0xB971eF87ede563556b2ED4b1C0b0019111Dd85d2",
+    swapRouter: "0xb971ef87ede563556b2ed4b1c0b0019111dd85d2",
     nftManager: "0x7b8A01B39D58278b5DE7e48c8449c9f4F5170613",
   },
 };

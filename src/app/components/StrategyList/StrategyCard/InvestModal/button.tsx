@@ -4,7 +4,7 @@ import { useAccount, useChainId } from "wagmi";
 import { parseUnits } from "viem";
 
 import { Token, InvestStrategy } from "@/app/utils/types";
-import { getStrategy } from "@/app/utils/strategies";
+import { getStrategy } from "@/app/utils/strategies/utils";
 import useSwitchChain from "@/app/hooks/useSwitchChain";
 
 enum ButtonState {
@@ -58,13 +58,20 @@ export default function InvestModalButton({
       const parsedAmount = parseUnits(amount, currency.decimals);
 
       try {
-        const result = await strategyHandler.execute(
-          user,
-          currency.chains![chainId],
-          parsedAmount
-        );
-        toast.success(`Investment successful! ${result}`);
+        let result;
+        if (currency.isNativeToken) {
+          console.log("native token");
+          result = await strategyHandler.execute(user, null, parsedAmount);
+        } else {
+          console.log("token");
+          result = await strategyHandler.execute(
+            user,
+            currency.chains![chainId],
+            parsedAmount
+          );
+        }
 
+        toast.success(`Investment successful! ${result}`);
         handleClose();
       } catch (error) {
         console.error(error);

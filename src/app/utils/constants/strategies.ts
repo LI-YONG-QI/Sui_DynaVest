@@ -1,6 +1,6 @@
 import { celo, flowMainnet, base, bsc, arbitrum, polygon } from "viem/chains";
 
-import { USDC, USDT, CELO, FLOW, cEUR } from "./coins";
+import { USDC, USDT, CELO, FLOW, cEUR, ETH, BNB } from "./coins";
 import type { StrategyMetadata } from "../types";
 
 export const STRATEGIES_METADATA: StrategyMetadata[] = [
@@ -20,7 +20,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     learnMoreLink: "https://morpho.org",
     tokens: [USDT, USDC],
     chainId: base.id,
-    displayInsufficientBalance: true, // TODO: review hardcoded data
+    displayInsufficientBalance: true,
   },
   {
     title: "Morpho Supplying",
@@ -81,7 +81,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
       color: "#10B981",
       bgColor: "rgba(16, 185, 129, 0.3)",
     },
-    protocol: "Bsc Aave",
+    protocol: "BSC Aave",
     description:
       "Lending protocol that allows anyone to deposit and earn yield. Learn More",
     image: "/crypto-icons/bnb.svg",
@@ -174,6 +174,57 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     learnMoreLink: "https://uniswap.org",
     tokens: [USDC],
     chainId: arbitrum.id,
+  },
+  {
+    title: "LST",
+    apy: 2.4,
+    risk: {
+      level: "High" as const,
+      color: "",
+      bgColor: "",
+    },
+    protocol: "LST",
+    description:
+      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+    image: "/crypto-icons/base.png",
+    externalLink: "https://uniswap.org",
+    learnMoreLink: "https://uniswap.org",
+    tokens: [ETH],
+    chainId: base.id,
+  },
+  {
+    title: "LST",
+    apy: 2.4,
+    risk: {
+      level: "High" as const,
+      color: "",
+      bgColor: "",
+    },
+    protocol: "LST",
+    description:
+      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+    image: "/crypto-icons/arb.svg",
+    externalLink: "https://uniswap.org",
+    learnMoreLink: "https://uniswap.org",
+    tokens: [ETH],
+    chainId: arbitrum.id,
+  },
+  {
+    title: "Binance LST",
+    apy: 2.4,
+    risk: {
+      level: "High" as const,
+      color: "",
+      bgColor: "",
+    },
+    protocol: "BSC LST",
+    description:
+      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+    image: "/crypto-icons/bnb.svg",
+    externalLink: "https://uniswap.org",
+    learnMoreLink: "https://uniswap.org",
+    tokens: [BNB],
+    chainId: bsc.id,
   },
   {
     title: "stCelo",

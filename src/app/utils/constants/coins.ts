@@ -26,6 +26,41 @@ export const USDC: Token = {
   },
 };
 
+export const ETH: Token = {
+  name: "ETH",
+  icon: "/crypto-icons/eth.svg",
+  decimals: 18,
+  isNativeToken: true,
+};
+
+export const BNB: Token = {
+  name: "BNB",
+  icon: "/crypto-icons/bnb.svg",
+  decimals: 18,
+  isNativeToken: true,
+};
+
+export const wstETH: Token = {
+  name: "wstETH",
+  icon: "/crypto-icons/weth.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [base.id]: "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+    [arbitrum.id]: "0x5979D7b546E38E414F7E9822514be443A4800529",
+  },
+};
+
+export const wbETH: Token = {
+  name: "wbETH",
+  icon: "/crypto-icons/weth.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [bsc.id]: "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
+  },
+};
+
 export const cbBTC: Token = {
   name: "cbBTC",
   icon: "/crypto-icons/cbBTC.svg",
@@ -62,3 +97,39 @@ export const cEUR: Token = {
     [celo.id]: "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73",
   },
 };
+
+export const WETH: Token = {
+  name: "WETH",
+  icon: "/crypto-icons/weth.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [base.id]: "0x4200000000000000000000000000000000000006",
+    [arbitrum.id]: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+  },
+};
+
+export const WBNB: Token = {
+  name: "WBNB",
+  icon: "/crypto-icons/bnb.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [bsc.id]: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+  },
+};
+
+export function getWrappedToken(token: Token): Token {
+  if (token.isNativeToken) {
+    switch (token.name) {
+      case "ETH":
+        return WETH;
+      case "BNB":
+        return WBNB;
+      default:
+        throw new Error("Token does't have wrapped token");
+    }
+  } else {
+    throw new Error("Token does't have wrapped token");
+  }
+}
