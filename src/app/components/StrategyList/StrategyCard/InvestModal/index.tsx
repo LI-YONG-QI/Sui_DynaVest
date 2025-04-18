@@ -290,7 +290,7 @@ export default function InvestModal({
                             {isLoadingBalance ? (
                               <MoonLoader size={10} />
                             ) : isSupportedChain ? (
-                              maxBalance.toFixed(2)
+                              maxBalance.toFixed(4)
                             ) : (
                               "NaN"
                             )}
