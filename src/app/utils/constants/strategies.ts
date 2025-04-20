@@ -24,24 +24,26 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "Morpho Supplying",
-    apy: 2.4,
+    apy: 5.4,
     risk: {
-      level: "Low" as const,
+      level: "Medium" as const,
       color: "#10B981",
       bgColor: "rgba(16, 185, 129, 0.3)",
     },
     protocol: "Morpho",
     description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
     image: "/crypto-icons/base.png",
-    externalLink: "https://morpho.org",
-    learnMoreLink: "https://morpho.org",
+    externalLink:
+      "https://app.morpho.org/base/market/0x8793cf302b8ffd655ab97bd1c695dbd967807e8367a65cb2f4edaf1380ba1bda/weth-usdc",
+    learnMoreLink:
+      "https://app.morpho.org/base/market/0x8793cf302b8ffd655ab97bd1c695dbd967807e8367a65cb2f4edaf1380ba1bda/weth-usdc",
     tokens: [USDC],
     chainId: base.id,
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 10,
+    apy: 3.33,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -49,16 +51,18 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "AAVE",
     description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
     image: "/crypto-icons/base.png",
-    externalLink: "https://aave.com",
-    learnMoreLink: "https://aave.com",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&marketName=proto_base_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&marketName=proto_base_v3",
     tokens: [USDC],
     chainId: base.id,
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 10,
+    apy: 2.47,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -66,33 +70,37 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "AAVE",
     description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
     image: "/crypto-icons/arb.svg",
-    externalLink: "https://aave.com",
-    learnMoreLink: "https://aave.com",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0xaf88d065e77c8cc2239327c5edb3a432268e5831&marketName=proto_arbitrum_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0xaf88d065e77c8cc2239327c5edb3a432268e5831&marketName=proto_arbitrum_v3",
     tokens: [USDC],
     chainId: arbitrum.id,
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 2.4,
+    apy: 2.93,
     risk: {
-      level: "Low" as const,
+      level: "Medium" as const,
       color: "#10B981",
       bgColor: "rgba(16, 185, 129, 0.3)",
     },
     protocol: "BSC Aave",
     description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
     image: "/crypto-icons/bnb.svg",
-    externalLink: "https://bsc.com",
-    learnMoreLink: "https://bsc.com",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d&marketName=proto_bnb_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d&marketName=proto_bnb_v3",
     tokens: [USDC],
     chainId: bsc.id,
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 10,
+    apy: 0.09,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -100,16 +108,18 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "AAVE",
     description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
     image: "/crypto-icons/celo.svg",
-    externalLink: "https://aave.com",
-    learnMoreLink: "https://aave.com",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0xceba9300f2b948710d2653dd7b07f33a8b32118c&marketName=proto_celo_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0xceba9300f2b948710d2653dd7b07f33a8b32118c&marketName=proto_celo_v3",
     tokens: [cEUR],
     chainId: celo.id,
   },
   {
-    title: "Aave Lending Strategy",
-    apy: 10,
+    title: "AAVE Lending Strategy",
+    apy: 3.28,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -117,16 +127,18 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "AAVE",
     description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
     image: "/crypto-icons/polygon.svg",
-    externalLink: "https://aave.com",
-    learnMoreLink: "https://aave.com",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
     tokens: [USDC],
     chainId: polygon.id,
   },
   {
     title: "Uniswap Liquidity",
-    apy: 2.4,
+    apy: 0.32,
     risk: {
       level: "High" as const,
       color: "",
@@ -134,16 +146,18 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "Uniswap",
     description:
-      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+      "Adding USDC and USDT to the Uniswap v3 USDC/USDT 0.01% pool enables users to earn swap fees by providing liquidity for trading between these stablecoins.",
     image: "/crypto-icons/base.png",
-    externalLink: "https://uniswap.org",
-    learnMoreLink: "https://uniswap.org",
+    externalLink:
+      "https://app.uniswap.org/explore/pools/base/0xD56da2B74bA826f19015E6B7Dd9Dae1903E85DA1",
+    learnMoreLink:
+      "https://app.uniswap.org/explore/pools/base/0xD56da2B74bA826f19015E6B7Dd9Dae1903E85DA1",
     tokens: [USDC],
     chainId: base.id,
   },
   {
     title: "Uniswap Liquidity",
-    apy: 2.4,
+    apy: 0.32,
     risk: {
       level: "High" as const,
       color: "",
@@ -151,16 +165,18 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "Uniswap",
     description:
-      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+      "Adding USDC and USDT to the Uniswap v3 USDC/USDT 0.01% pool enables users to earn swap fees by providing liquidity for trading between these stablecoins.",
     image: "/crypto-icons/bnb.svg",
-    externalLink: "https://uniswap.org",
-    learnMoreLink: "https://uniswap.org",
+    externalLink:
+      "https://app.uniswap.org/explore/pools/bnb/0x2C3c320D49019D4f9A92352e947c7e5AcFE47D68",
+    learnMoreLink:
+      "https://app.uniswap.org/explore/pools/bnb/0x2C3c320D49019D4f9A92352e947c7e5AcFE47D68",
     tokens: [USDC],
     chainId: bsc.id,
   },
   {
     title: "Uniswap Liquidity",
-    apy: 2.4,
+    apy: 0.32,
     risk: {
       level: "High" as const,
       color: "",
@@ -168,16 +184,18 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "Uniswap",
     description:
-      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+      "Adding USDC and USDT to the Uniswap v3 USDC/USDT 0.01% pool enables users to earn swap fees by providing liquidity for trading between these stablecoins.",
     image: "/crypto-icons/arb.svg",
-    externalLink: "https://uniswap.org",
-    learnMoreLink: "https://uniswap.org",
+    externalLink:
+      "https://app.uniswap.org/explore/pools/arbitrum/0xbE3aD6a5669Dc0B8b12FeBC03608860C31E2eef6",
+    learnMoreLink:
+      "https://app.uniswap.org/explore/pools/arbitrum/0xbE3aD6a5669Dc0B8b12FeBC03608860C31E2eef6",
     tokens: [USDC],
     chainId: arbitrum.id,
   },
   {
-    title: "LST",
-    apy: 2.4,
+    title: "Liquid Staking",
+    apy: 2.8,
     risk: {
       level: "High" as const,
       color: "",
@@ -185,16 +203,16 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "LST",
     description:
-      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+      "Staking tokens to operate network nodes helps to maintain security on the blockchain.",
     image: "/crypto-icons/base.png",
-    externalLink: "https://uniswap.org",
-    learnMoreLink: "https://uniswap.org",
+    externalLink: "https://lido.fi/",
+    learnMoreLink: "https://lido.fi/",
     tokens: [ETH],
     chainId: base.id,
   },
   {
-    title: "LST",
-    apy: 2.4,
+    title: "Liquid Staking",
+    apy: 2.8,
     risk: {
       level: "High" as const,
       color: "",
@@ -202,16 +220,16 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "LST",
     description:
-      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+      "Staking tokens to operate network nodes helps to maintain security on the blockchain.",
     image: "/crypto-icons/arb.svg",
-    externalLink: "https://uniswap.org",
-    learnMoreLink: "https://uniswap.org",
+    externalLink: "https://lido.fi/",
+    learnMoreLink: "https://lido.fi/",
     tokens: [ETH],
     chainId: arbitrum.id,
   },
   {
-    title: "Binance LST",
-    apy: 2.4,
+    title: "Binance Liquid Staking",
+    apy: 2.8,
     risk: {
       level: "High" as const,
       color: "",
@@ -219,16 +237,16 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     },
     protocol: "BSC LST",
     description:
-      "Provide liquidity to Uniswap V3 USDC/USDT pool with full range",
+      "Staking tokens to operate network nodes helps to maintain security on the blockchain.",
     image: "/crypto-icons/bnb.svg",
-    externalLink: "https://uniswap.org",
-    learnMoreLink: "https://uniswap.org",
+    externalLink: "https://lido.fi/",
+    learnMoreLink: "https://lido.fi/",
     tokens: [BNB],
     chainId: bsc.id,
   },
   {
     title: "stCelo",
-    apy: 2,
+    apy: 2.8,
     risk: {
       level: "Low" as const,
       color: "#E83033",
