@@ -139,7 +139,7 @@ export default function Home() {
     <div className="h-screen flex flex-col">
       <div className={`flex flex-col ${conversation.length > 0 && "flex-1"}`}>
         <h2 className="text-[48px] font-extrabold font-[family-name:var(--font-manrope)] text-[#141A21] mb-8 text-center">
-          DeFAI Strategies Advisor
+          DeFAI Strategies Advisor(DEV)
         </h2>
 
         {conversation.length === 0 ? (
