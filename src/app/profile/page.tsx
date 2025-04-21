@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import AssetsTableComponent from "../components/Profile/AssetsTable";
+import StrategiesTableComponent from "../components/Profile/StrategiesTable";
 
 const PROFILE_TABS = [
   {
@@ -24,7 +25,7 @@ function getTabComponent(tab: string) {
     case "assets":
       return <AssetsTableComponent />;
     case "strategies":
-      return null;
+      return <StrategiesTableComponent />;
     case "transactions":
       return null;
     default:
