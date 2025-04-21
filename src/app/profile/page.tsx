@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import AssetsTableComponent from "../components/Profile/AssetsTable";
 import StrategiesTableComponent from "../components/Profile/StrategiesTable";
+import TransactionsTableComponent from "../components/Profile/TransactionsTable";
 
 const PROFILE_TABS = [
   {
@@ -27,7 +28,7 @@ function getTabComponent(tab: string) {
     case "strategies":
       return <StrategiesTableComponent />;
     case "transactions":
-      return null;
+      return <TransactionsTableComponent />;
     default:
       return null;
   }
@@ -112,15 +113,17 @@ export default function ProfilePage() {
         {/* User Stats */}
         <div className="flex gap-10 items-center mb-8">
           <div>
-            <h4 className="text-sm text-gray-300">Available Balance</h4>
+            <h4 className="text-sm font-medium text-gray-300">
+              Available Balance
+            </h4>
             <p className="text-lg font-bold tracking-wide">$ 123,456</p>
           </div>
           <div>
-            <h4 className="text-sm text-gray-300">TVL</h4>
+            <h4 className="text-sm font-medium text-gray-300">TVL</h4>
             <p className="text-lg font-bold tracking-wide">$15</p>
           </div>
           <div>
-            <h4 className="text-sm text-gray-300">Total Profilt</h4>
+            <h4 className="text-sm font-medium text-gray-300">Total Profit</h4>
             <p className="text-green-500 font-bold tracking-wide">$0.04</p>
           </div>
         </div>
