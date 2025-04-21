@@ -138,10 +138,10 @@ export default function StrategiesTableComponent() {
               {/* Actions */}
               <td className="p-4 text-right rounded-r-xl">
                 <div className="flex justify-end gap-1">
-                  <button className="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                  <button className="px-3 py-1.5 rounded-lg text-sm text-primary hover:bg-gray-50 transition-colors">
                     Deposit
                   </button>
-                  <button className="px-3 py-1.5 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                  <button className="px-3 py-1.5 rounded-lg text-sm text-primary hover:bg-gray-50 transition-colors">
                     Withdraw
                   </button>
                 </div>
