@@ -12,3 +12,19 @@ export const getRiskColor = (risk: {
       return { text: "#E83033", bg: "rgba(232, 48, 51, 0.3)" };
   }
 };
+
+// TODO: Convert given value to USD
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
+export const formatCoin = (value: number, symbol: string) => {
+  return `${value.toLocaleString("en-US", {
+    maximumFractionDigits: 6,
+  })} ${symbol}`;
+};
