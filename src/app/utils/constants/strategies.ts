@@ -245,6 +245,22 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     chainId: bsc.id,
   },
   {
+    title: "Camelot",
+    apy: 17.54,
+    risk: {
+      level: "Medium" as const,
+      color: "",
+      bgColor: "",
+    },
+    protocol: "Camelot",
+    description: "Swap ETH to xGRAIL and stake it to Camelot to earn yield.",
+    image: "/crypto-icons/arb.svg",
+    externalLink: "https://app.camelot.exchange/xgrail/staking",
+    learnMoreLink: "https://app.camelot.exchange/xgrail/staking",
+    tokens: [ETH],
+    chainId: arbitrum.id,
+  },
+  {
     title: "stCelo",
     apy: 2.8,
     risk: {
