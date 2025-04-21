@@ -19,7 +19,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           >
             <span>
               <Image
-                src="/ask-onevault-bot-icon.png"
+                src="/ask-dynavest-bot-icon.png"
                 alt="Bot"
                 width={20}
                 height={20}

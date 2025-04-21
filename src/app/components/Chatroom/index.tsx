@@ -92,7 +92,7 @@ const Chatroom = () => {
         <div className="flex items-center gap-x-3">
           <div className="flex items-center justify-center mt-1">
             <Image
-              src="/ask-onevault-bot-icon.png"
+              src="/ask-dynavest-bot-icon.png"
               alt="Bot"
               width={48}
               height={48}
@@ -100,7 +100,7 @@ const Chatroom = () => {
             />
           </div>
           <div className="leading-5">
-            <h3 className="font-bold text-lg">OneVault Bot</h3>
+            <h3 className="font-bold text-lg">DynaVest Bot</h3>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               <span className="text-xs text-green-100">Online</span>

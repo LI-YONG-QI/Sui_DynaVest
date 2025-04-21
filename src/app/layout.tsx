@@ -52,8 +52,8 @@ const bricolageGrotesque = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "OneVault - DeFi Investment Made Easy",
-  description: "Make DeFi investment easy and simple with OneVault AI",
+  title: "DynaVest - DeFi Investment Made Easy",
+  description: "Make DeFi investment easy and simple with DynaVest AI",
 };
 
 export default function RootLayout({
