@@ -26,7 +26,8 @@ export default function StrategyCard({
 
   return (
     <>
-      <div className="flex flex-col items-center gap-[18px] p-5 bg-white rounded-2xl shadow-[0px_21px_27px_-10px_rgba(71,114,234,0.65)]">
+      <div className="flex flex-col items-center p-5 bg-white rounded-2xl shadow-[0px_21px_27px_-10px_rgba(71,114,234,0.65)] h-full">
+        {/* Header Section */}
         <div className="flex justify-around items-center w-full">
           <Image
             src={image}
@@ -60,8 +61,9 @@ export default function StrategyCard({
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-start self-stretch">
-          <div className="flex flex-col items-start gap-[18px] self-stretch">
+        {/* Content Section - Flex Grow */}
+        <div className="flex flex-col items-start self-stretch flex-grow">
+          <div className="flex flex-col items-start gap-4 self-stretch my-4">
             <div className="flex items-center gap-2 self-stretch">
               <span className="font-[family-name:var(--font-inter)] text-[#17181C] text-sm font-medium">
                 Protocol:
@@ -93,7 +95,7 @@ export default function StrategyCard({
                 </span>
               )}
             </div>
-            <div className="flex flex-col items-start self-stretch">
+            <div className="flex flex-col items-start self-stretch flex-grow">
               <p className="font-[family-name:var(--font-inter)] text-[#17181C] text-sm font-normal text-left">
                 {baseDescription}
                 {learnMoreLink && (
@@ -110,12 +112,15 @@ export default function StrategyCard({
             </div>
           </div>
         </div>
-        <button
-          className="flex justify-center items-center py-2 px-4 bg-[#5F79F1] rounded-lg text-white font-medium hover:bg-[#4A64DC] transition-colors w-full"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Invest
-        </button>
+        {/* Action button section - always stay at bottom */}
+        <div className="w-full mt-auto">
+          <button
+            className="flex justify-center items-center py-2 px-4 bg-[#5F79F1] rounded-lg text-white font-medium hover:bg-[#4A64DC] transition-colors w-full"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Invest
+          </button>
+        </div>
       </div>
 
       <InvestModal
