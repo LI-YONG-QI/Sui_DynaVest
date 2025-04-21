@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useLogin, usePrivy } from "@privy-io/react-auth";
 import { useDisconnect, useAccount } from "wagmi";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ConnectWalletButton() {
   const { ready: privyReady, authenticated, logout, linkWallet } = usePrivy();
@@ -11,6 +12,7 @@ export default function ConnectWalletButton() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // business logic
   const buttonReady = privyReady && !isLoading;
@@ -175,7 +177,10 @@ export default function ConnectWalletButton() {
               </button>
 
               {/* Profile */}
-              <button className="w-full flex items-center gap-2 px-5 py-3 hover:bg-white hover:bg-opacity-10 transition-colors">
+              <button
+                onClick={() => router.push("/profile")}
+                className="w-full flex items-center gap-2 px-5 py-3 hover:bg-white hover:bg-opacity-10 transition-colors"
+              >
                 <Image
                   src="/dropdown-icons/profile-icon.svg"
                   alt="Profile"
