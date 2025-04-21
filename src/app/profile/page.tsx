@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import AssetsTableComponent from "../components/Profile/AssetsTable";
 
 const PROFILE_TABS = [
   {
@@ -17,6 +18,19 @@ const PROFILE_TABS = [
     value: "transactions",
   },
 ];
+
+function getTabComponent(tab: string) {
+  switch (tab) {
+    case "assets":
+      return <AssetsTableComponent />;
+    case "strategies":
+      return null;
+    case "transactions":
+      return null;
+    default:
+      return null;
+  }
+}
 
 export default function ProfilePage() {
   const [selectedTab, setSelectedTab] = useState(PROFILE_TABS[0].value);
@@ -128,7 +142,7 @@ export default function ProfilePage() {
         </div>
 
         {/* TODO: Assets/Strategies/Transactions Table */}
-        <div></div>
+        <div>{getTabComponent(selectedTab)}</div>
       </div>
     </div>
   );
