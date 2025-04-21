@@ -1,6 +1,26 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+
+const PROFILE_TABS = [
+  {
+    label: "Assets",
+    value: "assets",
+  },
+  {
+    label: "Strategies",
+    value: "strategies",
+  },
+  {
+    label: "Transactions",
+    value: "transactions",
+  },
+];
 
 export default function ProfilePage() {
+  const [selectedTab, setSelectedTab] = useState(PROFILE_TABS[0].value);
+
   return (
     <div className="pb-10">
       <div className="bg-white rounded-lg min-h-[80vh] p-8">
@@ -73,8 +93,9 @@ export default function ProfilePage() {
             </button>
           </div>
         </div>
+
         {/* User Stats */}
-        <div className="flex gap-10 items-center">
+        <div className="flex gap-10 items-center mb-8">
           <div>
             <h4 className="text-sm text-gray-300">Available Balance</h4>
             <p className="text-lg font-bold tracking-wide">$ 123,456</p>
@@ -88,7 +109,25 @@ export default function ProfilePage() {
             <p className="text-green-500 font-bold tracking-wide">$0.04</p>
           </div>
         </div>
-        {/* TODO: Assets/Strategies/Transactions tables */}
+
+        {/* Assets/Strategies/Transactions tabs */}
+        <div className="mb-8 border-b border-gray-300 gap-x-5 flex">
+          {PROFILE_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setSelectedTab(tab.value)}
+              className={`py-2 hover:bg-[#d0e0ff] border-b-4 font-bold transition-colors ${
+                selectedTab === tab.value
+                  ? "font-bold border-black"
+                  : "text-gray-400 border-transparent"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* TODO: Assets/Strategies/Transactions Table */}
         <div></div>
       </div>
     </div>
