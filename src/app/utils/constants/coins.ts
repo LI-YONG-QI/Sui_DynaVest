@@ -109,6 +109,26 @@ export const WETH: Token = {
   },
 };
 
+export const GRAIL: Token = {
+  name: "GRAIL",
+  icon: "/crypto-icons/grail.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [arbitrum.id]: "0x3d9907F9a368ad0a51Be60f7Da3b97cf940982D8",
+  },
+};
+
+export const xGRAIL: Token = {
+  name: "xGRAIL",
+  icon: "/crypto-icons/xgrail.svg",
+  decimals: 18,
+  isNativeToken: false,
+  chains: {
+    [arbitrum.id]: "0x3CAaE25Ee616f2C8E13C74dA0813402eae3F496b",
+  },
+};
+
 export const WBNB: Token = {
   name: "WBNB",
   icon: "/crypto-icons/bnb.svg",
