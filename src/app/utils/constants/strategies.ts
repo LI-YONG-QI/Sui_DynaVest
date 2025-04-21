@@ -24,7 +24,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "Morpho Supplying",
-    apy: 5.4,
+    apy: 6.7,
     risk: {
       level: "Medium" as const,
       color: "#10B981",
@@ -43,7 +43,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 3.33,
+    apy: 6.1,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -62,7 +62,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 2.47,
+    apy: 4.5,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -81,7 +81,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 2.93,
+    apy: 4.3,
     risk: {
       level: "Medium" as const,
       color: "#10B981",
@@ -100,7 +100,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 0.09,
+    apy: 5.7,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -119,7 +119,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "AAVE Lending Strategy",
-    apy: 3.28,
+    apy: 5.1,
     risk: {
       level: "Medium" as const,
       color: "#B9AB15",
@@ -138,7 +138,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "Uniswap Liquidity",
-    apy: 0.32,
+    apy: 32.5,
     risk: {
       level: "High" as const,
       color: "",
@@ -157,7 +157,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "Uniswap Liquidity",
-    apy: 0.32,
+    apy: 39.1,
     risk: {
       level: "High" as const,
       color: "",
@@ -176,7 +176,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "Uniswap Liquidity",
-    apy: 0.32,
+    apy: 35.4,
     risk: {
       level: "High" as const,
       color: "",
@@ -197,7 +197,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     title: "Liquid Staking",
     apy: 2.8,
     risk: {
-      level: "High" as const,
+      level: "Low" as const,
       color: "",
       bgColor: "",
     },
@@ -214,7 +214,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     title: "Liquid Staking",
     apy: 2.8,
     risk: {
-      level: "High" as const,
+      level: "Low" as const,
       color: "",
       bgColor: "",
     },
@@ -231,7 +231,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     title: "Binance Liquid Staking",
     apy: 2.8,
     risk: {
-      level: "High" as const,
+      level: "Low" as const,
       color: "",
       bgColor: "",
     },
@@ -297,7 +297,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
   {
     title: "Flow Yield",
-    apy: 23.0,
+    apy: 34.0,
     risk: {
       level: "High" as const,
       color: "#10B981",
