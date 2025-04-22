@@ -8,3 +8,4 @@ export * from "./morpho";
 export * from "./stCelo";
 export * from "./uniswap";
 export * from "./camelot";
+export * from "./gmx";
