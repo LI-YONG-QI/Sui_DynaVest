@@ -1,16 +1,11 @@
 import { Address } from "viem";
 import { arbitrum } from "viem/chains";
+import { readContract, writeContract } from "@wagmi/core";
 
 import { BaseStrategy } from "./base";
 import { GMX_CONTRACTS } from "../constants/protocols/gmx";
-import {
-  waitForTransactionReceipt,
-  readContract,
-  writeContract,
-} from "@wagmi/core";
 import { wagmiConfig } from "@/providers/config";
-import { GMX_STRATEGY_ABI } from "@/app/abis";
-import { ERC20_ABI } from "@/app/abis/erc20";
+import { GMX_STRATEGY_ABI, ERC20_ABI } from "@/app/abis";
 
 type GMXSupportedChains = typeof arbitrum.id;
 
