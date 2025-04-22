@@ -7,5 +7,7 @@ export * from "./morpho";
 export * from "./stakeCelo";
 export * from "./nftManager";
 export * from "./v3SwapRouter";
+export * from "./gmxStrategy";
+export * from "./beefyVault";
 export * from "./xGrail";
 export * from "./camelotStrategy";
