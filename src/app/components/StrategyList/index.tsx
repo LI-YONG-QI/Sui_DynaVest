@@ -7,7 +7,7 @@ import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
 import RiskFilter from "./RiskFilter";
-import ProtocolFilters from "./ProtocolFilters";
+import ProtocolFilter from "./ProtocolFilter";
 import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
 
 // No results placeholder
@@ -100,6 +100,7 @@ export default function StrategyList() {
     <div>
       {/* Filters */}
       {/* TODO: Implement more filters */}
+      {/* TODO: Make fitlers dynamic */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <RiskFilter
@@ -110,7 +111,7 @@ export default function StrategyList() {
             setShowRiskDropdown={setShowRiskDropdown}
             dropdownRef={dropdownRef}
           />
-          <ProtocolFilters
+          <ProtocolFilter
             protocols={protocolOptions}
             selectedProtocols={selectedProtocols}
             setSelectedProtocols={setSelectedProtocols}

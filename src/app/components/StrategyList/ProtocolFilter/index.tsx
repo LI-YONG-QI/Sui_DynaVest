@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 
-export interface ProtocolFiltersProps {
+export interface ProtocolFilterProps {
   protocols: string[];
   selectedProtocols: string[];
   setSelectedProtocols: (protocols: string[]) => void;
@@ -11,14 +11,14 @@ export interface ProtocolFiltersProps {
   dropdownRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function ProtocolFilters({
+export default function ProtocolFilter({
   protocols,
   selectedProtocols,
   toggleProtocolSelection,
   showProtocolDropdown,
   setShowProtocolDropdown,
   dropdownRef,
-}: ProtocolFiltersProps) {
+}: ProtocolFilterProps) {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
