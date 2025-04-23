@@ -1,18 +1,12 @@
 import { Address } from "viem";
 import { arbitrum } from "viem/chains";
+import { writeContract, readContract } from "@wagmi/core";
 
 import { BaseStrategy } from "./base";
-import { CAMELOT_CONTRACTS } from "../constants/protocols/camelot";
-import {
-  waitForTransactionReceipt,
-  writeContract,
-  readContract,
-} from "@wagmi/core";
-import { wagmiConfig } from "@/providers/config";
-import { CAMELOT_STRATEGY_ABI } from "@/app/abis/camelotStrategy";
+import { CAMELOT_CONTRACTS } from "../constants/protocols";
 import { GRAIL, WETH, xGRAIL } from "../constants/coins";
-import { ERC20_ABI } from "@/app/abis/erc20";
-import { XGRAIL_ABI } from "@/app/abis/xGrail";
+import { wagmiConfig } from "@/providers/config";
+import { ERC20_ABI, XGRAIL_ABI, CAMELOT_STRATEGY_ABI } from "@/app/abis";
 
 type CamelotSupportedChains = typeof arbitrum.id;
 
@@ -39,29 +33,27 @@ export class CamelotStrategy extends BaseStrategy<CamelotSupportedChains> {
       const xGrail = xGRAIL.chains![this.chainId];
       const weth = WETH.chains![this.chainId];
 
-      const pair = "0xf82105aA473560CfBF8Cbc6Fd83dB14Eb4028117";
-      const adapter = "0x610934febc44be225adecd888eaf7dff3b0bc050";
+      const pair = "0xf82105aA473560CfBF8Cbc6Fd83dB14Eb4028117"; // TODO: hardcode
+      const adapter = "0x610934febc44be225adecd888eaf7dff3b0bc050"; // TODO: hardcode
 
-      const result = await writeContract(wagmiConfig, {
-        address: this.camelotStrategy,
-        abi: CAMELOT_STRATEGY_ABI,
-        functionName: "swapETHToXGrail",
-        args: [
-          {
-            amountIn: amount,
-            amountOut: BigInt(0), // TODO: amountOut limit
-            path: [weth, grail],
-            adapters: [adapter],
-            recipients: [pair],
-          },
-          user,
-        ],
-        value: amount,
-      });
-
-      await waitForTransactionReceipt(wagmiConfig, {
-        hash: result,
-      });
+      await this.executeWaitTx(() =>
+        writeContract(wagmiConfig, {
+          address: this.camelotStrategy,
+          abi: CAMELOT_STRATEGY_ABI,
+          functionName: "swapETHToXGrail",
+          args: [
+            {
+              amountIn: amount,
+              amountOut: BigInt(0),
+              path: [weth, grail],
+              adapters: [adapter],
+              recipients: [pair],
+            },
+            user,
+          ],
+          value: amount,
+        })
+      );
 
       const xGRAILBalance = await readContract(wagmiConfig, {
         address: xGrail,
@@ -70,27 +62,23 @@ export class CamelotStrategy extends BaseStrategy<CamelotSupportedChains> {
         args: [user],
       });
 
-      const approveTx = await writeContract(wagmiConfig, {
-        address: xGrail,
-        abi: XGRAIL_ABI,
-        functionName: "approveUsage",
-        args: [this.dividendsV2, xGRAILBalance],
-      });
+      await this.executeWaitTx(() =>
+        writeContract(wagmiConfig, {
+          address: xGrail,
+          abi: XGRAIL_ABI,
+          functionName: "approveUsage",
+          args: [this.dividendsV2, xGRAILBalance],
+        })
+      );
 
-      await waitForTransactionReceipt(wagmiConfig, {
-        hash: approveTx,
-      });
-
-      const allocateTx = await writeContract(wagmiConfig, {
-        address: xGrail,
-        abi: XGRAIL_ABI,
-        functionName: "allocate",
-        args: [this.dividendsV2, xGRAILBalance, "0x"],
-      });
-
-      await waitForTransactionReceipt(wagmiConfig, {
-        hash: allocateTx,
-      });
+      const allocateTx = await this.executeWaitTx(() =>
+        writeContract(wagmiConfig, {
+          address: xGrail,
+          abi: XGRAIL_ABI,
+          functionName: "allocate",
+          args: [this.dividendsV2, xGRAILBalance, "0x"],
+        })
+      );
 
       return allocateTx;
     } else {

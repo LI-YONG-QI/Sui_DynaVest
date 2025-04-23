@@ -1,9 +1,26 @@
 import { celo, flowMainnet, base, bsc, arbitrum, polygon } from "viem/chains";
 
-import { USDC, USDT, CELO, FLOW, cEUR, ETH, BNB } from "./coins";
+import { USDC, CELO, FLOW, cEUR, ETH, BNB } from "./coins";
 import type { StrategyMetadata } from "../types";
 
 export const STRATEGIES_METADATA: StrategyMetadata[] = [
+  {
+    title: "GMX Strategy",
+    apy: 214.47,
+    risk: {
+      level: "High" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "GMX",
+    description:
+      "Leveraged Beefy Vault on GMX, GMX is staked to earn ETH and esGMX. This ETH is compounded to more GMX",
+    image: "/crypto-icons/arb.svg",
+    externalLink: "https://app.beefy.com/vault/gmx-arb-gmx",
+    learnMoreLink: "https://app.beefy.com/vault/gmx-arb-gmx",
+    tokens: [ETH],
+    chainId: arbitrum.id,
+  },
   {
     title: "AAVE Lending Strategy",
     apy: 4.5,
@@ -74,24 +91,6 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     learnMoreLink: "https://app.camelot.exchange/xgrail/staking",
     tokens: [ETH],
     chainId: arbitrum.id,
-  },
-  {
-    title: "1inch Swap",
-    apy: 2.4,
-    risk: {
-      level: "Low" as const,
-      color: "#10B981",
-      bgColor: "rgba(16, 185, 129, 0.3)",
-    },
-    protocol: "1inch",
-    description:
-      "Lending protocol that allows anyone to deposit and earn yield. Learn More",
-    image: "/crypto-icons/base.png",
-    externalLink: "https://morpho.org",
-    learnMoreLink: "https://morpho.org",
-    tokens: [USDT, USDC],
-    chainId: base.id,
-    displayInsufficientBalance: true,
   },
   {
     title: "Morpho Supplying",

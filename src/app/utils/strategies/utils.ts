@@ -12,6 +12,7 @@ import { BscAaveV3Strategy } from "./bsc";
 import { LSTStrategy } from "./lst";
 import { BscLstStrategy } from "./bscLst";
 import { CamelotStrategy } from "./camelot";
+import { GMXStrategy } from "./gmx";
 
 export function getDeadline(): bigint {
   const timestampInSeconds = Math.floor(Date.now() / 1000);
@@ -47,6 +48,8 @@ export function getStrategy(
       return new BscLstStrategy(chainId);
     case "Camelot":
       return new CamelotStrategy(chainId);
+    case "GMX":
+      return new GMXStrategy(chainId);
     default:
       throw new Error("Unsupported protocol");
   }

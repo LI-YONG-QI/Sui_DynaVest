@@ -22,7 +22,8 @@ export type Protocol =
   | "BSC Aave"
   | "LST"
   | "BSC LST"
-  | "Camelot";
+  | "Camelot"
+  | "GMX";
 
 export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;
