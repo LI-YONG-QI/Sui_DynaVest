@@ -7,6 +7,7 @@ import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
 import RiskFilter from "./RiskFilter";
+import ProtocolFilter from "./ProtocolFilter";
 import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
 
 // No results placeholder
@@ -26,8 +27,25 @@ export default function StrategyList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showRiskDropdown, setShowRiskDropdown] = useState(false);
   const [selectedRisks, setSelectedRisks] = useState<string[]>([]);
+  const [showProtocolDropdown, setShowProtocolDropdown] = useState(false);
+  const [selectedProtocols, setSelectedProtocols] = useState<string[]>([]);
+  const protocolDropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Extract all distinct protocols
+  const protocolOptions = useMemo(() => {
+    const protocols = STRATEGIES_METADATA.map((strategy) => strategy.protocol);
+    return Array.from(new Set(protocols));
+  }, []);
+
+  // Toggle protocol selection
+  const toggleProtocolSelection = (protocol: string) => {
+    setSelectedProtocols((prev) =>
+      prev.includes(protocol)
+        ? prev.filter((p) => p !== protocol)
+        : [...prev, protocol]
+    );
+  };
   // Toggle risk selection
   const toggleRiskSelection = (risk: string) => {
     setSelectedRisks((prev) =>
@@ -35,7 +53,7 @@ export default function StrategyList() {
     );
   };
 
-  // Filter strategies based on search query and selected risks
+  // Filter strategies based on search query, selected risks, and selected protocols
   const filteredStrategies = useMemo(() => {
     let filtered = STRATEGIES_METADATA;
 
@@ -43,6 +61,13 @@ export default function StrategyList() {
     if (selectedRisks.length > 0) {
       filtered = filtered.filter((strategy) =>
         selectedRisks.includes(strategy.risk.level)
+      );
+    }
+
+    // Filter by protocol if any protocols are selected
+    if (selectedProtocols.length > 0) {
+      filtered = filtered.filter((strategy) =>
+        selectedProtocols.includes(strategy.protocol)
       );
     }
 
@@ -69,12 +94,13 @@ export default function StrategyList() {
     }
 
     return filtered;
-  }, [searchQuery, selectedRisks]);
+  }, [searchQuery, selectedRisks, selectedProtocols]);
 
   return (
     <div>
       {/* Filters */}
       {/* TODO: Implement more filters */}
+      {/* TODO: Make fitlers dynamic */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <RiskFilter
@@ -84,6 +110,15 @@ export default function StrategyList() {
             showRiskDropdown={showRiskDropdown}
             setShowRiskDropdown={setShowRiskDropdown}
             dropdownRef={dropdownRef}
+          />
+          <ProtocolFilter
+            protocols={protocolOptions}
+            selectedProtocols={selectedProtocols}
+            setSelectedProtocols={setSelectedProtocols}
+            toggleProtocolSelection={toggleProtocolSelection}
+            showProtocolDropdown={showProtocolDropdown}
+            setShowProtocolDropdown={setShowProtocolDropdown}
+            dropdownRef={protocolDropdownRef}
           />
         </div>
 
