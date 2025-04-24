@@ -287,7 +287,8 @@ export default function Home() {
             </div>
 
             {/* Input Box at Bottom */}
-            <div className="p-4 border-t border-gray-200 bg-white rounded-xl">
+            {/* Add padding for mobile bottom nav */}
+            <div className="p-4 border-t border-gray-200 bg-white rounded-xl md:pb-4 pb-20">
               <form
                 onSubmit={handleAskAI}
                 className="flex justify-between items-center gap-2"

@@ -11,6 +11,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "@/providers";
 import Header from "./components/Header";
+import BottomNav from "./components/BottomNav";
 import { ChatProvider } from "./contexts/ChatContext";
 import Chatroom from "./components/Chatroom";
 
@@ -65,19 +66,19 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${lilyScript.variable} ${dmSans.variable} ${inter.variable} ${manrope.variable} ${plusJakarta.variable} ${poppins.variable} ${bricolageGrotesque.variable} antialiased`}
+        style={{
+          background:
+            "linear-gradient(-59.08deg, #E6F2FB 0%, #EBE7FB 55%, #E6F2FB 100%) fixed",
+        }}
       >
         <ChatProvider>
           <Providers>
-            <div
-              style={{
-                background:
-                  "linear-gradient(-59.08deg, #E6F2FB 0%, #EBE7FB 55%, #E6F2FB 100%)",
-              }}
-            >
-              <div className="min-h-screen mx-auto">
+            <div className="min-h-screen w-full">
+              <div className="mx-auto">
                 <Header />
-                <div className="pt-10 max-w-7xl mx-auto px-5 md:px-20">
+                <div className="pt-10 max-w-7xl mx-auto px-5 md:px-20 relative">
                   {children}
+                  <BottomNav />
                 </div>
                 <Chatroom />
               </div>
