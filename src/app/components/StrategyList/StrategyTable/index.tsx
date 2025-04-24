@@ -23,7 +23,7 @@ interface StrategyTableProps {
 
 export default function StrategyTable({ strategies }: StrategyTableProps) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const { toggleChat } = useChat();
+  const { openChat } = useChat();
 
   // Sort strategies by APY
   const sortedStrategies = [...strategies].sort((a, b) => {
@@ -204,7 +204,11 @@ export default function StrategyTable({ strategies }: StrategyTableProps) {
                     Deposit
                   </button>
                   <button
-                    onClick={toggleChat}
+                    onClick={() =>
+                      openChat(
+                        `Hello! How can I help you with ${strategy.title}?`
+                      )
+                    }
                     className="bg-[#5F79F1] text-white px-3 py-1.5 rounded-sm font-medium"
                   >
                     Ask AI
