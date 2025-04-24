@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import InvestModal from "./InvestModal";
 import { getRiskColor } from "@/app/utils";
+import { useChat } from "@/app/contexts/ChatContext";
 import type { StrategyMetadata } from "@/app/utils/types";
 
 export default function StrategyCard({
@@ -23,6 +24,8 @@ export default function StrategyCard({
 
   // Extract the base description without "Learn More" text
   const baseDescription = description.replace(/\s*Learn More\s*$/, "");
+
+  const { openChat } = useChat();
 
   return (
     <>
@@ -120,7 +123,11 @@ export default function StrategyCard({
           >
             Invest
           </button>
-          <button>
+          <button
+            onClick={() =>
+              openChat(`Hello. Do you want to ask anything about ${title}?`)
+            }
+          >
             <Image src="/bot-icon-blue.svg" alt="bot" width={30} height={30} />
           </button>
         </div>
