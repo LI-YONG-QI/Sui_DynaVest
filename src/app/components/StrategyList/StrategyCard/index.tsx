@@ -113,12 +113,15 @@ export default function StrategyCard({
           </div>
         </div>
         {/* Action button section - always stay at bottom */}
-        <div className="w-full mt-auto">
+        <div className="w-full mt-auto flex items-center gap-5">
           <button
             className="flex justify-center items-center py-2 px-4 bg-[#5F79F1] rounded-lg text-white font-medium hover:bg-[#4A64DC] transition-colors w-full"
             onClick={() => setIsModalOpen(true)}
           >
             Invest
+          </button>
+          <button>
+            <Image src="/bot-icon-blue.svg" alt="bot" width={30} height={30} />
           </button>
         </div>
       </div>
