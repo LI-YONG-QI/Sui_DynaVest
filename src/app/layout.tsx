@@ -76,7 +76,9 @@ export default function RootLayout({
             >
               <div className="min-h-screen mx-auto">
                 <Header />
-                <div className="pt-10 max-w-7xl mx-auto px-20">{children}</div>
+                <div className="pt-10 max-w-7xl mx-auto px-5 md:px-20">
+                  {children}
+                </div>
                 <Chatroom />
               </div>
             </div>
