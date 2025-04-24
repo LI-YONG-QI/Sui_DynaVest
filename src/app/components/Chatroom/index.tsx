@@ -8,18 +8,8 @@ import ChatBubble from "./ChatBubble";
 import { useChat } from "@/app/contexts/ChatContext";
 
 const Chatroom = () => {
-  const { showChat } = useChat();
-  const [isMinimized, setIsMinimized] = useState(false);
-
-  // TODO: review the content for welcoming message.
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! How can I help you with your DeFi investments today?",
-      sender: "bot",
-      timestamp: new Date(),
-    },
-  ]);
+  const { showChat, messages, setMessages, isMinimized, toggleMinimize } =
+    useChat();
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
@@ -35,10 +25,6 @@ const Chatroom = () => {
       scrollToBottom();
     }
   }, [messages, showChat, isMinimized]);
-
-  const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
-  };
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() === "") return;

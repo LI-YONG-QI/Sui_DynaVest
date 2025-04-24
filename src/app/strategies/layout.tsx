@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useChat } from "../contexts/ChatContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { toggleChat } = useChat();
+  const { openChat } = useChat();
 
   return (
     <div className="">
@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         <div className="absolute right-0">
           <button
-            onClick={toggleChat}
+            onClick={() => openChat()}
             className="bg-[#5F79F1] flex items-center gap-x-2 text-white px-5 py-3 rounded-2xl shadow-[0px_21px_27px_-10px_rgba(71,114,234,0.65)] font-[family-name:var(--font-manrope)] font-medium hover:bg-[#4A64DC] transition-colors z-10"
           >
             <span>

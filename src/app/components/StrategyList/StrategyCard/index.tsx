@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import InvestModal from "./InvestModal";
 import { getRiskColor } from "@/app/utils";
+import { useChat } from "@/app/contexts/ChatContext";
 import type { StrategyMetadata } from "@/app/utils/types";
 
 export default function StrategyCard({
@@ -23,6 +24,8 @@ export default function StrategyCard({
 
   // Extract the base description without "Learn More" text
   const baseDescription = description.replace(/\s*Learn More\s*$/, "");
+
+  const { openChat } = useChat();
 
   return (
     <>
@@ -113,12 +116,19 @@ export default function StrategyCard({
           </div>
         </div>
         {/* Action button section - always stay at bottom */}
-        <div className="w-full mt-auto">
+        <div className="w-full mt-auto flex items-center gap-5">
           <button
             className="flex justify-center items-center py-2 px-4 bg-[#5F79F1] rounded-lg text-white font-medium hover:bg-[#4A64DC] transition-colors w-full"
             onClick={() => setIsModalOpen(true)}
           >
             Invest
+          </button>
+          <button
+            onClick={() =>
+              openChat(`Hello. Do you want to ask anything about ${title}?`)
+            }
+          >
+            <Image src="/bot-icon-blue.svg" alt="bot" width={30} height={30} />
           </button>
         </div>
       </div>
