@@ -169,7 +169,7 @@ const Chatroom = () => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your message here..."
-                  className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#5F79F1] placeholder:text-xs md:placeholder:text-md focus:border-transparent resize-none"
+                  className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#5F79F1] placeholder:text-xs md:placeholder:text-sm focus:border-transparent resize-none"
                   rows={1}
                 />
               </div>
