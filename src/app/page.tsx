@@ -5,7 +5,10 @@ import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
 import useChatbot from "./hooks/useChatbotResponse";
 import { Message } from "./types";
 import { format } from "date-fns";
+import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
+import { STRATEGIES_METADATA } from "./utils/constants/strategies";
 
+// Define Token type
 const COMMANDS = [
   {
     title: "DeFAI Strategies",
@@ -46,6 +49,14 @@ export default function Home() {
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
 
+  const sendMockMessage = async (message: string) => {
+    // For demo purposes, we're including our mock strategy in the response
+    return {
+      result: "Hello, how can I help you today?",
+      strategy: { ...STRATEGIES_METADATA[1] }, // AAVE Lending Strategy
+    };
+  };
+
   const handleCommand = (command: string) => {
     setCommand(command);
     // Focus the input field after setting the command
@@ -75,7 +86,7 @@ export default function Home() {
     setCommand("");
 
     try {
-      const botResponse = await sendMessage(command);
+      const botResponse = await sendMockMessage(command);
       if (!botResponse || !botResponse.result) return;
 
       // Add bot response to conversation
@@ -84,6 +95,7 @@ export default function Home() {
         text: botResponse.result,
         sender: "bot",
         timestamp: new Date(),
+        strategy: botResponse.strategy,
       };
 
       // Start typewriter effect
@@ -233,25 +245,31 @@ export default function Home() {
                 {conversation.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex ${
-                      message.sender === "user"
-                        ? "justify-end"
-                        : "justify-start"
+                    className={`flex flex-col ${
+                      message.sender === "user" ? "items-end" : "items-start"
                     }`}
                   >
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                         message.sender === "user"
-                          ? "bg-gray-100 text-gray-800"
-                          : "bg-[#5F79F1] text-white"
+                          ? "bg-[#5F79F1] text-white"
+                          : "bg-transparent text-gray-800"
                       }`}
                     >
                       <div className="whitespace-pre-wrap">{message.text}</div>
+
+                      {/* Investment UI - integrated into bot message */}
+                      {message.sender === "bot" && message.strategy && (
+                        <div className="mt-3 pt-3 border-t border-gray-300">
+                          <InvestmentForm strategy={message.strategy} />
+                        </div>
+                      )}
+
                       <div
                         className={`text-xs mt-1 ${
                           message.sender === "user"
-                            ? "text-gray-500"
-                            : "text-blue-100"
+                            ? "text-blue-100"
+                            : "text-gray-500"
                         }`}
                       >
                         {format(message.timestamp, "HH:mm")}
@@ -276,7 +294,7 @@ export default function Home() {
                 {/* Typewriter effect */}
                 {isTyping && typingText && (
                   <div className="flex justify-start">
-                    <div className="bg-[#5F79F1] text-white max-w-[80%] rounded-2xl px-4 py-3">
+                    <div className=" text-black max-w-[80%] rounded-2xl px-4 py-3">
                       <div className="whitespace-pre-wrap">{typingText}</div>
                     </div>
                   </div>
