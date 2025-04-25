@@ -4,7 +4,7 @@ import StrategyList from "../components/StrategyList";
 
 export default function StrategiesPage() {
   return (
-    <div className="">
+    <div className="pb-10 md:pb-0">
       <StrategyList />
     </div>
   );
