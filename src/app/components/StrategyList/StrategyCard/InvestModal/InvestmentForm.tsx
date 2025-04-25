@@ -5,7 +5,7 @@ import useCurrency from "@/app/hooks/useCurrency";
 import useSwitchChain from "@/app/hooks/useSwitchChain";
 import InvestModalButton from "./button";
 import { InvestStrategy } from "@/app/utils/types";
-
+import { MoonLoader } from "react-spinners";
 // Props interface
 interface InvestmentFormProps {
   strategy: InvestStrategy;
@@ -106,7 +106,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({ strategy, handleClose }) => {
               <span>Balance: </span>
               <div>
                 {isLoadingBalance ? (
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                  <MoonLoader size={10} />
                 ) : isSupportedChain ? (
                   maxBalance.toFixed(4)
                 ) : (

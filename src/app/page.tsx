@@ -52,7 +52,8 @@ export default function Home() {
   const sendMockMessage = async (message: string) => {
     // For demo purposes, we're including our mock strategy in the response
     return {
-      result: "Hello, how can I help you today?",
+      result:
+        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (amount)? ",
       strategy: { ...STRATEGIES_METADATA[1] }, // AAVE Lending Strategy
     };
   };
@@ -240,7 +241,7 @@ export default function Home() {
         ) : (
           <>
             {/* Chat View */}
-            <div className="flex-1 overflow-y-auto px-4 py-6">
+            <div className="flex-1 overflow-y-auto px-4 py-6 max-h-[calc(100vh-200px)]">
               <div className="flex flex-col gap-6">
                 {conversation.map((message) => (
                   <div
@@ -260,7 +261,7 @@ export default function Home() {
 
                       {/* Investment UI - integrated into bot message */}
                       {message.sender === "bot" && message.strategy && (
-                        <div className="mt-3 pt-3 border-t border-gray-300">
+                        <div className="mt-3 pt-3 border-t border-gray-300 w-[350px]">
                           <InvestmentForm strategy={message.strategy} />
                         </div>
                       )}
@@ -281,11 +282,11 @@ export default function Home() {
                 {/* Loading animation or typing effect */}
                 {loadingBotResponse && (
                   <div className="flex justify-start">
-                    <div className="bg-[#5F79F1] text-white max-w-[80%] rounded-2xl px-4 py-3">
+                    <div className="text-black max-w-[80%] rounded-2xl px-4 py-3">
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-150"></div>
-                        <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-300"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-150"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-300"></div>
                       </div>
                     </div>
                   </div>
@@ -294,7 +295,7 @@ export default function Home() {
                 {/* Typewriter effect */}
                 {isTyping && typingText && (
                   <div className="flex justify-start">
-                    <div className=" text-black max-w-[80%] rounded-2xl px-4 py-3">
+                    <div className="text-black max-w-[80%] rounded-2xl px-4 py-3">
                       <div className="whitespace-pre-wrap">{typingText}</div>
                     </div>
                   </div>
@@ -305,7 +306,7 @@ export default function Home() {
             </div>
 
             {/* Input Box at Bottom */}
-            <div className="p-4 border-t border-gray-200 bg-white rounded-xl">
+            <div className="p-4 border-t border-gray-200 bg-white rounded-xl mt-auto">
               <form
                 onSubmit={handleAskAI}
                 className="flex justify-between items-center gap-2"
