@@ -261,7 +261,7 @@ export default function Home() {
 
                       {/* Investment UI - integrated into bot message */}
                       {message.sender === "bot" && message.strategy && (
-                        <div className="mt-3 pt-3 border-t border-gray-300 w-[350px]">
+                        <div className="mt-3 pt-3 border-t border-gray-300 w-[400px]">
                           <InvestmentForm strategy={message.strategy} />
                         </div>
                       )}
