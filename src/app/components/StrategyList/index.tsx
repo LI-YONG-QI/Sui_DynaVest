@@ -8,6 +8,8 @@ import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
 import RiskFilter from "./RiskFilter";
 import ProtocolFilter from "./ProtocolFilter";
+import ChainFilter from "./ChainFilter";
+
 import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
 
 // No results placeholder
@@ -29,6 +31,7 @@ export default function StrategyList() {
   const [selectedRisks, setSelectedRisks] = useState<string[]>([]);
   const [showProtocolDropdown, setShowProtocolDropdown] = useState(false);
   const [selectedProtocols, setSelectedProtocols] = useState<string[]>([]);
+  const [selectedChains, setSelectedChains] = useState<number[]>([]);
   const protocolDropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -71,6 +74,12 @@ export default function StrategyList() {
       );
     }
 
+    if (selectedChains.length > 0) {
+      filtered = filtered.filter((strategy) =>
+        selectedChains.includes(strategy.chainId)
+      );
+    }
+
     // Filter by search query
     if (searchQuery.trim()) {
       try {
@@ -94,7 +103,7 @@ export default function StrategyList() {
     }
 
     return filtered;
-  }, [searchQuery, selectedRisks, selectedProtocols]);
+  }, [searchQuery, selectedRisks, selectedProtocols, selectedChains]);
 
   return (
     <div>
@@ -120,6 +129,21 @@ export default function StrategyList() {
             showProtocolDropdown={showProtocolDropdown}
             setShowProtocolDropdown={setShowProtocolDropdown}
             dropdownRef={protocolDropdownRef}
+          />
+
+          {/* Chain Filter - Desktop */}
+          <ChainFilter
+            selectedChains={selectedChains}
+            setSelectedChains={setSelectedChains}
+            className="hidden md:flex md:w-auto md:mb-0"
+          />
+        </div>
+
+        {/* Chain Filter - Mobile */}
+        <div className="flex md:hidden w-full">
+          <ChainFilter
+            selectedChains={selectedChains}
+            setSelectedChains={setSelectedChains}
           />
         </div>
 

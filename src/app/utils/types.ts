@@ -55,3 +55,9 @@ export type Token = {
     [key: number]: Address;
   };
 };
+
+export type Chain = {
+  name: string;
+  id: number;
+  icon: string;
+};
