@@ -149,7 +149,7 @@ export default function StrategyList() {
 
         {/* Search bar and view toggle row */}
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="flex items-center gap-3 px-3 py-2.5 bg-[#F8F9FE] border border-[#E2E8F7] rounded-lg w-full md:w-[300px]">
+          <div className="flex items-center gap-3 px-3 py-2.5 h-[44px] bg-[#F8F9FE] border border-[#E2E8F7] rounded-lg w-full md:w-[300px]">
             <Image
               src="/search.svg"
               alt="Search"
@@ -165,7 +165,7 @@ export default function StrategyList() {
               className="bg-transparent border-none outline-none font-[family-name:var(--font-inter)] font-medium text-sm text-[#AFB8C8] w-full"
             />
           </div>
-          <div className="flex justify-center items-center gap-2 px-3 py-2.5 bg-[#F8F9FE] rounded-lg">
+          <div className="flex border border-[#E2E8F7] px-3 justify-center items-center gap-2 h-[44px] bg-[#F8F9FE] rounded-lg">
             <button
               className={`p-1 rounded hover:bg-gray-100`}
               onClick={() => {
