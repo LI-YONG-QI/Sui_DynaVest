@@ -46,9 +46,12 @@ export default function Home() {
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sendMockMessage = async (message: string) => {
     // For demo purposes, we're including our mock strategy in the response
     return {
