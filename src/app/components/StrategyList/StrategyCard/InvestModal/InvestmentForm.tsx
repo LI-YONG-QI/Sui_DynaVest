@@ -33,21 +33,21 @@ const InvestmentForm: FC<InvestmentFormProps> = ({ strategy, handleClose }) => {
     <div>
       {/* Amount input */}
       <div className="bg-gray-100 rounded-md border border-gray-300 mb-6">
-        <div className="flex items-center">
+        <div className="flex items-center w-full gap-2">
           <input
             type="text"
             name="amount"
             id="amount"
-            className="bg-transparent text-gray-500 block px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-0 placeholder:text-gray-500"
+            className="flex-1 min-w-0 bg-transparent text-gray-500 block px-4 py-3 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-0 placeholder:text-gray-500"
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
           {/* Custom dropdown with icons */}
-          <div className="ml-auto min-w-[100px] relative">
+          <div className="shrink-0 md:min-w-[100px] relative">
             <button
               type="button"
-              className="bg-transparent flex items-center gap-2 px-4 py-2 text-lg font-semibold focus:outline-none rounded-md hover:bg-gray-200"
+              className="text-sm md:text-lg bg-transparent flex items-center gap-1 md:gap-2 px-2 md:px-4 py-2 font-semibold focus:outline-none rounded-md hover:bg-gray-200"
               onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
             >
               <Image
@@ -60,7 +60,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({ strategy, handleClose }) => {
               {currency.name}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 ml-1"
+                className="h-3 w-3 md:h-5 md:w-5 md:ml-1"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -73,14 +73,13 @@ const InvestmentForm: FC<InvestmentFormProps> = ({ strategy, handleClose }) => {
                 />
               </svg>
             </button>
-
             {showCurrencyDropdown && (
               <div className="absolute right-0 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
                 {strategy.tokens.map((token) => (
                   <button
                     key={token.name}
                     type="button"
-                    className="w-full flex items-center gap-2 px-4 py-2 text-left hover:bg-gray-100"
+                    className="w-full flex items-center gap-1 px-2 md:gap-2 md:px-4 py-2 text-left hover:bg-gray-100"
                     onClick={() => {
                       setCurrency(token);
                       setShowCurrencyDropdown(false);
@@ -102,7 +101,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({ strategy, handleClose }) => {
         </div>
         <div className="flex items-center px-4 pb-2">
           <div className="flex items-center w-full">
-            <span className="flex items-center gap-2 text-sm text-gray-500">
+            <span className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
               <span>Balance: </span>
               <div>
                 {isLoadingBalance ? (
@@ -119,7 +118,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({ strategy, handleClose }) => {
               type="button"
               onClick={handleSetMax}
               disabled={!isSupportedChain || isLoadingBalance}
-              className="text-sm font-medium text-[#5F79F1] hover:text-[#4A64DC] focus:outline-none ml-2 border-0 bg-transparent cursor-pointer disabled:opacity-50"
+              className="text-xs md:text-sm font-medium text-[#5F79F1] hover:text-[#4A64DC] focus:outline-none ml-2 border-0 bg-transparent cursor-pointer disabled:opacity-50"
             >
               MAX
             </button>
