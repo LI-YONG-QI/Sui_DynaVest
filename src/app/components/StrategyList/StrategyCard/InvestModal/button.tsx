@@ -17,7 +17,7 @@ interface InvestModalButtonProps {
   currency: Token;
   strategy: InvestStrategy;
   amount: string;
-  handleClose: () => void;
+  handleClose?: () => void;
 }
 
 export default function InvestModalButton({
@@ -72,7 +72,8 @@ export default function InvestModalButton({
         }
 
         toast.success(`Investment successful! ${result}`);
-        handleClose();
+
+        if (handleClose) handleClose();
       } catch (error) {
         console.error(error);
         toast.error(`Investment failed! ${error}`);
