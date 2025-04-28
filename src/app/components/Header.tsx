@@ -13,14 +13,14 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Strategies", href: "/strategies", isActive: true },
   { label: "Bot", href: "/", isActive: true },
-  { label: "Quests", href: "/quests" },
+  // { label: "Quests", href: "/quests" },
 ];
 
 export default function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="flex justify-between items-center px-20 py-6">
+    <header className="flex justify-between items-center px-5 md:px-20 py-6">
       <div className="flex items-center">
         <Link
           href="/"
@@ -30,7 +30,7 @@ export default function Header() {
         </Link>
       </div>
 
-      <nav className="flex gap-7 items-center">
+      <nav className="hidden md:flex gap-7 items-center">
         {navItems.map((item) => (
           <Link
             key={item.label}

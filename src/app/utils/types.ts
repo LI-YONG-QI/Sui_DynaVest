@@ -21,7 +21,9 @@ export type Protocol =
   | "Uniswap"
   | "BSC Aave"
   | "LST"
-  | "BSC LST";
+  | "BSC LST"
+  | "Camelot"
+  | "GMX";
 
 export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;
@@ -52,4 +54,10 @@ export type Token = {
   chains?: {
     [key: number]: Address;
   };
+};
+
+export type Chain = {
+  name: string;
+  id: number;
+  icon: string;
 };

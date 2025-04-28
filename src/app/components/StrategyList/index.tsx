@@ -7,6 +7,9 @@ import GridIcon from "./GridIcon";
 import ListIcon from "./ListIcon";
 import StrategyTable from "./StrategyTable";
 import RiskFilter from "./RiskFilter";
+import ProtocolFilter from "./ProtocolFilter";
+import ChainFilter from "./ChainFilter";
+
 import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
 
 // No results placeholder
@@ -26,8 +29,26 @@ export default function StrategyList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showRiskDropdown, setShowRiskDropdown] = useState(false);
   const [selectedRisks, setSelectedRisks] = useState<string[]>([]);
+  const [showProtocolDropdown, setShowProtocolDropdown] = useState(false);
+  const [selectedProtocols, setSelectedProtocols] = useState<string[]>([]);
+  const [selectedChains, setSelectedChains] = useState<number[]>([]);
+  const protocolDropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Extract all distinct protocols
+  const protocolOptions = useMemo(() => {
+    const protocols = STRATEGIES_METADATA.map((strategy) => strategy.protocol);
+    return Array.from(new Set(protocols));
+  }, []);
+
+  // Toggle protocol selection
+  const toggleProtocolSelection = (protocol: string) => {
+    setSelectedProtocols((prev) =>
+      prev.includes(protocol)
+        ? prev.filter((p) => p !== protocol)
+        : [...prev, protocol]
+    );
+  };
   // Toggle risk selection
   const toggleRiskSelection = (risk: string) => {
     setSelectedRisks((prev) =>
@@ -35,7 +56,7 @@ export default function StrategyList() {
     );
   };
 
-  // Filter strategies based on search query and selected risks
+  // Filter strategies based on search query, selected risks, and selected protocols
   const filteredStrategies = useMemo(() => {
     let filtered = STRATEGIES_METADATA;
 
@@ -43,6 +64,19 @@ export default function StrategyList() {
     if (selectedRisks.length > 0) {
       filtered = filtered.filter((strategy) =>
         selectedRisks.includes(strategy.risk.level)
+      );
+    }
+
+    // Filter by protocol if any protocols are selected
+    if (selectedProtocols.length > 0) {
+      filtered = filtered.filter((strategy) =>
+        selectedProtocols.includes(strategy.protocol)
+      );
+    }
+
+    if (selectedChains.length > 0) {
+      filtered = filtered.filter((strategy) =>
+        selectedChains.includes(strategy.chainId)
       );
     }
 
@@ -69,14 +103,16 @@ export default function StrategyList() {
     }
 
     return filtered;
-  }, [searchQuery, selectedRisks]);
+  }, [searchQuery, selectedRisks, selectedProtocols, selectedChains]);
 
   return (
     <div>
       {/* Filters */}
       {/* TODO: Implement more filters */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
+      {/* TODO: Make fitlers dynamic */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-3">
+        {/* Filters row */}
+        <div className="flex items-center gap-2 md:gap-4 w-full">
           <RiskFilter
             selectedRisks={selectedRisks}
             setSelectedRisks={setSelectedRisks}
@@ -85,10 +121,35 @@ export default function StrategyList() {
             setShowRiskDropdown={setShowRiskDropdown}
             dropdownRef={dropdownRef}
           />
+          <ProtocolFilter
+            protocols={protocolOptions}
+            selectedProtocols={selectedProtocols}
+            setSelectedProtocols={setSelectedProtocols}
+            toggleProtocolSelection={toggleProtocolSelection}
+            showProtocolDropdown={showProtocolDropdown}
+            setShowProtocolDropdown={setShowProtocolDropdown}
+            dropdownRef={protocolDropdownRef}
+          />
+
+          {/* Chain Filter - Desktop */}
+          <ChainFilter
+            selectedChains={selectedChains}
+            setSelectedChains={setSelectedChains}
+            className="hidden md:flex md:w-auto md:mb-0"
+          />
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 px-3 py-2.5 bg-[#F8F9FE] border border-[#E2E8F7] rounded-lg w-[300px]">
+        {/* Chain Filter - Mobile */}
+        <div className="flex md:hidden w-full">
+          <ChainFilter
+            selectedChains={selectedChains}
+            setSelectedChains={setSelectedChains}
+          />
+        </div>
+
+        {/* Search bar and view toggle row */}
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="flex items-center gap-3 px-3 py-2.5 h-[44px] bg-[#F8F9FE] border border-[#E2E8F7] rounded-lg w-full md:w-[300px]">
             <Image
               src="/search.svg"
               alt="Search"
@@ -104,7 +165,7 @@ export default function StrategyList() {
               className="bg-transparent border-none outline-none font-[family-name:var(--font-inter)] font-medium text-sm text-[#AFB8C8] w-full"
             />
           </div>
-          <div className="flex justify-center items-center gap-2 px-3 py-2.5 bg-[#F8F9FE] rounded-lg">
+          <div className="flex border border-[#E2E8F7] px-3 justify-center items-center gap-2 h-[44px] bg-[#F8F9FE] rounded-lg">
             <button
               className={`p-1 rounded hover:bg-gray-100`}
               onClick={() => {
@@ -130,7 +191,7 @@ export default function StrategyList() {
       {view === "grid" && (
         <>
           {filteredStrategies.length > 0 ? (
-            <div className="grid grid-cols-3 gap-7">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
               {filteredStrategies.map((strategy, index) => (
                 <StrategyCard key={index} {...strategy} />
               ))}

@@ -23,7 +23,7 @@ interface StrategyTableProps {
 
 export default function StrategyTable({ strategies }: StrategyTableProps) {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const { toggleChat } = useChat();
+  const { openChat } = useChat();
 
   // Sort strategies by APY
   const sortedStrategies = [...strategies].sort((a, b) => {
@@ -62,7 +62,7 @@ export default function StrategyTable({ strategies }: StrategyTableProps) {
               scope="col"
               className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 w-[15%]"
             >
-              Platform
+              Protocol
             </th>
             <th
               scope="col"
@@ -150,7 +150,7 @@ export default function StrategyTable({ strategies }: StrategyTableProps) {
                   <span>Ethereum</span>
                 </div>
               </td>
-              {/* Platform */}
+              {/* Protocol */}
               <td className="px-6 py-4">
                 <div className="text-sm text-gray-900 truncate">
                   <div className="flex items-center gap-x-2">
@@ -204,7 +204,11 @@ export default function StrategyTable({ strategies }: StrategyTableProps) {
                     Deposit
                   </button>
                   <button
-                    onClick={toggleChat}
+                    onClick={() =>
+                      openChat(
+                        `Hello! How can I help you with ${strategy.title}?`
+                      )
+                    }
                     className="bg-[#5F79F1] text-white px-3 py-1.5 rounded-sm font-medium"
                   >
                     Ask AI

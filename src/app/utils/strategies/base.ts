@@ -1,5 +1,7 @@
+import { waitForTransactionReceipt } from "@wagmi/core";
 import { Address } from "viem";
 
+import { wagmiConfig as config } from "@/providers/config";
 export abstract class BaseStrategy<T extends number> {
   public readonly chainId: T;
 
@@ -22,4 +24,13 @@ export abstract class BaseStrategy<T extends number> {
   ): Promise<string>;
 
   abstract isSupported(chainId: number): boolean;
+
+  protected async executeWaitTx(
+    writeContract: () => Promise<`0x${string}`>
+  ): Promise<string> {
+    const hash = await writeContract();
+    await waitForTransactionReceipt(config, { hash });
+
+    return hash;
+  }
 }
