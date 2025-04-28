@@ -27,7 +27,7 @@ const COMMANDS = [
 const HOT_TOPICS = [
   {
     icon: "/atom.svg",
-    title: "Strategy: Give me top-performing DeFi strategies on Base",
+    title: "Strategy: Give me best DeFi strategies on Base",
   },
   {
     icon: "/uni-hat.svg",
@@ -154,7 +154,7 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col">
       <div className={`flex flex-col ${conversation.length > 0 && "flex-1"}`}>
-        <h2 className="text-[48px] font-extrabold font-[family-name:var(--font-manrope)] text-[#141A21] mb-8 text-center">
+        <h2 className="text-2xl md:text-[48px] font-extrabold font-[family-name:var(--font-manrope)] text-[#141A21] mb-8 text-center">
           DeFAI Strategies Advisor
         </h2>
 
@@ -171,7 +171,7 @@ export default function Home() {
                 value={command}
                 onChange={(e) => setCommand(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="outline-none text-[#A0ACC5] font-[family-name:var(--font-manrope)] font-medium text-base w-[90%]"
+                className="outline-none text-[#A0ACC5] font-[family-name:var(--font-manrope)] font-medium text-xs md:text-base w-[70%] md:w-[90%]"
                 placeholder="Ask OneVault AI anything. Make DeFi investment easy and simple."
               />
               <button
@@ -206,7 +206,7 @@ export default function Home() {
               <h3 className="text-[#160211] font-[family-name:var(--font-manrope)] font-bold text-2xl mb-4">
                 Hot Topics
               </h3>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col text-xs md:text-base gap-2 md:gap-3">
                 {HOT_TOPICS.map((topic) => (
                   <button
                     key={topic.title}
@@ -217,7 +217,7 @@ export default function Home() {
                       src={topic.icon}
                       width={12}
                       height={12}
-                      className="h-6 w-6 mr-2 object-contain"
+                      className="h-3 w-3 md:h-6 md:w-6 mr-2 object-contain"
                       alt={topic.title}
                     />
                     {topic.title}
@@ -226,7 +226,7 @@ export default function Home() {
                       alt="Arrow"
                       width={12}
                       height={12}
-                      className="h-6 w-6 ml-2 object-contain"
+                      className="h-3 w-3 md:h-6 md:w-6 ml-2 object-contain"
                     />
                   </button>
                 ))}
@@ -234,7 +234,7 @@ export default function Home() {
             </div>
 
             {/* Empty State */}
-            <div className="mt-20 flex items-center justify-center text-gray-400">
+            <div className="mt-20 flex text-center items-center justify-center text-gray-400">
               <p>
                 Ask me anything about DeFi strategies or use the quick commands
                 above!
@@ -264,7 +264,7 @@ export default function Home() {
 
                       {/* Investment UI - integrated into bot message */}
                       {message.sender === "bot" && message.strategy && (
-                        <div className="mt-3 pt-3 border-t border-gray-300 w-[80%]">
+                        <div className="mt-3 pt-3 border-t border-gray-300 w-full md:w-[80%]">
                           <InvestmentForm strategy={message.strategy} />
                         </div>
                       )}
@@ -298,7 +298,7 @@ export default function Home() {
                 {/* Typewriter effect */}
                 {isTyping && typingText && (
                   <div className="flex justify-start">
-                    <div className=" text-black max-w-[80%] rounded-2xl px-4 py-3">
+                    <div className="bg-[#5F79F1] text-white max-w-[80%] rounded-2xl px-4 py-3">
                       <div className="whitespace-pre-wrap">{typingText}</div>
                     </div>
                   </div>
@@ -309,7 +309,8 @@ export default function Home() {
             </div>
 
             {/* Input Box at Bottom */}
-            <div className="p-4 border-t border-gray-200 bg-white rounded-xl">
+            {/* Add padding for mobile bottom nav */}
+            <div className="p-4 border-t border-gray-200 bg-white rounded-xl md:pb-4 pb-20">
               <form
                 onSubmit={handleAskAI}
                 className="flex justify-between items-center gap-2"
