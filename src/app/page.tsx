@@ -3,12 +3,11 @@
 import Image from "next/image";
 import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
 import useChatbot from "./hooks/useChatbotResponse";
-import { Message } from "./types";
+import type { Message, MessageType } from "./types";
 import { format } from "date-fns";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
 import { BOT_STRATEGY } from "./utils/constants/strategies";
 import RiskPortfolio from "@/app/components/RiskPortfolio";
-import { toast } from "react-toastify";
 import EditList from "@/app/components/EditList";
 
 // Define Token type
@@ -57,7 +56,7 @@ export default function Home() {
 
   const sendMockInvestMessage = async (
     message: string
-  ): Promise<{ result: string; type: "Invest" }> => {
+  ): Promise<{ result: string; type: MessageType }> => {
     // For demo purposes, we're including our mock strategy in the response
     console.log("message", message);
 
@@ -71,7 +70,7 @@ export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sendMockPortfolioMessage = async (
     message: string
-  ): Promise<{ result: string; type: "Portfolio" }> => {
+  ): Promise<{ result: string; type: MessageType }> => {
     // For demo purposes, we're including our mock strategy in the response
     return {
       result: `${message} USDT it is! Final question, what's your Risk/Yield and Airdrop portfolio preference?`,
@@ -79,6 +78,15 @@ export default function Home() {
     };
   };
 
+  const sendMockChangePercentageMessage = async (
+    message: string
+  ): Promise<{ result: string; type: MessageType }> => {
+    console.log("message", message);
+    return {
+      result: " ",
+      type: "Edit",
+    };
+  };
   const handleCommand = (command: string) => {
     setCommand(command);
     // Focus the input field after setting the command
@@ -87,19 +95,12 @@ export default function Home() {
     }, 0);
   };
 
-  // TODO: Handle Ask AI
-  const handleAskAI = async (e: FormEvent) => {
-    e.preventDefault();
-    if (command.trim() === "") return;
-
-    console.log("Command:", command);
-    // Process the command here
-    // Reset form if needed
-
+  const addUserMessage = (message: string) => {
+    if (message === "") return;
     // Add user message to conversation
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: command,
+      text: message,
       sender: "user",
       timestamp: new Date(),
       type: "Text",
@@ -107,10 +108,33 @@ export default function Home() {
 
     setConversation((prev) => [...prev, userMessage]);
     setCommand("");
+  };
+
+  // TODO: Handle Ask AI
+  const handleAskAI = async (
+    e: FormEvent,
+    userMessage: string,
+    sendFn: (message: string) => Promise<{
+      result: string;
+      type: MessageType;
+    }>
+  ) => {
+    e.preventDefault();
+    await handleMessage(userMessage, sendFn);
+  };
+
+  const handleMessage = async (
+    userMessage: string,
+    sendFn: (message: string) => Promise<{
+      result: string;
+      type: MessageType;
+    }>
+  ) => {
+    addUserMessage(userMessage);
 
     // Handle Bot response
     try {
-      const botResponse = await sendMockInvestMessage(command);
+      const botResponse = await sendFn(userMessage);
       if (!botResponse || !botResponse.result) return;
 
       // Add bot response to conversation
@@ -146,98 +170,16 @@ export default function Home() {
         timestamp: new Date(),
         type: "Text",
       };
+
       setConversation((prev) => [...prev, errorMessage]);
     }
-  };
-
-  // TODO: Chat
-  const chat = async (amount: string) => {
-    if (amount.trim() === "") {
-      toast.error("Please enter an amount");
-      return;
-    }
-
-    console.log("Amount:", amount);
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: amount + " USDT",
-      sender: "user",
-      timestamp: new Date(),
-      type: "Text",
-    };
-
-    setConversation((prev) => [...prev, userMessage]);
-    setCommand("");
-
-    // Handle Bot response
-    try {
-      const botResponse = await sendMockPortfolioMessage(amount);
-      if (!botResponse || !botResponse.result) return;
-
-      // Add bot response to conversation
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: botResponse.result,
-        sender: "bot",
-        timestamp: new Date(),
-        type: botResponse.type,
-      };
-
-      // Start typewriter effect
-      setIsTyping(true);
-      let currentText = "";
-      const textToType = botResponse.result;
-
-      for (let i = 0; i < textToType.length; i++) {
-        currentText += textToType[i];
-        setTypingText(currentText);
-        // Slow down the typing speed
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-
-      setIsTyping(false);
-      setTypingText("");
-      setConversation((prev) => [...prev, botMessage]);
-    } catch {
-      // TODO: handle AI error
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Sorry, I couldn't process your request. Please try again.",
-        sender: "bot",
-        timestamp: new Date(),
-        type: "Text",
-      };
-      setConversation((prev) => [...prev, errorMessage]);
-    }
-  };
-
-  const handleChangePercentage = () => {
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: "Change percentage",
-      sender: "user",
-      timestamp: new Date(),
-      type: "Text",
-    };
-    setConversation((prev) => [...prev, userMessage]);
-
-    const editMessage: Message = {
-      id: (Date.now() + 2).toString(),
-      text: "",
-      sender: "bot",
-      timestamp: new Date(),
-      type: "Edit",
-    };
-
-    setConversation((prev) => [...prev, editMessage]);
   };
 
   // Handle key press in input field
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleAskAI(e as unknown as FormEvent);
+      handleAskAI(e as unknown as FormEvent, command, sendMockInvestMessage);
     }
   };
 
@@ -261,7 +203,7 @@ export default function Home() {
           <>
             {/* Initial Search Bar */}
             <form
-              onSubmit={handleAskAI}
+              onSubmit={(e) => handleAskAI(e, command, sendMockInvestMessage)}
               className="flex justify-between items-center w-full px-5 py-2.5 border border-[#5F79F1]/30 rounded-lg bg-white"
             >
               <input
@@ -368,7 +310,12 @@ export default function Home() {
                           <div className="mt-3 pt-3 border-t border-gray-300 w-full md:w-[80%]">
                             <InvestmentForm
                               strategy={BOT_STRATEGY}
-                              handlePortfolio={chat}
+                              handlePortfolio={(amount: string) =>
+                                handleMessage(
+                                  amount + " USDT",
+                                  sendMockPortfolioMessage
+                                )
+                              }
                             />
                           </div>
                         )}
@@ -377,7 +324,12 @@ export default function Home() {
                         message.type === "Portfolio" && (
                           <div>
                             <RiskPortfolio
-                              changePercentage={handleChangePercentage}
+                              changePercentage={() =>
+                                handleMessage(
+                                  "Change percentage",
+                                  sendMockChangePercentageMessage
+                                )
+                              }
                             />
                           </div>
                         )}
@@ -428,7 +380,9 @@ export default function Home() {
             {/* Command Form Input */}
             <div className="fixed w-[70%] bottom-5 left-1/2 -translate-x-1/2 p-4 border-t border-gray-200 bg-white rounded-xl md:pb-4 pb-6 shadow-md">
               <form
-                onSubmit={handleAskAI}
+                onSubmit={(e) =>
+                  handleAskAI(e, command, sendMockPortfolioMessage)
+                }
                 className="flex justify-between items-center gap-2"
               >
                 <input

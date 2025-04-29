@@ -29,7 +29,7 @@ const EditList: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-start gap-3">
+    <div className="w-full flex flex-col items-start gap-7">
       <div className="flex flex-col w-full gap-2">
         {strategies.map((strategy, index) => (
           <React.Fragment key={index}>
@@ -39,7 +39,7 @@ const EditList: React.FC = () => {
               </span>
 
               <input
-                className="text-center border border-[#CBD5E1] rounded-md py-1.5 px-4.5 w-[72px] text-[#17181C] font-[Inter] text-sm"
+                className="bg-white text-center border border-[#CBD5E1] rounded-md py-1.5 px-4.5 w-[72px] text-[#17181C] font-[Inter] text-sm"
                 value={strategy.percentage}
                 onChange={(e) => handleInputChange(index, e.target.value)}
                 type="text"
