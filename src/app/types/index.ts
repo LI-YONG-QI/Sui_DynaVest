@@ -6,5 +6,5 @@ export interface Message {
   text: string;
   sender: "user" | "bot";
   timestamp: Date;
-  type: "Text" | "Invest" | "Portfolio";
+  type: "Text" | "Invest" | "Portfolio" | "ChangePercentage" | "Edit";
 }

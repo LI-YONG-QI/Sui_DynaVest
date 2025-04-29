@@ -1,6 +1,6 @@
-import React from "react";
-import BalancedRiskPortfolioExample from "../components/RiskPorfolio/index";
+// import React from "react";
+// import BalancedRiskPortfolioExample from "@/app/components/RiskPortfolio";
 
-export default function PortfolioExamplePage() {
-  return <BalancedRiskPortfolioExample />;
-}
+// export default function PortfolioExamplePage() {
+//   return <BalancedRiskPortfolioExample />;
+// }

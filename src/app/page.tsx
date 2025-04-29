@@ -7,8 +7,9 @@ import { Message } from "./types";
 import { format } from "date-fns";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
 import { BOT_STRATEGY } from "./utils/constants/strategies";
-import RiskPortfolio from "./components/RiskPorfolio";
+import RiskPortfolio from "@/app/components/RiskPortfolio";
 import { toast } from "react-toastify";
+import EditList from "@/app/components/EditList";
 
 // Define Token type
 const COMMANDS = [
@@ -211,6 +212,27 @@ export default function Home() {
     }
   };
 
+  const handleChangePercentage = () => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: "Change percentage",
+      sender: "user",
+      timestamp: new Date(),
+      type: "Text",
+    };
+    setConversation((prev) => [...prev, userMessage]);
+
+    const editMessage: Message = {
+      id: (Date.now() + 2).toString(),
+      text: "",
+      sender: "bot",
+      timestamp: new Date(),
+      type: "Edit",
+    };
+
+    setConversation((prev) => [...prev, editMessage]);
+  };
+
   // Handle key press in input field
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
@@ -352,10 +374,20 @@ export default function Home() {
                         )}
 
                       {message.sender === "bot" &&
-                        message.type === "Portfolio" && <RiskPortfolio />}
+                        message.type === "Portfolio" && (
+                          <div>
+                            <RiskPortfolio
+                              changePercentage={handleChangePercentage}
+                            />
+                          </div>
+                        )}
+
+                      {message.sender === "bot" && message.type === "Edit" && (
+                        <EditList />
+                      )}
 
                       <div
-                        className={`text-xs mt-1 ${
+                        className={`text-xs mt-3 ${
                           message.sender === "user"
                             ? "text-gray-500"
                             : "text-black"

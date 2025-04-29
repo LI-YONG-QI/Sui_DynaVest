@@ -2,6 +2,11 @@
 
 import React, { useState } from "react";
 import { PortfolioPieChart } from "./pie";
+
+interface RiskPortfolioProps {
+  changePercentage: () => void;
+}
+
 // Component for risk preference badges
 const RiskBadge = ({
   label,
@@ -28,7 +33,7 @@ const RiskBadge = ({
 
 // Portfolio legend item component
 
-const RiskPortfolio = () => {
+const RiskPortfolio = ({ changePercentage }: RiskPortfolioProps) => {
   // State for selected risk preference
   const [selectedRisk, setSelectedRisk] = useState("Balanced Risk");
 
@@ -102,7 +107,10 @@ const RiskPortfolio = () => {
           </span>
         </button>
 
-        <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
+        <button
+          className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
+          onClick={changePercentage}
+        >
           <svg
             width="24"
             height="24"
