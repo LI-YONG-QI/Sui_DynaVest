@@ -56,7 +56,7 @@ export default function Home() {
     // For demo purposes, we're including our mock strategy in the response
     return {
       result:
-        "We will diversify your token into reputable and secured yield protocols based on your preference.\n What’s your investment size (amount)? ",
+        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat’s your investment size (amount)? ",
       strategy: { ...STRATEGIES_METADATA[1] }, // AAVE Lending Strategy
     };
   };
@@ -298,7 +298,7 @@ export default function Home() {
                 {/* Typewriter effect */}
                 {isTyping && typingText && (
                   <div className="flex justify-start">
-                    <div className="bg-[#5F79F1] text-white max-w-[80%] rounded-2xl px-4 py-3">
+                    <div className=" text-black max-w-[80%] rounded-2xl px-4 py-3">
                       <div className="whitespace-pre-wrap">{typingText}</div>
                     </div>
                   </div>
