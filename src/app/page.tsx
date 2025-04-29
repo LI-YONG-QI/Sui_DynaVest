@@ -6,7 +6,9 @@ import useChatbot from "./hooks/useChatbotResponse";
 import { Message } from "./types";
 import { format } from "date-fns";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import { STRATEGIES_METADATA } from "./utils/constants/strategies";
+import { BOT_STRATEGY } from "./utils/constants/strategies";
+import RiskPortfolio from "./components/RiskPorfolio";
+import { toast } from "react-toastify";
 
 // Define Token type
 const COMMANDS = [
@@ -45,19 +47,34 @@ export default function Home() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const sendMockMessage = async (message: string) => {
+  const sendMockInvestMessage = async (
+    message: string
+  ): Promise<{ result: string; type: "Invest" }> => {
     // For demo purposes, we're including our mock strategy in the response
+    console.log("message", message);
+
     return {
       result:
-        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat’s your investment size (amount)? ",
-      strategy: { ...STRATEGIES_METADATA[1] }, // AAVE Lending Strategy
+        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
+      type: "Invest",
+    };
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const sendMockPortfolioMessage = async (
+    message: string
+  ): Promise<{ result: string; type: "Portfolio" }> => {
+    // For demo purposes, we're including our mock strategy in the response
+    return {
+      result: `${message} USDT it is! Final question, what's your Risk/Yield and Airdrop portfolio preference?`,
+      type: "Portfolio",
     };
   };
 
@@ -84,13 +101,15 @@ export default function Home() {
       text: command,
       sender: "user",
       timestamp: new Date(),
+      type: "Text",
     };
 
     setConversation((prev) => [...prev, userMessage]);
     setCommand("");
 
+    // Handle Bot response
     try {
-      const botResponse = await sendMockMessage(command);
+      const botResponse = await sendMockInvestMessage(command);
       if (!botResponse || !botResponse.result) return;
 
       // Add bot response to conversation
@@ -99,7 +118,7 @@ export default function Home() {
         text: botResponse.result,
         sender: "bot",
         timestamp: new Date(),
-        strategy: botResponse.strategy,
+        type: botResponse.type,
       };
 
       // Start typewriter effect
@@ -124,6 +143,69 @@ export default function Home() {
         text: "Sorry, I couldn't process your request. Please try again.",
         sender: "bot",
         timestamp: new Date(),
+        type: "Text",
+      };
+      setConversation((prev) => [...prev, errorMessage]);
+    }
+  };
+
+  // TODO: Chat
+  const chat = async (amount: string) => {
+    if (amount.trim() === "") {
+      toast.error("Please enter an amount");
+      return;
+    }
+
+    console.log("Amount:", amount);
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: amount + " USDT",
+      sender: "user",
+      timestamp: new Date(),
+      type: "Text",
+    };
+
+    setConversation((prev) => [...prev, userMessage]);
+    setCommand("");
+
+    // Handle Bot response
+    try {
+      const botResponse = await sendMockPortfolioMessage(amount);
+      if (!botResponse || !botResponse.result) return;
+
+      // Add bot response to conversation
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: botResponse.result,
+        sender: "bot",
+        timestamp: new Date(),
+        type: botResponse.type,
+      };
+
+      // Start typewriter effect
+      setIsTyping(true);
+      let currentText = "";
+      const textToType = botResponse.result;
+
+      for (let i = 0; i < textToType.length; i++) {
+        currentText += textToType[i];
+        setTypingText(currentText);
+        // Slow down the typing speed
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+
+      setIsTyping(false);
+      setTypingText("");
+      setConversation((prev) => [...prev, botMessage]);
+    } catch {
+      // TODO: handle AI error
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Sorry, I couldn't process your request. Please try again.",
+        sender: "bot",
+        timestamp: new Date(),
+        type: "Text",
       };
       setConversation((prev) => [...prev, errorMessage]);
     }
@@ -137,7 +219,6 @@ export default function Home() {
     }
   };
 
-  // TODO
   const handleHotTopic = (topic: string) => {
     setCommand(topic);
     // Focus the input field after setting the command
@@ -152,15 +233,10 @@ export default function Home() {
   }, [conversation, isTyping]);
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen pb-6 flex flex-col">
       <div className={`flex flex-col ${conversation.length > 0 && "flex-1"}`}>
-        <h2 className="text-2xl md:text-[48px] font-extrabold font-[family-name:var(--font-manrope)] text-[#141A21] mb-8 text-center">
-          DeFAI Strategies Advisor
-        </h2>
-
         {conversation.length === 0 ? (
           <>
-            {/* Pre-chat View */}
             {/* Initial Search Bar */}
             <form
               onSubmit={handleAskAI}
@@ -244,8 +320,10 @@ export default function Home() {
         ) : (
           <>
             {/* Chat View */}
+
             <div className="flex-1 overflow-y-auto px-4 py-6">
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 pb-24">
+                {/* Conversion */}
                 {conversation.map((message) => (
                   <div
                     key={message.id}
@@ -256,24 +334,31 @@ export default function Home() {
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                         message.sender === "user"
-                          ? "bg-[#5F79F1] text-white"
+                          ? "bg-white text-black"
                           : "bg-transparent text-gray-800"
                       }`}
                     >
                       <div className="whitespace-pre-wrap">{message.text}</div>
 
                       {/* Investment UI - integrated into bot message */}
-                      {message.sender === "bot" && message.strategy && (
-                        <div className="mt-3 pt-3 border-t border-gray-300 w-full md:w-[80%]">
-                          <InvestmentForm strategy={message.strategy} />
-                        </div>
-                      )}
+                      {message.sender === "bot" &&
+                        message.type === "Invest" && (
+                          <div className="mt-3 pt-3 border-t border-gray-300 w-full md:w-[80%]">
+                            <InvestmentForm
+                              strategy={BOT_STRATEGY}
+                              handlePortfolio={chat}
+                            />
+                          </div>
+                        )}
+
+                      {message.sender === "bot" &&
+                        message.type === "Portfolio" && <RiskPortfolio />}
 
                       <div
                         className={`text-xs mt-1 ${
                           message.sender === "user"
-                            ? "text-blue-100"
-                            : "text-gray-500"
+                            ? "text-gray-500"
+                            : "text-black"
                         }`}
                       >
                         {format(message.timestamp, "HH:mm")}
@@ -308,9 +393,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Input Box at Bottom */}
-            {/* Add padding for mobile bottom nav */}
-            <div className="p-4 border-t border-gray-200 bg-white rounded-xl md:pb-4 pb-20">
+            {/* Command Form Input */}
+            <div className="fixed w-[70%] bottom-5 left-1/2 -translate-x-1/2 p-4 border-t border-gray-200 bg-white rounded-xl md:pb-4 pb-6 shadow-md">
               <form
                 onSubmit={handleAskAI}
                 className="flex justify-between items-center gap-2"

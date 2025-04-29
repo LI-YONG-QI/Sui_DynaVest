@@ -28,7 +28,7 @@ const RiskBadge = ({
 
 // Portfolio legend item component
 
-const BalancedRiskPortfolio = () => {
+const RiskPortfolio = () => {
   // State for selected risk preference
   const [selectedRisk, setSelectedRisk] = useState("Balanced Risk");
 
@@ -44,34 +44,27 @@ const BalancedRiskPortfolio = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-[805px]">
+    <div className="my-4 flex flex-col gap-6 w-full max-w-[805px]">
       {/* System message with risk preferences */}
       <div className="flex flex-col gap-3">
         <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
-          <div className="flex flex-col gap-3">
-            <p className="text-black text-base font-medium">
-              1000 USDT it is! Final question, what&apos;s your Risk/Yield and
-              Airdrop portfolio preference?
+          {/* Risk preference selection */}
+          <div className="flex flex-wrap gap-[18px] items-center">
+            {riskOptions.map((risk) => (
+              <RiskBadge
+                key={risk}
+                label={risk}
+                isSelected={selectedRisk === risk}
+                onClick={() => setSelectedRisk(risk)}
+              />
+            ))}
+          </div>
+
+          <div className="flex  items-center">
+            <p className="text-gray text-sm font-normal">
+              This portfolio will diversify equally in yield protocols of three
+              risk levels.
             </p>
-
-            {/* Risk preference selection */}
-            <div className="flex flex-wrap gap-[18px] items-center">
-              {riskOptions.map((risk) => (
-                <RiskBadge
-                  key={risk}
-                  label={risk}
-                  isSelected={selectedRisk === risk}
-                  onClick={() => setSelectedRisk(risk)}
-                />
-              ))}
-            </div>
-
-            <div className="flex  items-center">
-              <p className="text-gray text-sm font-normal">
-                This portfolio will diversify equally in yield protocols of
-                three risk levels.
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -132,4 +125,4 @@ const BalancedRiskPortfolio = () => {
   );
 };
 
-export default BalancedRiskPortfolio;
+export default RiskPortfolio;

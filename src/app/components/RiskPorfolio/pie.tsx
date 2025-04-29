@@ -10,6 +10,7 @@ import {
   ChartTooltipContent,
 } from "@/app/components/ui/chart";
 
+// TODO: sync with chartData and chartConfig
 const strategies = [
   {
     id: 1,
@@ -21,7 +22,7 @@ const strategies = [
   {
     id: 2,
     color: "#6FD195",
-    name: "AAVE Lending Strategy",
+    name: "AAVE Lending",
     apy: "APY 214.47%",
     risk: "High Risk",
   },
@@ -77,9 +78,11 @@ const LegendItem = ({
 };
 
 // Data for the balanced risk portfolio
+
+// TODO: chart data and config should be synced
 const chartData = [
-  { name: "GMX Strategy", value: 20 },
-  { name: "AAVE Lending Strategy", value: 20 },
+  { name: "GMX Staking", value: 20 },
+  { name: "AAVE Lending", value: 20 },
   { name: "Uniswap Liquidity", value: 20 },
   { name: "Liquid Staking", value: 20 },
   { name: "Camelot Staking", value: 20 },
@@ -98,12 +101,12 @@ const chartConfig = {
   value: {
     label: "Allocation",
   },
-  "GMX Strategy": {
-    label: "GMX Strategy",
+  "GMX Staking": {
+    label: "GMX Staking",
     color: "#7086FD",
   },
-  "AAVE Lending Strategy": {
-    label: "AAVE Lending Strategy",
+  "AAVE Lending": {
+    label: "AAVE Lending",
     color: "#6FD195",
   },
   "Uniswap Liquidity": {
