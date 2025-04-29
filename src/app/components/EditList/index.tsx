@@ -8,7 +8,11 @@ const initialStrategies = [
   { name: "Camelot Staking", percentage: 20 },
 ];
 
-const EditList: React.FC = () => {
+type EditListProps = {
+  handleReview: () => void;
+};
+
+const EditList: React.FC<EditListProps> = ({ handleReview }: EditListProps) => {
   const [strategies, setStrategies] = useState(initialStrategies);
 
   const handleInputChange = (index: number, value: string) => {
@@ -52,7 +56,10 @@ const EditList: React.FC = () => {
           </React.Fragment>
         ))}
       </div>
-      <button className="bg-[#5F79F1] text-white font-[Manrope] font-semibold text-sm rounded-lg py-3.5 px-5 flex gap-2.5">
+      <button
+        onClick={handleReview}
+        className="bg-[#5F79F1] text-white font-[Manrope] font-semibold text-sm rounded-lg py-3.5 px-5 flex gap-2.5"
+      >
         <svg
           width="24"
           height="24"

@@ -9,7 +9,13 @@ import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestMod
 import { BOT_STRATEGY } from "./utils/constants/strategies";
 import RiskPortfolio from "@/app/components/RiskPortfolio";
 import EditList from "@/app/components/EditList";
-
+import {
+  sendMockInvestMessage,
+  sendMockPortfolioMessage,
+  sendMockChangePercentageMessage,
+  sendMockReviewMessage,
+} from "@/test/sendMock";
+import { Undo2 } from "lucide-react";
 // Define Token type
 const COMMANDS = [
   {
@@ -54,39 +60,6 @@ export default function Home() {
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
 
-  const sendMockInvestMessage = async (
-    message: string
-  ): Promise<{ result: string; type: MessageType }> => {
-    // For demo purposes, we're including our mock strategy in the response
-    console.log("message", message);
-
-    return {
-      result:
-        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
-      type: "Invest",
-    };
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const sendMockPortfolioMessage = async (
-    message: string
-  ): Promise<{ result: string; type: MessageType }> => {
-    // For demo purposes, we're including our mock strategy in the response
-    return {
-      result: `${message} USDT it is! Final question, what's your Risk/Yield and Airdrop portfolio preference?`,
-      type: "Portfolio",
-    };
-  };
-
-  const sendMockChangePercentageMessage = async (
-    message: string
-  ): Promise<{ result: string; type: MessageType }> => {
-    console.log("message", message);
-    return {
-      result: " ",
-      type: "Edit",
-    };
-  };
   const handleCommand = (command: string) => {
     setCommand(command);
     // Focus the input field after setting the command
@@ -111,6 +84,7 @@ export default function Home() {
   };
 
   // TODO: Handle Ask AI
+  // TODO: sendFn should be `sendMessage` (sendFn for dev)
   const handleAskAI = async (
     e: FormEvent,
     userMessage: string,
@@ -203,7 +177,15 @@ export default function Home() {
           <>
             {/* Initial Search Bar */}
             <form
-              onSubmit={(e) => handleAskAI(e, command, sendMockInvestMessage)}
+              onSubmit={(e) =>
+                handleAskAI(
+                  e,
+                  command,
+                  sendMockInvestMessage.bind(
+                    "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? "
+                  )
+                )
+              }
               className="flex justify-between items-center w-full px-5 py-2.5 border border-[#5F79F1]/30 rounded-lg bg-white"
             >
               <input
@@ -335,7 +317,14 @@ export default function Home() {
                         )}
 
                       {message.sender === "bot" && message.type === "Edit" && (
-                        <EditList />
+                        <EditList
+                          handleReview={() =>
+                            handleMessage(
+                              "Review my portfolio",
+                              sendMockReviewMessage
+                            )
+                          }
+                        />
                       )}
 
                       <div
@@ -378,12 +367,24 @@ export default function Home() {
             </div>
 
             {/* Command Form Input */}
-            <div className="fixed w-[70%] bottom-5 left-1/2 -translate-x-1/2 p-4 border-t border-gray-200 bg-white rounded-xl md:pb-4 pb-6 shadow-md">
+            <div className="flex flex-col fixed w-[70%] bottom-5 left-1/2 -translate-x-1/2 gap-4">
+              <div className="flex justify-center">
+                <button
+                  className="flex items-center gap-2.5 py-4 px-8 text-[16px] bg-[#9EACEB] text-[rgba(0,0,0,0.6)] rounded-[11px] self-end"
+                  onClick={() => setConversation([])}
+                >
+                  <Undo2 className="w-5 h-5" />
+
+                  <span className="font-[Plus Jakarta Sans] font-semibold text-sm">
+                    Start a new chat
+                  </span>
+                </button>
+              </div>
               <form
                 onSubmit={(e) =>
                   handleAskAI(e, command, sendMockPortfolioMessage)
                 }
-                className="flex justify-between items-center gap-2"
+                className="flex justify-between items-center gap-2 p-4 border-t border-gray-200 bg-white rounded-xl md:pb-4 pb-6 shadow-md"
               >
                 <input
                   ref={inputRef}
