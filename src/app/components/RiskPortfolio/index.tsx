@@ -54,7 +54,7 @@ const RiskPortfolio = ({ changePercentage }: RiskPortfolioProps) => {
       <div className="flex flex-col gap-3">
         <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
           {/* Risk preference selection */}
-          <div className="flex flex-wrap gap-[18px] items-center">
+          <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
             {riskOptions.map((risk) => (
               <RiskBadge
                 key={risk}
@@ -65,7 +65,7 @@ const RiskPortfolio = ({ changePercentage }: RiskPortfolioProps) => {
             ))}
           </div>
 
-          <div className="flex  items-center">
+          <div className="flex items-center">
             <p className="text-gray text-sm font-normal">
               This portfolio will diversify equally in yield protocols of three
               risk levels.
@@ -85,7 +85,7 @@ const RiskPortfolio = ({ changePercentage }: RiskPortfolioProps) => {
       </div>
 
       {/* Action buttons */}
-      <div className="flex gap-5">
+      <div className="w-full flex flex-col gap-5 md:flex-row">
         <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
           <svg
             width="24"

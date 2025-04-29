@@ -64,14 +64,18 @@ const LegendItem = ({
     <div className="flex items-center p-1 gap-1">
       <div className="flex justify-center items-center">
         <div
-          className="w-4 h-4 rounded-full border border-white"
+          className="w-3 h-3 md:w-4 md:h-4 rounded-full border border-white"
           style={{ backgroundColor: color }}
         />
       </div>
-      <div className="flex gap-2">
-        <span className="text-xs text-[rgba(0,0,0,0.7)]">{name}</span>
-        <span className="text-xs text-[rgba(0,0,0,0.7)]">{apy}</span>
-        <span className="text-xs text-red-500">{risk}</span>
+      <div className="flex flex-wrap gap-1 md:gap-2">
+        <span className="text-[10px] md:text-xs text-[rgba(0,0,0,0.7)]">
+          {name}
+        </span>
+        <span className="text-[10px] md:text-xs text-[rgba(0,0,0,0.7)]">
+          {apy}
+        </span>
+        <span className="text-[10px] md:text-xs text-red-500">{risk}</span>
       </div>
     </div>
   );
@@ -126,11 +130,11 @@ const chartConfig = {
 export function PortfolioPieChart() {
   return (
     <Card className="flex flex-col">
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         <CardContent className="flex-1 pb-0">
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square max-h-[250px]"
+            className="mx-auto aspect-square max-h-[200px] md:max-h-[250px]"
           >
             <RechartsPieChart>
               <ChartTooltip
@@ -143,7 +147,7 @@ export function PortfolioPieChart() {
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                outerRadius={80}
+                outerRadius={70}
                 fill="#8884d8"
                 label={(entry) => `${entry.value}%`}
               >
@@ -158,7 +162,7 @@ export function PortfolioPieChart() {
           </ChartContainer>
         </CardContent>
 
-        <div className="flex-1 flex flex-col justify-center space-y-2">
+        <div className="flex-1 flex flex-col justify-center space-y-1 md:space-y-2 px-2 md:px-0">
           {strategies.map((strategy) => (
             <LegendItem
               key={strategy.id}
