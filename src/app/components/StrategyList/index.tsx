@@ -211,7 +211,6 @@ export default function StrategyList() {
           )}
         </>
       )}
-      <ToastContainer position="bottom-right" />
     </div>
   );
 }
