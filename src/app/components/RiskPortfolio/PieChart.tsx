@@ -10,31 +10,22 @@ import {
   ChartTooltipContent,
 } from "@/app/components/ui/chart";
 import { LegendItem } from "./LegendItem";
-import { StrategyMetadata } from "@/app/utils/types";
-import { generateChartConfig, generateChartData } from "@/app/utils/pie";
+import { PieStrategy } from "@/app/utils/types";
+import { createChartConfig, createChartData, COLORS } from "@/app/utils/pie";
 
 // Simple color palette for the chart
-const COLORS = ["#7086FD", "#6FD195", "#FFAE4C", "#07DBFA", "#988AFC"];
 
 export function PortfolioPieChart({
-  strategiesMetadata,
+  pieStrategies,
 }: {
-  strategiesMetadata: StrategyMetadata[];
+  pieStrategies: PieStrategy[];
 }) {
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 0
   );
 
-  const strategies = strategiesMetadata.map((strategy, index) => ({
-    id: index + 1,
-    color: COLORS[index],
-    name: strategy.title,
-    apy: `APY ${strategy.apy}%`,
-    risk: `${strategy.risk.level} Risk`,
-    allocation: 20, // TODO: set allocation
-  }));
-  const chartData = generateChartData(strategies);
-  const chartConfig = generateChartConfig(strategies);
+  const chartData = createChartData(pieStrategies);
+  const chartConfig = createChartConfig(pieStrategies);
 
   useEffect(() => {
     const handleResize = () => {
@@ -113,7 +104,7 @@ export function PortfolioPieChart({
         </CardContent>
 
         <div className="flex-1 flex flex-col justify-center space-y-1 md:space-y-2 px-2 md:px-0 mt-10">
-          {strategies.map((strategy) => (
+          {pieStrategies.map((strategy) => (
             <LegendItem
               key={strategy.id}
               color={strategy.color}
