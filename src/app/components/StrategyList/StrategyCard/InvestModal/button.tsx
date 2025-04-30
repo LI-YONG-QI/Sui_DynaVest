@@ -33,7 +33,6 @@ export default function InvestModalButton({
   );
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isBot] = useState<boolean>(handlePortfolio ? true : false);
   const { address: user } = useAccount();
   const chainId = useChainId();
   const {
@@ -41,6 +40,8 @@ export default function InvestModalButton({
     isSupportedChain,
     ready: isWalletReady,
   } = useSwitchChain(strategy.chainId);
+
+  const AMOUNT_LIMIT = 0.01;
 
   useEffect(() => {
     setButtonState(
@@ -53,9 +54,23 @@ export default function InvestModalButton({
         : ButtonState.SwitchChain
     );
     setIsDisabled(isLoading);
-  }, [isWalletReady, isLoading, isSupportedChain, isBot]);
+  }, [isWalletReady, isLoading, isSupportedChain]);
 
   const invest = async () => {
+    // TODO: custom logic for each strategy
+    if (Number(amount) < AMOUNT_LIMIT) {
+      toast.error("Investment amount must be greater than 0.01");
+      return;
+    }
+
+    if (handlePortfolio) {
+      handlePortfolio(amount);
+    } else {
+      executeStrategy();
+    }
+  };
+
+  const executeStrategy = async () => {
     setIsLoading(true);
 
     if (user) {
@@ -88,19 +103,10 @@ export default function InvestModalButton({
     setIsLoading(false);
   };
 
-  // TODO: Unified validation
   const handler = () => {
     switch (buttonState) {
       case ButtonState.Invest:
-        if (isBot) {
-          if (Number(amount) > 0.01) {
-            handlePortfolio!(amount);
-          } else {
-            toast.error("Investment amount must be greater than 0.01");
-          }
-        } else {
-          invest();
-        }
+        invest();
         break;
       case ButtonState.SwitchChain:
         handleSwitchChain();
