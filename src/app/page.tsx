@@ -364,8 +364,8 @@ export default function Home() {
 
                         {message.sender === "bot" &&
                           message.type === "Portfolio" && (
-                            <div className="overflow-x-auto max-w-full w-full">
-                              <div className="min-w-[330px] w-full">
+                            <div className="overflow-x-auto max-w-full w-full flex justify-center">
+                              <div className="w-full max-w-[320px] md:max-w-none">
                                 <RiskPortfolio
                                   changePercentage={() =>
                                     handleMessage(
