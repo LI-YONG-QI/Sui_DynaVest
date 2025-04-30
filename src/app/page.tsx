@@ -1,23 +1,20 @@
 "use client";
 
 import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
-import useChatbot from "./hooks/useChatbotResponse";
-import type { Message, MessageType } from "./types";
+import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
-import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import {
-  BOT_STRATEGY,
-  STRATEGIES_METADATA,
-} from "./utils/constants/strategies";
+
+import type { Message, MessageType } from "./types";
+import useChatbot from "@/app/hooks/useChatbotResponse";
+import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
 import RiskPortfolio from "@/app/components/RiskPortfolio";
 import EditList from "@/app/components/EditList";
+import { InvestmentFormWithChainFilter } from "@/app/components/InvestmentFormWithChainFilter";
 import {
-  sendMockPortfolioMessage,
   sendMockChangePercentageMessage,
   sendMockReviewMessage,
   sendMockInvestMessage,
 } from "@/test/sendMock";
-import { Undo2 } from "lucide-react";
 
 const renderBotMessageContent = (
   message: Message,
@@ -32,16 +29,7 @@ const renderBotMessageContent = (
 
   switch (message.type) {
     case "Invest":
-      return (
-        <div className="mt-3 pt-3 border-t border-gray-300 w-[80%]">
-          <InvestmentForm
-            strategy={BOT_STRATEGY}
-            handlePortfolio={(amount: string) =>
-              handleMessage(amount + " USDT", sendMockPortfolioMessage)
-            }
-          />
-        </div>
-      );
+      return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
     case "Portfolio":
       return (
         <div className="overflow-x-auto max-w-full w-full flex justify-center">

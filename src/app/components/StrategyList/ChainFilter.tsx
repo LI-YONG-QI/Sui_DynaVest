@@ -6,12 +6,14 @@ interface ChainFilterProps {
   selectedChains: number[];
   setSelectedChains: Dispatch<SetStateAction<number[]>>;
   className?: string;
+  selectionMode?: "single" | "multiple";
 }
 
 export default function ChainFilter({
   selectedChains,
   setSelectedChains,
   className = "",
+  selectionMode = "multiple",
 }: ChainFilterProps) {
   return (
     <div
@@ -31,11 +33,15 @@ export default function ChainFilter({
                   : "opacity-100"
               }`}
             onClick={() => {
-              setSelectedChains((prev) =>
-                prev.includes(chain.id)
-                  ? prev.filter((id) => id !== chain.id)
-                  : [...prev, chain.id]
-              );
+              if (selectionMode === "single") {
+                setSelectedChains([chain.id]);
+              } else {
+                setSelectedChains((prev) =>
+                  prev.includes(chain.id)
+                    ? prev.filter((id) => id !== chain.id)
+                    : [...prev, chain.id]
+                );
+              }
             }}
             aria-label={chain.name}
           >
