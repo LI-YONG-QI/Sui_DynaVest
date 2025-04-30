@@ -3,7 +3,7 @@
 import Link from "next/link";
 import ConnectWalletButton from "./ConnectWalletButton";
 import { usePathname } from "next/navigation";
-
+import Image from "next/image";
 interface NavItem {
   label: string;
   href: string;
@@ -26,7 +26,7 @@ export default function Header() {
           href="/"
           className="text-[#5F79F1] text-[22px] font-[family-name:var(--font-lily-script)]"
         >
-          DynaVest
+          <Image src="/logo.svg" alt="DynaVest" width={150} height={120} />
         </Link>
       </div>
 
