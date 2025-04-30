@@ -62,3 +62,12 @@ export type Chain = {
   id: number;
   icon: string;
 };
+
+export type PieStrategy = {
+  id: number;
+  color: string;
+  name: string;
+  apy: string;
+  risk: string;
+  allocation: number;
+};

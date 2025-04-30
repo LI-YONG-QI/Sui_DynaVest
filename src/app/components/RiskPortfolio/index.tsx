@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { PortfolioPieChart } from "./pie";
+
+import { PortfolioPieChart } from "./PieChart";
+import type { StrategyMetadata } from "@/app/utils/types";
 
 interface RiskPortfolioProps {
   changePercentage: () => void;
+  strategiesMetadata: StrategyMetadata[];
 }
 
 // Component for risk preference badges
@@ -33,7 +36,10 @@ const RiskBadge = ({
 
 // Portfolio legend item component
 
-const RiskPortfolio = ({ changePercentage }: RiskPortfolioProps) => {
+const RiskPortfolio = ({
+  changePercentage,
+  strategiesMetadata,
+}: RiskPortfolioProps) => {
   // State for selected risk preference
   const [selectedRisk, setSelectedRisk] = useState("Balanced Risk");
 
@@ -78,7 +84,7 @@ const RiskPortfolio = ({ changePercentage }: RiskPortfolioProps) => {
       <div className="flex items-center w-full px-[10px] gap-[10px]">
         {/* Pie chart */}
         <div className="w-full">
-          <PortfolioPieChart />
+          <PortfolioPieChart strategiesMetadata={strategiesMetadata} />
         </div>
 
         {/* Legends */}

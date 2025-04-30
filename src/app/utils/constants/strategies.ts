@@ -40,7 +40,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     chainId: arbitrum.id,
   },
   {
-    title: "AAVE Lending Strategy",
+    title: "AAVE Lending",
     apy: 4.5,
     risk: {
       level: "Medium" as const,

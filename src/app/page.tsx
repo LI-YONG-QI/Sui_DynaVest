@@ -5,15 +5,111 @@ import useChatbot from "./hooks/useChatbotResponse";
 import type { Message, MessageType } from "./types";
 import { format } from "date-fns";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import { BOT_STRATEGY } from "./utils/constants/strategies";
+import {
+  BOT_STRATEGY,
+  STRATEGIES_METADATA,
+} from "./utils/constants/strategies";
 import RiskPortfolio from "@/app/components/RiskPortfolio";
 import EditList from "@/app/components/EditList";
 import {
   sendMockPortfolioMessage,
   sendMockChangePercentageMessage,
   sendMockReviewMessage,
+  sendMockInvestMessage,
 } from "@/test/sendMock";
 import { Undo2 } from "lucide-react";
+
+const renderBotMessageContent = (
+  message: Message,
+  handleMessage: (
+    userInput: string,
+    sendFn: (message: string) => Promise<{
+      result: string;
+    }>
+  ) => Promise<void>
+) => {
+  if (message.sender !== "bot") return null;
+
+  switch (message.type) {
+    case "Invest":
+      return (
+        <div className="mt-3 pt-3 border-t border-gray-300 w-[80%]">
+          <InvestmentForm
+            strategy={BOT_STRATEGY}
+            handlePortfolio={(amount: string) =>
+              handleMessage(amount + " USDT", sendMockPortfolioMessage)
+            }
+          />
+        </div>
+      );
+    case "Portfolio":
+      return (
+        <div className="overflow-x-auto max-w-full w-full flex justify-center">
+          <div className="w-full max-w-[320px] md:max-w-none">
+            <RiskPortfolio
+              changePercentage={() =>
+                handleMessage(
+                  "Change percentage",
+                  sendMockChangePercentageMessage
+                )
+              }
+              strategiesMetadata={STRATEGIES_METADATA.slice(0, 5)}
+            />
+          </div>
+        </div>
+      );
+    case "Edit":
+      return (
+        <div className="overflow-x-auto max-w-full">
+          <EditList
+            handleReview={() =>
+              handleMessage("Review my portfolio", sendMockReviewMessage)
+            }
+          />
+        </div>
+      );
+    default:
+      return null;
+  }
+};
+
+// Process the bot response and determine its type and text
+const createBotMessage = (botResponse: { result: string }): Message => {
+  let type: MessageType = "Text";
+  let text = "";
+
+  switch (botResponse.result) {
+    case "build_portfolio":
+      text =
+        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ";
+      type = "Invest";
+      break;
+    case "pie_chart":
+      text = "What's your Risk/Yield and Airdrop portfolio preference?";
+      type = "Portfolio";
+      break;
+    case "edit_portfolio":
+      type = "Edit";
+      break;
+    case "review_portfolio":
+      type = "Portfolio";
+      break;
+    default:
+      text = botResponse.result;
+      break;
+  }
+
+  // Add bot response to conversation
+  const botMessage: Message = {
+    id: (Date.now() + 1).toString(),
+    text,
+    sender: "bot",
+    timestamp: new Date(),
+    type,
+  };
+
+  return botMessage;
+};
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -50,85 +146,35 @@ export default function Home() {
     setCommand("");
   };
 
-  // TODO: Handle Ask AI
-  // TODO: sendFn should be  `sendMessage` always (sendFn for dev)
+  // TODO: Handle Ask AI error
+  // TODO: sendMsg should be `sendMessage` always (sendFn for dev)
   const handleAskAI = async (
     e: FormEvent,
     userMessage: string,
-    sendFn: (message: string) => Promise<{
+    sendMsg: (message: string) => Promise<{
       result: string;
       type: MessageType;
     }>
   ) => {
     e.preventDefault();
-    await handleMessage(userMessage, sendFn);
+    await handleMessage(userMessage, sendMsg);
   };
 
   const handleMessage = async (
     userInput: string,
-    sendFn: (message: string) => Promise<{
+    sendMsg: (message: string) => Promise<{
       result: string;
     }>
   ) => {
     addUserMessage(userInput);
 
-    // Handle Bot response
     try {
-      let type: MessageType = "Text";
-      let text = "";
-
-      const botResponse = await sendFn(userInput);
-
+      const botResponse = await sendMsg(userInput);
       if (!botResponse || !botResponse.result) return;
+      const botMessage = createBotMessage(botResponse);
 
-      // TODO: Extract it
-      switch (botResponse.result) {
-        case "build_portfolio":
-          text =
-            "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ";
-          type = "Invest";
-          break;
-        case "pie_chart":
-          text = "What's your Risk/Yield and Airdrop portfolio preference?";
-          type = "Portfolio";
-          break;
-        case "edit_portfolio":
-          type = "Edit";
-          break;
-        case "review_portfolio":
-          type = "Portfolio";
-          break;
-        default:
-          text = botResponse.result;
-          break;
-      }
-
-      // Add bot response to conversation
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text,
-        sender: "bot",
-        timestamp: new Date(),
-        type,
-      };
-
-      // Start typewriter effect
-      setIsTyping(true);
-      let currentText = "";
-      const textToType = text;
-
-      for (let i = 0; i < textToType.length; i++) {
-        currentText += textToType[i];
-        setTypingText(currentText);
-        // Slow down the typing speed
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-
-      setIsTyping(false);
-      setTypingText("");
-      setConversation((prev) => [...prev, botMessage]);
+      await handleTypingText(botMessage);
     } catch {
-      // TODO: handle AI error
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: "Sorry, I couldn't process your request. Please try again.",
@@ -139,6 +185,23 @@ export default function Home() {
 
       setConversation((prev) => [...prev, errorMessage]);
     }
+  };
+
+  const handleTypingText = async (botMessage: Message) => {
+    setIsTyping(true);
+    let currentText = "";
+    const textToType = botMessage.text;
+
+    for (let i = 0; i < textToType.length; i++) {
+      currentText += textToType[i];
+      setTypingText(currentText);
+      // Slow down the typing speed
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+
+    setIsTyping(false);
+    setTypingText("");
+    setConversation((prev) => [...prev, botMessage]);
   };
 
   // Handle key press in input field
@@ -190,7 +253,7 @@ export default function Home() {
                     onClick={() =>
                       handleMessage(
                         "Build a diversified DeFi Portfolio",
-                        sendMessage
+                        sendMockInvestMessage
                       )
                     }
                   >
@@ -346,51 +409,8 @@ export default function Home() {
                           {message.text}
                         </div>
 
-                        {/* TODO: Wrapped it to function */}
-                        {message.sender === "bot" &&
-                          message.type === "Invest" && (
-                            <div className="mt-3 pt-3 border-t border-gray-300 w-[80%]">
-                              <InvestmentForm
-                                strategy={BOT_STRATEGY}
-                                handlePortfolio={(amount: string) =>
-                                  handleMessage(
-                                    amount + " USDT",
-                                    sendMockPortfolioMessage
-                                  )
-                                }
-                              />
-                            </div>
-                          )}
-
-                        {message.sender === "bot" &&
-                          message.type === "Portfolio" && (
-                            <div className="overflow-x-auto max-w-full w-full flex justify-center">
-                              <div className="w-full max-w-[320px] md:max-w-none">
-                                <RiskPortfolio
-                                  changePercentage={() =>
-                                    handleMessage(
-                                      "Change percentage",
-                                      sendMockChangePercentageMessage
-                                    )
-                                  }
-                                />
-                              </div>
-                            </div>
-                          )}
-
-                        {message.sender === "bot" &&
-                          message.type === "Edit" && (
-                            <div className="overflow-x-auto max-w-full">
-                              <EditList
-                                handleReview={() =>
-                                  handleMessage(
-                                    "Review my portfolio",
-                                    sendMockReviewMessage
-                                  )
-                                }
-                              />
-                            </div>
-                          )}
+                        {/* Render bot message content by response type */}
+                        {renderBotMessageContent(message, handleMessage)}
 
                         <div
                           className={`text-xs mt-3 ${

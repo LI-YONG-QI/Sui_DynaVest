@@ -5,133 +5,36 @@ import { useEffect, useState } from "react";
 
 import { Card, CardContent } from "@/app/components/ui/card";
 import {
-  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/app/components/ui/chart";
+import { LegendItem } from "./LegendItem";
+import { StrategyMetadata } from "@/app/utils/types";
+import { generateChartConfig, generateChartData } from "@/app/utils/pie";
 
-// TODO: sync with chartData and chartConfig
-const strategies = [
-  {
-    id: 1,
-    color: "#7086FD",
-    name: "GMX Strategy",
-    apy: "APY 214.47%",
-    risk: "High Risk",
-  },
-  {
-    id: 2,
-    color: "#6FD195",
-    name: "AAVE Lending",
-    apy: "APY 214.47%",
-    risk: "High Risk",
-  },
-  {
-    id: 3,
-    color: "#FFAE4C",
-    name: "Uniswap Liquidity",
-    apy: "APY 214.47%",
-    risk: "High Risk",
-  },
-  {
-    id: 4,
-    color: "#07DBFA",
-    name: "Liquid Staking",
-    apy: "APY 214.47%",
-    risk: "High Risk",
-  },
-  {
-    id: 5,
-    color: "#988AFC",
-    name: "Camelot Staking",
-    apy: "APY 214.47%",
-    risk: "High Risk",
-  },
-];
+// Simple color palette for the chart
+const COLORS = ["#7086FD", "#6FD195", "#FFAE4C", "#07DBFA", "#988AFC"];
 
-const LegendItem = ({
-  color,
-  name,
-  apy,
-  risk,
+export function PortfolioPieChart({
+  strategiesMetadata,
 }: {
-  color: string;
-  name: string;
-  apy: string;
-  risk: string;
-}) => {
-  return (
-    <div className="flex items-center p-1 gap-1">
-      <div className="flex justify-center items-center">
-        <div
-          className="w-3 h-3 md:w-4 md:h-4 rounded-full border border-white"
-          style={{ backgroundColor: color }}
-        />
-      </div>
-      <div className="flex flex-wrap gap-1 md:gap-2">
-        <span className="text-[10px] md:text-xs text-[rgba(0,0,0,0.7)]">
-          {name}
-        </span>
-        <span className="text-[10px] md:text-xs text-[rgba(0,0,0,0.7)]">
-          {apy}
-        </span>
-        <span className="text-[10px] md:text-xs text-red-500">{risk}</span>
-      </div>
-    </div>
-  );
-};
-
-// Data for the balanced risk portfolio
-
-// TODO: chart data and config should be synced
-const chartData = [
-  { name: "GMX Staking", value: 20 },
-  { name: "AAVE Lending", value: 20 },
-  { name: "Uniswap Liquidity", value: 20 },
-  { name: "Liquid Staking", value: 20 },
-  { name: "Camelot Staking", value: 20 },
-];
-
-// Define colors to match the original design
-const COLORS = [
-  "#7086FD", // GMX Strategy
-  "#6FD195", // AAVE Lending Strategy
-  "#FFAE4C", // Uniswap Liquidity
-  "#07DBFA", // Liquid Staking
-  "#988AFC", // Camelot Staking
-];
-
-const chartConfig = {
-  value: {
-    label: "Allocation",
-  },
-  "GMX Staking": {
-    label: "GMX Staking",
-    color: "#7086FD",
-  },
-  "AAVE Lending": {
-    label: "AAVE Lending",
-    color: "#6FD195",
-  },
-  "Uniswap Liquidity": {
-    label: "Uniswap Liquidity",
-    color: "#FFAE4C",
-  },
-  "Liquid Staking": {
-    label: "Liquid Staking",
-    color: "#07DBFA",
-  },
-  "Camelot Staking": {
-    label: "Camelot Staking",
-    color: "#988AFC",
-  },
-} satisfies ChartConfig;
-
-export function PortfolioPieChart() {
+  strategiesMetadata: StrategyMetadata[];
+}) {
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 0
   );
+
+  const strategies = strategiesMetadata.map((strategy, index) => ({
+    id: index + 1,
+    color: COLORS[index],
+    name: strategy.title,
+    apy: `APY ${strategy.apy}%`,
+    risk: `${strategy.risk.level} Risk`,
+    allocation: 20, // TODO: set allocation
+  }));
+  const chartData = generateChartData(strategies);
+  const chartConfig = generateChartConfig(strategies);
 
   useEffect(() => {
     const handleResize = () => {
