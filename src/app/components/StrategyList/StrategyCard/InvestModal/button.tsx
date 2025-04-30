@@ -88,11 +88,16 @@ export default function InvestModalButton({
     setIsLoading(false);
   };
 
+  // TODO: Unified validation
   const handler = () => {
     switch (buttonState) {
       case ButtonState.Invest:
         if (isBot) {
-          handlePortfolio!(amount);
+          if (Number(amount) > 0.01) {
+            handlePortfolio!(amount);
+          } else {
+            toast.error("Investment amount must be greater than 0.01");
+          }
         } else {
           invest();
         }
