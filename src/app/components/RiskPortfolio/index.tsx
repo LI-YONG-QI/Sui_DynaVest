@@ -4,13 +4,7 @@ import React, { useState, useMemo } from "react";
 
 import { PortfolioPieChart } from "./PieChart";
 import type { StrategyMetadata } from "@/app/utils/types";
-import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
 import { createPieChartStrategies } from "@/app/utils/pie";
-
-interface RiskPortfolioProps {
-  changePercentage: () => void;
-  strategiesMetadata?: StrategyMetadata[];
-}
 
 const RISK_OPTIONS = [
   "Balanced Risk",
@@ -18,9 +12,19 @@ const RISK_OPTIONS = [
   "Medium Risk",
   "High Risk",
   "High Airdrop Potential",
-];
+] as const;
 
-// Component for risk preference badges
+export type RiskLevel = (typeof RISK_OPTIONS)[number];
+
+export type RiskPortfolioStrategies = StrategyMetadata & {
+  allocation: number;
+};
+
+interface RiskPortfolioProps {
+  changePercentage: () => void;
+  strategiesSet?: Record<RiskLevel, RiskPortfolioStrategies[]>;
+}
+
 const RiskBadge = ({
   label,
   isSelected,
@@ -48,80 +52,14 @@ const RiskBadge = ({
 
 const RiskPortfolio = ({
   changePercentage,
-  strategiesMetadata = STRATEGIES_METADATA,
+  strategiesSet,
 }: RiskPortfolioProps) => {
   // State for selected risk preference
-  const [selectedRisk, setSelectedRisk] = useState("Balanced Risk");
+  const [selectedRisk, setSelectedRisk] = useState<RiskLevel>("Balanced Risk");
 
-  // TODO: filter function need to be refactored, and length of strategies and allocations matched
-  // Filter strategies based on selected risk
   const filteredStrategies = useMemo(() => {
-    let riskLevel: "Low" | "Medium" | "High" | null = null;
-
-    // Map selected risk to risk level
-    switch (selectedRisk) {
-      case "Low Risk":
-        riskLevel = "Low";
-        break;
-      case "Medium Risk":
-        riskLevel = "Medium";
-        break;
-      case "High Risk":
-        riskLevel = "High";
-        break;
-      case "Balanced Risk":
-        // For balanced risk, we'll get mix of strategies
-        return strategiesMetadata.slice(0, 5);
-      case "High Airdrop Potential":
-        // For airdrop potential, we could select specific strategies
-        // This is a placeholder - you might want to tag which strategies have airdrop potential
-        return strategiesMetadata
-          .filter((_, index) => index % 3 === 0)
-          .slice(0, 5);
-      default:
-        return strategiesMetadata.slice(0, 5);
-    }
-
-    // If specific risk level selected, filter by that level
-    if (riskLevel) {
-      const filtered = strategiesMetadata.filter(
-        (strategy) => strategy.risk.level === riskLevel
-      );
-      // Return at least 5 strategies or pad with others if needed
-      return filtered.length >= 5
-        ? filtered.slice(0, 5)
-        : [
-            ...filtered,
-            ...strategiesMetadata
-              .filter((strategy) => strategy.risk.level !== riskLevel)
-              .slice(0, 5 - filtered.length),
-          ];
-    }
-
-    return strategiesMetadata.slice(0, 5);
-  }, [selectedRisk, strategiesMetadata]);
-
-  // Create mock allocations based on selected risk
-  const allocations = useMemo(() => {
-    switch (selectedRisk) {
-      case "Low Risk":
-        // Conservative allocation - more weight on low-risk strategies
-        return [30, 25, 20, 15, 10];
-      case "Medium Risk":
-        // Balanced allocation
-        return [20, 25, 30, 15, 10];
-      case "High Risk":
-        // Aggressive allocation - more weight on high-risk strategies
-        return [10, 15, 20, 25, 30];
-      case "High Airdrop Potential":
-        // Focus on potential airdrop strategies
-        return [80, 20];
-      case "Balanced Risk":
-      default:
-        // Equal allocation
-        return [20, 20, 20, 20, 20];
-    }
-  }, [selectedRisk]);
+    return strategiesSet?.[selectedRisk] || [];
+  }, [selectedRisk, strategiesSet]);
 
   // Description text based on selected risk
   const getRiskDescription = () => {
@@ -169,10 +107,7 @@ const RiskPortfolio = ({
         {/* Pie chart */}
         <div className="w-full">
           <PortfolioPieChart
-            pieStrategies={createPieChartStrategies(
-              filteredStrategies,
-              allocations
-            )}
+            pieStrategies={createPieChartStrategies(filteredStrategies)}
           />
         </div>
 

@@ -6,60 +6,15 @@ import { format } from "date-fns";
 
 import type { Message, MessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
-import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
 import RiskPortfolio from "@/app/components/RiskPortfolio";
-import EditList from "@/app/components/EditList";
+import ChangePercentList from "@/app/components/ChangePercentList";
 import { InvestmentFormWithChainFilter } from "@/app/components/InvestmentFormWithChainFilter";
 import {
   sendMockChangePercentageMessage,
   sendMockReviewMessage,
   sendMockInvestMessage,
 } from "@/test/sendMock";
-
-const renderBotMessageContent = (
-  message: Message,
-  handleMessage: (
-    userInput: string,
-    sendFn: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => Promise<void>
-) => {
-  if (message.sender !== "bot") return null;
-
-  switch (message.type) {
-    case "Invest":
-      return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
-    case "Portfolio":
-      return (
-        <div className="overflow-x-auto max-w-full w-full flex justify-center">
-          <div className="w-full max-w-[320px] md:max-w-none">
-            <RiskPortfolio
-              changePercentage={() =>
-                handleMessage(
-                  "Change percentage",
-                  sendMockChangePercentageMessage
-                )
-              }
-              strategiesMetadata={STRATEGIES_METADATA.slice(0, 5)}
-            />
-          </div>
-        </div>
-      );
-    case "Edit":
-      return (
-        <div className="overflow-x-auto max-w-full">
-          <EditList
-            handleReview={() =>
-              handleMessage("Review my portfolio", sendMockReviewMessage)
-            }
-          />
-        </div>
-      );
-    default:
-      return null;
-  }
-};
+import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 
 // Process the bot response and determine its type and text
 const createBotMessage = (botResponse: { result: string }): Message => {
@@ -99,6 +54,8 @@ const createBotMessage = (botResponse: { result: string }): Message => {
   return botMessage;
 };
 
+// TODO: add `strategiesSet` in this component
+// TODO: pass strategiesSet to RiskPortfolio and ChangePercentList (selected)
 export default function Home() {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -204,6 +161,52 @@ export default function Home() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation, isTyping]);
+
+  // Render UI
+  const renderBotMessageContent = (
+    message: Message,
+    handleMessage: (
+      userInput: string,
+      sendFn: (message: string) => Promise<{
+        result: string;
+      }>
+    ) => Promise<void>
+  ) => {
+    if (message.sender !== "bot") return null;
+
+    switch (message.type) {
+      case "Invest":
+        return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
+      case "Portfolio":
+        return (
+          <div className="overflow-x-auto max-w-full w-full flex justify-center">
+            <div className="w-full max-w-[320px] md:max-w-none">
+              <RiskPortfolio
+                changePercentage={() =>
+                  handleMessage(
+                    "Change percentage",
+                    sendMockChangePercentageMessage
+                  )
+                }
+                strategiesSet={MOCK_STRATEGIES_SET}
+              />
+            </div>
+          </div>
+        );
+      case "Edit":
+        return (
+          <div className="overflow-x-auto max-w-full">
+            <ChangePercentList
+              handleReview={() =>
+                handleMessage("Review my portfolio", sendMockReviewMessage)
+              }
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="h-[80vh]">

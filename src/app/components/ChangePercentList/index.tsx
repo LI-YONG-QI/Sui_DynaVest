@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 
-const initialStrategies = [
-  { name: "GMX Strategy", percentage: 20 },
-  { name: "AAVE Lending Strategy", percentage: 20 },
-  { name: "Uniswap Liquidity", percentage: 20 },
-  { name: "Liquid Staking", percentage: 20 },
-  { name: "Camelot Staking", percentage: 20 },
-];
+type ChangePercentStrategy = {
+  name: string;
+  percentage: number;
+};
 
-type EditListProps = {
+type ChangePercentListProps = {
+  initialStrategies: ChangePercentStrategy[];
   handleReview: () => void;
 };
 
-const EditList: React.FC<EditListProps> = ({ handleReview }: EditListProps) => {
+const ChangePercentList = ({
+  initialStrategies,
+  handleReview,
+}: ChangePercentListProps) => {
   const [strategies, setStrategies] = useState(initialStrategies);
 
   const handleInputChange = (index: number, value: string) => {
@@ -81,4 +82,4 @@ const EditList: React.FC<EditListProps> = ({ handleReview }: EditListProps) => {
   );
 };
 
-export default EditList;
+export default ChangePercentList;
