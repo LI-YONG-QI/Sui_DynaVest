@@ -21,7 +21,6 @@ import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 
-// TODO: settleMessage have high relation with `changePercentage`
 export default function Home() {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +33,7 @@ export default function Home() {
     setSelectedRiskLevel,
     selectedStrategies,
     setSelectedStrategies,
-  } = useStrategiesSet(MOCK_STRATEGIES_SET);
+  } = useStrategiesSet(MOCK_STRATEGIES_SET); // TODO: remove mock data
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
@@ -88,14 +87,14 @@ export default function Home() {
     return botMessage;
   };
 
-  const validateEditable = (message: Message) => {
-    return (
-      message.id === conversation[conversation.length - 1].id && // The latest message conversation
-      isEditing === true
-    );
-  };
-
   const getMessageData = (message: Message) => {
+    const validateEditable = (message: Message) => {
+      return (
+        message.id === conversation[conversation.length - 1].id && // The latest message conversation
+        isEditing === true
+      );
+    };
+
     const { data } = message;
     const isEditable = validateEditable(message);
 
@@ -109,37 +108,31 @@ export default function Home() {
     return { isEditable, risk, strategies };
   };
 
-  const settleMessage = (message: Message) => {
-    // Update the message with the current data
-    const updatedConversation = conversation.map((convMsg) => {
-      if (convMsg.id === message.id) {
-        return {
-          ...convMsg,
-          data: {
-            risk: selectedRiskLevel,
-            strategies: selectedStrategies,
-          },
-        };
-      }
-      return convMsg;
-    });
-    setConversation(updatedConversation);
-    setIsEditing(false);
-  };
-
-  const addUserMessage = (message: string) => {
-    if (message === "") return;
-    // Add user message to conversation
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: message,
-      sender: "user",
-      timestamp: new Date(),
-      type: "Text",
+  const nextStep = (
+    sendFn: (message: string) => Promise<{
+      result: string;
+    }>
+  ) => {
+    const settleMessage = (message: Message) => {
+      // Update the message with the current data
+      const updatedConversation = conversation.map((convMsg) => {
+        if (convMsg.id === message.id) {
+          return {
+            ...convMsg,
+            data: {
+              risk: selectedRiskLevel,
+              strategies: selectedStrategies,
+            },
+          };
+        }
+        return convMsg;
+      });
+      setConversation(updatedConversation);
+      setIsEditing(false);
     };
 
-    setConversation((prev) => [...prev, userMessage]);
-    setCommand("");
+    settleMessage(conversation[conversation.length - 1]);
+    handleMessage("Change percentage", sendFn);
   };
 
   /// HANDLE FUNCTIONS ///
@@ -170,6 +163,21 @@ export default function Home() {
       result: string;
     }>
   ) => {
+    const addUserMessage = (message: string) => {
+      if (message === "") return;
+      // Add user message to conversation
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        text: message,
+        sender: "user",
+        timestamp: new Date(),
+        type: "Text",
+      };
+
+      setConversation((prev) => [...prev, userMessage]);
+      setCommand("");
+    };
+
     addUserMessage(userInput);
 
     try {
@@ -263,15 +271,8 @@ export default function Home() {
                 </div>
               </div>
               <RiskPortfolio
-                changePercentage={() =>
-                  handleMessage(
-                    "Change percentage",
-                    sendMockChangePercentageMessage
-                  )
-                }
+                nextStep={() => nextStep(sendMockChangePercentageMessage)}
                 riskPortfolioStrategies={strategies}
-                message={message}
-                settleMessage={settleMessage}
               />
             </div>
           </div>
@@ -285,12 +286,8 @@ export default function Home() {
             <ChangePercentList
               riskPortfolioStrategies={strategies}
               setRiskPortfolioStrategies={setSelectedStrategies}
-              message={message}
-              settleMessage={settleMessage}
               isEditable={isEditable}
-              handleReview={() =>
-                handleMessage("Review my portfolio", sendMockReviewMessage)
-              }
+              nextStep={() => nextStep(sendMockReviewMessage)}
             />
           </div>
         );
@@ -300,15 +297,8 @@ export default function Home() {
 
         return (
           <RiskPortfolio
-            changePercentage={() =>
-              handleMessage(
-                "Change percentage",
-                sendMockChangePercentageMessage
-              )
-            }
+            nextStep={() => nextStep(sendMockChangePercentageMessage)}
             riskPortfolioStrategies={strategies}
-            message={message}
-            settleMessage={settleMessage}
           />
         );
       }
