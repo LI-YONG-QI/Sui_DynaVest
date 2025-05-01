@@ -4,7 +4,7 @@ import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
 import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
 
-import type { Message, MessageType } from "./types";
+import type { Message, MessagePortfolioData, MessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
 import RiskPortfolio, {
   getRiskDescription,
@@ -21,44 +21,6 @@ import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 
-// Process the bot response and determine its type and text
-const createBotMessage = (botResponse: { result: string }): Message => {
-  let type: MessageType = "Text";
-  let text = "";
-
-  switch (botResponse.result) {
-    case "build_portfolio":
-      text =
-        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ";
-      type = "Invest";
-      break;
-    case "pie_chart":
-      text = "What's your Risk/Yield and Airdrop portfolio preference?";
-      type = "Portfolio";
-      break;
-    case "edit_portfolio":
-      type = "Edit";
-      break;
-    case "review_portfolio":
-      type = "Review Portfolio";
-      break;
-    default:
-      text = botResponse.result;
-      break;
-  }
-
-  // Add bot response to conversation
-  const botMessage: Message = {
-    id: (Date.now() + 1).toString(),
-    text,
-    sender: "bot",
-    timestamp: new Date(),
-    type,
-  };
-
-  return botMessage;
-};
-
 // TODO: add `strategiesSet` in this component
 // TODO: pass strategiesSet to RiskPortfolio and ChangePercentList (selected)
 export default function Home() {
@@ -67,18 +29,80 @@ export default function Home() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-
   const {
     selectedRiskLevel,
     setSelectedRiskLevel,
     selectedStrategies,
     setSelectedStrategies,
   } = useStrategiesSet(MOCK_STRATEGIES_SET);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
+
+  const createBotMessage = (botResponse: { result: string }): Message => {
+    let type: MessageType = "Text";
+    let text = "";
+    let isActive = false;
+    let data: MessagePortfolioData | undefined;
+
+    switch (botResponse.result) {
+      case "build_portfolio":
+        text =
+          "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ";
+        type = "Invest";
+        break;
+      case "pie_chart":
+        text = "What's your Risk/Yield and Airdrop portfolio preference?";
+        type = "Portfolio";
+        isActive = true;
+        break;
+      case "edit_portfolio":
+        type = "Edit";
+        isActive = true;
+        break;
+      case "review_portfolio":
+        type = "Review Portfolio";
+        isActive = false;
+        data = {
+          risk: selectedRiskLevel,
+          strategies: selectedStrategies,
+        };
+        break;
+      default:
+        text = botResponse.result;
+        break;
+    }
+
+    // Add bot response to conversation
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      text,
+      sender: "bot",
+      timestamp: new Date(),
+      type,
+      isActive,
+      data,
+    };
+
+    return botMessage;
+  };
+
+  const settleMessage = (message: Message) => {
+    const updatedConversation = conversation.map((convMsg) => {
+      if (convMsg.id === message.id) {
+        return {
+          ...convMsg,
+          data: {
+            risk: selectedRiskLevel,
+            strategies: selectedStrategies,
+          },
+          isActive: false,
+        };
+      }
+      return convMsg;
+    });
+    setConversation(updatedConversation);
+  };
 
   const addUserMessage = (message: string) => {
     if (message === "") return;
@@ -89,12 +113,14 @@ export default function Home() {
       sender: "user",
       timestamp: new Date(),
       type: "Text",
+      isActive: false,
     };
 
     setConversation((prev) => [...prev, userMessage]);
     setCommand("");
   };
 
+  /// HANDLE FUNCTIONS ///
   const handleHotTopic = (topic: string) => {
     setCommand(topic);
     // Focus the input field after setting the command
@@ -137,6 +163,7 @@ export default function Home() {
         sender: "bot",
         timestamp: new Date(),
         type: "Text",
+        isActive: false,
       };
 
       setConversation((prev) => [...prev, errorMessage]);
@@ -168,14 +195,6 @@ export default function Home() {
     }
   };
 
-  // Scroll to bottom of messages when conversation updates
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [conversation, isTyping]);
-
-  // Render UI
-
-  //!  message from conversations
   const renderBotMessageContent = (
     message: Message,
     handleMessage: (
@@ -191,6 +210,15 @@ export default function Home() {
       case "Invest":
         return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
       case "Portfolio":
+        const { isActive, data } = message;
+
+        if (isActive === false && !data)
+          throw new Error("Portfolio data is required");
+
+        const risk = isActive ? selectedRiskLevel : data!.risk;
+        const strategies = isActive ? selectedStrategies : data!.strategies;
+
+        // TODO: settleMessage have high relation with `changePercentage`
         return (
           <div className="overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full max-w-[320px] md:max-w-none">
@@ -198,23 +226,24 @@ export default function Home() {
                 <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
                   {/* Risk preference selection */}
                   <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
-                    {RISK_OPTIONS.map((risk) => (
+                    {RISK_OPTIONS.map((_risk) => (
                       <RiskBadge
-                        key={risk}
-                        label={risk}
-                        isSelected={selectedRiskLevel === risk}
-                        onClick={() => setSelectedRiskLevel(risk)}
+                        key={_risk}
+                        label={_risk}
+                        isSelected={_risk === risk}
+                        onClick={() => setSelectedRiskLevel(_risk)}
                       />
                     ))}
                   </div>
 
                   <div className="flex items-center">
                     <p className="text-gray text-xs md:text-sm font-normal px-1">
-                      {getRiskDescription(selectedRiskLevel)}
+                      {getRiskDescription(risk)}
                     </p>
                   </div>
                 </div>
               </div>
+
               <RiskPortfolio
                 changePercentage={() =>
                   handleMessage(
@@ -222,25 +251,47 @@ export default function Home() {
                     sendMockChangePercentageMessage
                   )
                 }
-                riskPortfolioStrategies={selectedStrategies}
+                riskPortfolioStrategies={strategies}
+                message={message}
+                settleMessage={settleMessage}
               />
             </div>
           </div>
         );
-      case "Edit":
+      case "Edit": {
+        const { isActive, data } = message;
+
+        if (isActive === false && !data)
+          throw new Error("Portfolio data is required");
+
+        const strategies = isActive ? selectedStrategies : data!.strategies;
+
+        // TODO: settleMessage have high relation with `handleReview`
         return (
           <div className="overflow-x-auto max-w-full">
             <ChangePercentList
-              riskPortfolioStrategies={selectedStrategies}
+              riskPortfolioStrategies={strategies}
               setRiskPortfolioStrategies={setSelectedStrategies}
+              message={message}
+              settleMessage={settleMessage}
               handleReview={() =>
                 handleMessage("Review my portfolio", sendMockReviewMessage)
               }
             />
           </div>
         );
-      case "Review Portfolio":
+      }
+      case "Review Portfolio": {
+        const { isActive, data } = message;
+
+        if (isActive === false && !data)
+          throw new Error("Portfolio data is required");
+
+        // const risk = isActive ? selectedRiskLevel : data!.risk;
+        const strategies = isActive ? selectedStrategies : data!.strategies;
+
         return (
+          // TODO: settleMessage have high relation with `handleReview`
           <RiskPortfolio
             changePercentage={() =>
               handleMessage(
@@ -248,13 +299,21 @@ export default function Home() {
                 sendMockChangePercentageMessage
               )
             }
-            riskPortfolioStrategies={selectedStrategies}
+            riskPortfolioStrategies={strategies}
+            message={message}
+            settleMessage={settleMessage}
           />
         );
+      }
       default:
         return null;
     }
   };
+
+  // Scroll to bottom of messages when conversation updates
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [conversation, isTyping]);
 
   return (
     <div className="h-[80vh]">

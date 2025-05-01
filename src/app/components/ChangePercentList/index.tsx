@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { RiskPortfolioStrategies } from "@/app/utils/types";
+import type { Message } from "@/app/types";
 
 export type ChangePercentStrategy = {
   name: string;
@@ -9,6 +10,8 @@ export type ChangePercentStrategy = {
 type ChangePercentListProps = {
   riskPortfolioStrategies: RiskPortfolioStrategies[];
   setRiskPortfolioStrategies: (strategies: RiskPortfolioStrategies[]) => void;
+  message: Message;
+  settleMessage: (message: Message) => void;
   handleReview: () => void;
 };
 
@@ -24,6 +27,8 @@ const createChangePercentStrategy = (
 const ChangePercentList = ({
   riskPortfolioStrategies,
   setRiskPortfolioStrategies,
+  message,
+  settleMessage,
   handleReview,
 }: ChangePercentListProps) => {
   const [strategies, setStrategies] = useState(
@@ -32,6 +37,8 @@ const ChangePercentList = ({
 
   const handleInputChange = (index: number, value: string) => {
     // Only allow numbers
+    if (!message.isActive) return;
+
     if (!/^\d*$/.test(value)) return;
 
     // Convert to number and limit to 0-100
@@ -81,7 +88,10 @@ const ChangePercentList = ({
         ))}
       </div>
       <button
-        onClick={handleReview}
+        onClick={() => {
+          settleMessage(message);
+          handleReview();
+        }}
         className="bg-[#5F79F1] text-white font-[Manrope] font-semibold text-sm rounded-lg py-3.5 px-5 flex gap-2.5"
       >
         <svg

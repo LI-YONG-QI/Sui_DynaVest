@@ -5,8 +5,12 @@ import React from "react";
 import { PortfolioPieChart } from "./PieChart";
 import type { RiskPortfolioStrategies, RiskLevel } from "@/app/utils/types";
 import { createPieChartStrategies } from "@/app/utils/pie";
+import { Message } from "@/app/types";
+
 interface RiskPortfolioProps {
   changePercentage: () => void;
+  message: Message;
+  settleMessage: (message: Message) => void;
   riskPortfolioStrategies: RiskPortfolioStrategies[];
 }
 
@@ -52,8 +56,15 @@ export const getRiskDescription = (selectedRisk: RiskLevel) => {
 
 const RiskPortfolio = ({
   changePercentage,
+  message,
+  settleMessage,
   riskPortfolioStrategies,
 }: RiskPortfolioProps) => {
+  const changeAndSettleMessage = () => {
+    settleMessage(message);
+    changePercentage();
+  };
+
   return (
     <div className="my-4 flex flex-col gap-6 w-full max-w-[805px]">
       {/* Portfolio visualization */}
@@ -91,7 +102,7 @@ const RiskPortfolio = ({
 
         <button
           className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
-          onClick={changePercentage}
+          onClick={changeAndSettleMessage}
         >
           <svg
             width="24"

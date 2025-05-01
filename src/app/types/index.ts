@@ -17,4 +17,11 @@ export interface Message {
   sender: "user" | "bot";
   timestamp: Date;
   type: MessageType;
+  isActive: boolean; // data field if can be edited (the message is settled or not)
+  data?: MessagePortfolioData;
+}
+
+export interface MessagePortfolioData {
+  risk: RiskLevel;
+  strategies: RiskPortfolioStrategies[];
 }
