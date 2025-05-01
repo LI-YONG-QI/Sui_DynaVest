@@ -21,14 +21,14 @@ import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 
-// TODO: add `strategiesSet` in this component
-// TODO: pass strategiesSet to RiskPortfolio and ChangePercentList (selected)
+// TODO: settleMessage have high relation with `changePercentage`
 export default function Home() {
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [conversation, setConversation] = useState<Message[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const {
     selectedRiskLevel,
     setSelectedRiskLevel,
@@ -42,7 +42,6 @@ export default function Home() {
   const createBotMessage = (botResponse: { result: string }): Message => {
     let type: MessageType = "Text";
     let text = "";
-    let isActive = false;
     let data: MessagePortfolioData | undefined;
 
     switch (botResponse.result) {
@@ -54,15 +53,13 @@ export default function Home() {
       case "pie_chart":
         text = "What's your Risk/Yield and Airdrop portfolio preference?";
         type = "Portfolio";
-        isActive = true;
+        // Set this message as being edited
         break;
       case "edit_portfolio":
         type = "Edit";
-        isActive = true;
         break;
       case "review_portfolio":
         type = "Review Portfolio";
-        isActive = false;
         data = {
           risk: selectedRiskLevel,
           strategies: selectedStrategies,
@@ -80,14 +77,40 @@ export default function Home() {
       sender: "bot",
       timestamp: new Date(),
       type,
-      isActive,
       data,
     };
+
+    // For Portfolio and Edit types, set this message as being edited
+    if (type === "Portfolio" || type === "Edit") {
+      setIsEditing(true);
+    }
 
     return botMessage;
   };
 
+  const validateEditable = (message: Message) => {
+    return (
+      message.id === conversation[conversation.length - 1].id && // The latest message conversation
+      isEditing === true
+    );
+  };
+
+  const getMessageData = (message: Message) => {
+    const { data } = message;
+    const isEditable = validateEditable(message);
+
+    if (!isEditable && !data) {
+      throw new Error("Portfolio data is required");
+    }
+
+    const risk = isEditable ? selectedRiskLevel : data!.risk;
+    const strategies = isEditable ? selectedStrategies : data!.strategies;
+
+    return { isEditable, risk, strategies };
+  };
+
   const settleMessage = (message: Message) => {
+    // Update the message with the current data
     const updatedConversation = conversation.map((convMsg) => {
       if (convMsg.id === message.id) {
         return {
@@ -96,12 +119,12 @@ export default function Home() {
             risk: selectedRiskLevel,
             strategies: selectedStrategies,
           },
-          isActive: false,
         };
       }
       return convMsg;
     });
     setConversation(updatedConversation);
+    setIsEditing(false);
   };
 
   const addUserMessage = (message: string) => {
@@ -113,7 +136,6 @@ export default function Home() {
       sender: "user",
       timestamp: new Date(),
       type: "Text",
-      isActive: false,
     };
 
     setConversation((prev) => [...prev, userMessage]);
@@ -163,7 +185,6 @@ export default function Home() {
         sender: "bot",
         timestamp: new Date(),
         type: "Text",
-        isActive: false,
       };
 
       setConversation((prev) => [...prev, errorMessage]);
@@ -209,16 +230,13 @@ export default function Home() {
     switch (message.type) {
       case "Invest":
         return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
-      case "Portfolio":
-        const { isActive, data } = message;
+      case "Portfolio": {
+        const {
+          isEditable,
+          risk: messageRisk,
+          strategies,
+        } = getMessageData(message);
 
-        if (isActive === false && !data)
-          throw new Error("Portfolio data is required");
-
-        const risk = isActive ? selectedRiskLevel : data!.risk;
-        const strategies = isActive ? selectedStrategies : data!.strategies;
-
-        // TODO: settleMessage have high relation with `changePercentage`
         return (
           <div className="overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full max-w-[320px] md:max-w-none">
@@ -226,24 +244,24 @@ export default function Home() {
                 <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
                   {/* Risk preference selection */}
                   <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
-                    {RISK_OPTIONS.map((_risk) => (
+                    {RISK_OPTIONS.map((risk) => (
                       <RiskBadge
-                        key={_risk}
-                        label={_risk}
-                        isSelected={_risk === risk}
-                        onClick={() => setSelectedRiskLevel(_risk)}
+                        key={risk}
+                        label={risk}
+                        isSelected={risk === messageRisk}
+                        isEditable={isEditable}
+                        setSelectedRiskLevel={setSelectedRiskLevel}
                       />
                     ))}
                   </div>
 
                   <div className="flex items-center">
                     <p className="text-gray text-xs md:text-sm font-normal px-1">
-                      {getRiskDescription(risk)}
+                      {getRiskDescription(messageRisk)}
                     </p>
                   </div>
                 </div>
               </div>
-
               <RiskPortfolio
                 changePercentage={() =>
                   handleMessage(
@@ -258,15 +276,10 @@ export default function Home() {
             </div>
           </div>
         );
+      }
       case "Edit": {
-        const { isActive, data } = message;
+        const { isEditable, strategies } = getMessageData(message);
 
-        if (isActive === false && !data)
-          throw new Error("Portfolio data is required");
-
-        const strategies = isActive ? selectedStrategies : data!.strategies;
-
-        // TODO: settleMessage have high relation with `handleReview`
         return (
           <div className="overflow-x-auto max-w-full">
             <ChangePercentList
@@ -274,6 +287,7 @@ export default function Home() {
               setRiskPortfolioStrategies={setSelectedStrategies}
               message={message}
               settleMessage={settleMessage}
+              isEditable={isEditable}
               handleReview={() =>
                 handleMessage("Review my portfolio", sendMockReviewMessage)
               }
@@ -282,16 +296,9 @@ export default function Home() {
         );
       }
       case "Review Portfolio": {
-        const { isActive, data } = message;
-
-        if (isActive === false && !data)
-          throw new Error("Portfolio data is required");
-
-        // const risk = isActive ? selectedRiskLevel : data!.risk;
-        const strategies = isActive ? selectedStrategies : data!.strategies;
+        const { strategies } = getMessageData(message);
 
         return (
-          // TODO: settleMessage have high relation with `handleReview`
           <RiskPortfolio
             changePercentage={() =>
               handleMessage(

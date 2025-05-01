@@ -13,6 +13,7 @@ type ChangePercentListProps = {
   message: Message;
   settleMessage: (message: Message) => void;
   handleReview: () => void;
+  isEditable: boolean;
 };
 
 const createChangePercentStrategy = (
@@ -30,14 +31,15 @@ const ChangePercentList = ({
   message,
   settleMessage,
   handleReview,
+  isEditable,
 }: ChangePercentListProps) => {
   const [strategies, setStrategies] = useState(
     createChangePercentStrategy(riskPortfolioStrategies)
   );
 
   const handleInputChange = (index: number, value: string) => {
-    // Only allow numbers
-    if (!message.isActive) return;
+    // Only allow edits when in editing mode
+    if (!isEditable) return;
 
     if (!/^\d*$/.test(value)) return;
 

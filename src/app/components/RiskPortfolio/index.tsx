@@ -17,12 +17,18 @@ interface RiskPortfolioProps {
 export const RiskBadge = ({
   label,
   isSelected,
-  onClick,
+  setSelectedRiskLevel,
+  isEditable,
 }: {
   label: string;
   isSelected: boolean;
-  onClick: () => void;
+  setSelectedRiskLevel: (risk: RiskLevel) => void;
+  isEditable: boolean;
 }) => {
+  const handleClick = () => {
+    if (isEditable) setSelectedRiskLevel(label as RiskLevel);
+  };
+
   return (
     <div
       className={`rounded-lg px-3 py-3 cursor-pointer ${
@@ -30,7 +36,7 @@ export const RiskBadge = ({
           ? "bg-[#5F79F1] text-white"
           : "border border-[#5F79F1] text-[#5F79F1]"
       }`}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <span className="text-sm font-medium">{label}</span>
     </div>
