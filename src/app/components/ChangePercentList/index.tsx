@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-type ChangePercentStrategy = {
+export type ChangePercentStrategy = {
   name: string;
   percentage: number;
 };

@@ -1,4 +1,5 @@
 import type { TypedData, Address } from "viem";
+import { RISK_OPTIONS } from "./constants/risk";
 
 export const PERMIT_TYPES = {
   Permit: [
@@ -71,3 +72,11 @@ export type PieStrategy = {
   risk: string;
   allocation: number;
 };
+
+export type RiskLevel = (typeof RISK_OPTIONS)[number];
+
+export type RiskPortfolioStrategies = StrategyMetadata & {
+  allocation: number;
+};
+
+export type StrategiesSet = Record<RiskLevel, RiskPortfolioStrategies[]>;

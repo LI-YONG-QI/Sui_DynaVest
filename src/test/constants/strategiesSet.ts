@@ -1,8 +1,9 @@
 import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
-import {
+import type {
+  StrategiesSet,
   RiskLevel,
   RiskPortfolioStrategies,
-} from "@/app/components/RiskPortfolio";
+} from "@/app/utils/types";
 
 // Helper function to convert StrategyMetadata to RiskPortfolioStrategies with allocation
 const addAllocation = (
@@ -88,34 +89,33 @@ const generateAllocations = (
 };
 
 // Create the mock data structure
-export const MOCK_STRATEGIES_SET: Record<RiskLevel, RiskPortfolioStrategies[]> =
-  {
-    "Balanced Risk": getBalancedStrategies().map((strategy, i, arr) =>
-      addAllocation(strategy, generateAllocations(arr, "Balanced Risk")[i])
+export const MOCK_STRATEGIES_SET: StrategiesSet = {
+  "Balanced Risk": getBalancedStrategies().map((strategy, i, arr) =>
+    addAllocation(strategy, generateAllocations(arr, "Balanced Risk")[i])
+  ),
+
+  "Low Risk": getStrategiesByRisk("Low")
+    .slice(0, 5)
+    .map((strategy, i, arr) =>
+      addAllocation(strategy, generateAllocations(arr, "Low Risk")[i])
     ),
 
-    "Low Risk": getStrategiesByRisk("Low")
-      .slice(0, 5)
-      .map((strategy, i, arr) =>
-        addAllocation(strategy, generateAllocations(arr, "Low Risk")[i])
-      ),
-
-    "Medium Risk": getStrategiesByRisk("Medium")
-      .slice(0, 5)
-      .map((strategy, i, arr) =>
-        addAllocation(strategy, generateAllocations(arr, "Medium Risk")[i])
-      ),
-
-    "High Risk": getStrategiesByRisk("High")
-      .slice(0, 5)
-      .map((strategy, i, arr) =>
-        addAllocation(strategy, generateAllocations(arr, "High Risk")[i])
-      ),
-
-    "High Airdrop Potential": getAirdropStrategies().map((strategy, i, arr) =>
-      addAllocation(
-        strategy,
-        generateAllocations(arr, "High Airdrop Potential")[i]
-      )
+  "Medium Risk": getStrategiesByRisk("Medium")
+    .slice(0, 5)
+    .map((strategy, i, arr) =>
+      addAllocation(strategy, generateAllocations(arr, "Medium Risk")[i])
     ),
-  };
+
+  "High Risk": getStrategiesByRisk("High")
+    .slice(0, 5)
+    .map((strategy, i, arr) =>
+      addAllocation(strategy, generateAllocations(arr, "High Risk")[i])
+    ),
+
+  "High Airdrop Potential": getAirdropStrategies().map((strategy, i, arr) =>
+    addAllocation(
+      strategy,
+      generateAllocations(arr, "High Airdrop Potential")[i]
+    )
+  ),
+};

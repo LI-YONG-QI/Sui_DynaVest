@@ -6,8 +6,13 @@ import { format } from "date-fns";
 
 import type { Message, MessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
-import RiskPortfolio from "@/app/components/RiskPortfolio";
-import ChangePercentList from "@/app/components/ChangePercentList";
+import RiskPortfolio, {
+  getRiskDescription,
+  RiskBadge,
+} from "@/app/components/RiskPortfolio";
+import ChangePercentList, {
+  ChangePercentStrategy,
+} from "@/app/components/ChangePercentList";
 import { InvestmentFormWithChainFilter } from "@/app/components/InvestmentFormWithChainFilter";
 import {
   sendMockChangePercentageMessage,
@@ -15,6 +20,9 @@ import {
   sendMockInvestMessage,
 } from "@/test/sendMock";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
+import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
+import { RiskPortfolioStrategies } from "./utils/types";
+import { RISK_OPTIONS } from "./utils/constants/risk";
 
 // Process the bot response and determine its type and text
 const createBotMessage = (botResponse: { result: string }): Message => {
@@ -63,6 +71,9 @@ export default function Home() {
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
+  const { selectedRiskLevel, setSelectedRiskLevel, selectedStrategies } =
+    useStrategiesSet(MOCK_STRATEGIES_SET);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
@@ -98,7 +109,6 @@ export default function Home() {
     userMessage: string,
     sendMsg: (message: string) => Promise<{
       result: string;
-      type: MessageType;
     }>
   ) => {
     e.preventDefault();
@@ -153,7 +163,7 @@ export default function Home() {
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleAskAI(e as unknown as FormEvent, command, sendMessage);
+      handleAskAI(e as unknown as FormEvent, command, sendMockInvestMessage);
     }
   };
 
@@ -181,6 +191,27 @@ export default function Home() {
         return (
           <div className="overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full max-w-[320px] md:max-w-none">
+              <div className="flex flex-col gap-3">
+                <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
+                  {/* Risk preference selection */}
+                  <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
+                    {RISK_OPTIONS.map((risk) => (
+                      <RiskBadge
+                        key={risk}
+                        label={risk}
+                        isSelected={selectedRiskLevel === risk}
+                        onClick={() => setSelectedRiskLevel(risk)}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="flex items-center">
+                    <p className="text-gray text-xs md:text-sm font-normal px-1">
+                      {getRiskDescription(selectedRiskLevel)}
+                    </p>
+                  </div>
+                </div>
+              </div>
               <RiskPortfolio
                 changePercentage={() =>
                   handleMessage(
@@ -188,7 +219,7 @@ export default function Home() {
                     sendMockChangePercentageMessage
                   )
                 }
-                strategiesSet={MOCK_STRATEGIES_SET}
+                riskPortfolioStrategies={selectedStrategies}
               />
             </div>
           </div>
@@ -197,6 +228,9 @@ export default function Home() {
         return (
           <div className="overflow-x-auto max-w-full">
             <ChangePercentList
+              initialStrategies={createChangePercentStrategy(
+                selectedStrategies
+              )}
               handleReview={() =>
                 handleMessage("Review my portfolio", sendMockReviewMessage)
               }
@@ -206,6 +240,15 @@ export default function Home() {
       default:
         return null;
     }
+  };
+
+  const createChangePercentStrategy = (
+    strategies: RiskPortfolioStrategies[]
+  ): ChangePercentStrategy[] => {
+    return strategies.map((strategy) => ({
+      name: strategy.title,
+      percentage: strategy.allocation,
+    }));
   };
 
   return (
@@ -335,13 +378,17 @@ export default function Home() {
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  className="flex-1 outline-none text-[#A0ACC5] font-[Manrope] font-medium text-base"
+                  className="flex-1 outline-none text-black font-[Manrope] font-medium text-base"
                   placeholder="Ask me anything about DeFi strategies or use the quick commands"
                 />
               </div>
               <button
                 onClick={(e) =>
-                  handleAskAI(e as unknown as FormEvent, command, sendMessage)
+                  handleAskAI(
+                    e as unknown as FormEvent,
+                    command,
+                    sendMockInvestMessage
+                  )
                 }
                 disabled={command.trim() === ""}
                 className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"

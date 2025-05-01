@@ -1,31 +1,16 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React from "react";
 
 import { PortfolioPieChart } from "./PieChart";
-import type { StrategyMetadata } from "@/app/utils/types";
+import type { RiskPortfolioStrategies, RiskLevel } from "@/app/utils/types";
 import { createPieChartStrategies } from "@/app/utils/pie";
-
-const RISK_OPTIONS = [
-  "Balanced Risk",
-  "Low Risk",
-  "Medium Risk",
-  "High Risk",
-  "High Airdrop Potential",
-] as const;
-
-export type RiskLevel = (typeof RISK_OPTIONS)[number];
-
-export type RiskPortfolioStrategies = StrategyMetadata & {
-  allocation: number;
-};
-
 interface RiskPortfolioProps {
   changePercentage: () => void;
-  strategiesSet?: Record<RiskLevel, RiskPortfolioStrategies[]>;
+  riskPortfolioStrategies: RiskPortfolioStrategies[];
 }
 
-const RiskBadge = ({
+export const RiskBadge = ({
   label,
   isSelected,
   onClick,
@@ -48,70 +33,37 @@ const RiskBadge = ({
   );
 };
 
+export const getRiskDescription = (selectedRisk: RiskLevel) => {
+  switch (selectedRisk) {
+    case "Low Risk":
+      return "This portfolio focuses on lower-risk yield protocols prioritizing capital preservation.";
+    case "Medium Risk":
+      return "This portfolio balances moderate risk with potentially higher returns.";
+    case "High Risk":
+      return "This portfolio focuses on high-risk, high-reward yield protocols.";
+    case "High Airdrop Potential":
+      return "This portfolio prioritizes protocols with potential future token airdrops.";
+    default:
+      return "This portfolio will diversify equally in yield protocols of three risk levels.";
+  }
+};
+
 // Portfolio legend item component
 
 const RiskPortfolio = ({
   changePercentage,
-  strategiesSet,
+  riskPortfolioStrategies,
 }: RiskPortfolioProps) => {
-  // State for selected risk preference
-  const [selectedRisk, setSelectedRisk] = useState<RiskLevel>("Balanced Risk");
-
-  const filteredStrategies = useMemo(() => {
-    return strategiesSet?.[selectedRisk] || [];
-  }, [selectedRisk, strategiesSet]);
-
-  // Description text based on selected risk
-  const getRiskDescription = () => {
-    switch (selectedRisk) {
-      case "Low Risk":
-        return "This portfolio focuses on lower-risk yield protocols prioritizing capital preservation.";
-      case "Medium Risk":
-        return "This portfolio balances moderate risk with potentially higher returns.";
-      case "High Risk":
-        return "This portfolio focuses on high-risk, high-reward yield protocols.";
-      case "High Airdrop Potential":
-        return "This portfolio prioritizes protocols with potential future token airdrops.";
-      default:
-        return "This portfolio will diversify equally in yield protocols of three risk levels.";
-    }
-  };
-
   return (
     <div className="my-4 flex flex-col gap-6 w-full max-w-[805px]">
-      {/* System message with risk preferences */}
-      <div className="flex flex-col gap-3">
-        <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
-          {/* Risk preference selection */}
-          <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
-            {RISK_OPTIONS.map((risk) => (
-              <RiskBadge
-                key={risk}
-                label={risk}
-                isSelected={selectedRisk === risk}
-                onClick={() => setSelectedRisk(risk)}
-              />
-            ))}
-          </div>
-
-          <div className="flex items-center">
-            <p className="text-gray text-xs md:text-sm font-normal px-1">
-              {getRiskDescription()}
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Portfolio visualization */}
       <div className="flex items-center w-full px-[10px] gap-[10px]">
         {/* Pie chart */}
         <div className="w-full">
           <PortfolioPieChart
-            pieStrategies={createPieChartStrategies(filteredStrategies)}
+            pieStrategies={createPieChartStrategies(riskPortfolioStrategies)}
           />
         </div>
-
-        {/* Legends */}
       </div>
 
       {/* Action buttons */}
