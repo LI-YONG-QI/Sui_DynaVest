@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import type { RiskPortfolioStrategies } from "@/app/utils/types";
 
 export type ChangePercentStrategy = {
   name: string;
@@ -6,15 +7,28 @@ export type ChangePercentStrategy = {
 };
 
 type ChangePercentListProps = {
-  initialStrategies: ChangePercentStrategy[];
+  riskPortfolioStrategies: RiskPortfolioStrategies[];
+  setRiskPortfolioStrategies: (strategies: RiskPortfolioStrategies[]) => void;
   handleReview: () => void;
 };
 
+const createChangePercentStrategy = (
+  strategies: RiskPortfolioStrategies[]
+): ChangePercentStrategy[] => {
+  return strategies.map((strategy) => ({
+    name: strategy.title,
+    percentage: strategy.allocation,
+  }));
+};
+
 const ChangePercentList = ({
-  initialStrategies,
+  riskPortfolioStrategies,
+  setRiskPortfolioStrategies,
   handleReview,
 }: ChangePercentListProps) => {
-  const [strategies, setStrategies] = useState(initialStrategies);
+  const [strategies, setStrategies] = useState(
+    createChangePercentStrategy(riskPortfolioStrategies)
+  );
 
   const handleInputChange = (index: number, value: string) => {
     // Only allow numbers
@@ -31,6 +45,15 @@ const ChangePercentList = ({
     };
 
     setStrategies(updatedStrategies);
+
+    // Update parent component's strategy state
+    const updatedRiskStrategies = [...riskPortfolioStrategies];
+    updatedRiskStrategies[index] = {
+      ...updatedRiskStrategies[index],
+      allocation: numValue,
+    };
+
+    setRiskPortfolioStrategies(updatedRiskStrategies);
   };
 
   return (

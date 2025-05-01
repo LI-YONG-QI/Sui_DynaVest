@@ -1,4 +1,4 @@
-import { RiskPortfolioStrategies } from "../components/RiskPortfolio";
+import { RiskPortfolioStrategies } from "../utils/types";
 import type { ChartConfig } from "../components/ui/chart";
 import type { PieStrategy } from "./types";
 

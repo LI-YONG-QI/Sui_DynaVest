@@ -10,9 +10,7 @@ import RiskPortfolio, {
   getRiskDescription,
   RiskBadge,
 } from "@/app/components/RiskPortfolio";
-import ChangePercentList, {
-  ChangePercentStrategy,
-} from "@/app/components/ChangePercentList";
+import ChangePercentList from "@/app/components/ChangePercentList";
 import { InvestmentFormWithChainFilter } from "@/app/components/InvestmentFormWithChainFilter";
 import {
   sendMockChangePercentageMessage,
@@ -21,7 +19,6 @@ import {
 } from "@/test/sendMock";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
-import { RiskPortfolioStrategies } from "./utils/types";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 
 // Process the bot response and determine its type and text
@@ -43,7 +40,7 @@ const createBotMessage = (botResponse: { result: string }): Message => {
       type = "Edit";
       break;
     case "review_portfolio":
-      type = "Portfolio";
+      type = "Review Portfolio";
       break;
     default:
       text = botResponse.result;
@@ -71,21 +68,17 @@ export default function Home() {
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  const { selectedRiskLevel, setSelectedRiskLevel, selectedStrategies } =
-    useStrategiesSet(MOCK_STRATEGIES_SET);
+  const {
+    selectedRiskLevel,
+    setSelectedRiskLevel,
+    selectedStrategies,
+    setSelectedStrategies,
+  } = useStrategiesSet(MOCK_STRATEGIES_SET);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
-
-  const handleHotTopic = (topic: string) => {
-    setCommand(topic);
-    // Focus the input field after setting the command
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 0);
-  };
 
   const addUserMessage = (message: string) => {
     if (message === "") return;
@@ -100,6 +93,14 @@ export default function Home() {
 
     setConversation((prev) => [...prev, userMessage]);
     setCommand("");
+  };
+
+  const handleHotTopic = (topic: string) => {
+    setCommand(topic);
+    // Focus the input field after setting the command
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
   };
 
   // TODO: Handle Ask AI error
@@ -173,6 +174,8 @@ export default function Home() {
   }, [conversation, isTyping]);
 
   // Render UI
+
+  //!  message from conversations
   const renderBotMessageContent = (
     message: Message,
     handleMessage: (
@@ -228,27 +231,29 @@ export default function Home() {
         return (
           <div className="overflow-x-auto max-w-full">
             <ChangePercentList
-              initialStrategies={createChangePercentStrategy(
-                selectedStrategies
-              )}
+              riskPortfolioStrategies={selectedStrategies}
+              setRiskPortfolioStrategies={setSelectedStrategies}
               handleReview={() =>
                 handleMessage("Review my portfolio", sendMockReviewMessage)
               }
             />
           </div>
         );
+      case "Review Portfolio":
+        return (
+          <RiskPortfolio
+            changePercentage={() =>
+              handleMessage(
+                "Change percentage",
+                sendMockChangePercentageMessage
+              )
+            }
+            riskPortfolioStrategies={selectedStrategies}
+          />
+        );
       default:
         return null;
     }
-  };
-
-  const createChangePercentStrategy = (
-    strategies: RiskPortfolioStrategies[]
-  ): ChangePercentStrategy[] => {
-    return strategies.map((strategy) => ({
-      name: strategy.title,
-      percentage: strategy.allocation,
-    }));
   };
 
   return (
