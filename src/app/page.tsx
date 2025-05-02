@@ -4,100 +4,22 @@ import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
 import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
 
-import type { Message, MessageType } from "./types";
+import type { Message, MessagePortfolioData, MessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
-import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
-import RiskPortfolio from "@/app/components/RiskPortfolio";
-import EditList from "@/app/components/EditList";
+import RiskPortfolio, {
+  getRiskDescription,
+  RiskBadge,
+} from "@/app/components/RiskPortfolio";
+import ChangePercentList from "@/app/components/ChangePercentList";
 import { InvestmentFormWithChainFilter } from "@/app/components/InvestmentFormWithChainFilter";
 import {
   sendMockChangePercentageMessage,
   sendMockReviewMessage,
   sendMockInvestMessage,
 } from "@/test/sendMock";
-
-const renderBotMessageContent = (
-  message: Message,
-  handleMessage: (
-    userInput: string,
-    sendFn: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => Promise<void>
-) => {
-  if (message.sender !== "bot") return null;
-
-  switch (message.type) {
-    case "Invest":
-      return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
-    case "Portfolio":
-      return (
-        <div className="overflow-x-auto max-w-full w-full flex justify-center">
-          <div className="w-full max-w-[320px] md:max-w-none">
-            <RiskPortfolio
-              changePercentage={() =>
-                handleMessage(
-                  "Change percentage",
-                  sendMockChangePercentageMessage
-                )
-              }
-              strategiesMetadata={STRATEGIES_METADATA.slice(0, 5)}
-            />
-          </div>
-        </div>
-      );
-    case "Edit":
-      return (
-        <div className="overflow-x-auto max-w-full">
-          <EditList
-            handleReview={() =>
-              handleMessage("Review my portfolio", sendMockReviewMessage)
-            }
-          />
-        </div>
-      );
-    default:
-      return null;
-  }
-};
-
-// Process the bot response and determine its type and text
-const createBotMessage = (botResponse: { result: string }): Message => {
-  let type: MessageType = "Text";
-  let text = "";
-
-  switch (botResponse.result) {
-    case "build_portfolio":
-      text =
-        "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ";
-      type = "Invest";
-      break;
-    case "pie_chart":
-      text = "What's your Risk/Yield and Airdrop portfolio preference?";
-      type = "Portfolio";
-      break;
-    case "edit_portfolio":
-      type = "Edit";
-      break;
-    case "review_portfolio":
-      type = "Portfolio";
-      break;
-    default:
-      text = botResponse.result;
-      break;
-  }
-
-  // Add bot response to conversation
-  const botMessage: Message = {
-    id: (Date.now() + 1).toString(),
-    text,
-    sender: "bot",
-    timestamp: new Date(),
-    type,
-  };
-
-  return botMessage;
-};
+import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
+import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
+import { RISK_OPTIONS } from "./utils/constants/risk";
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -105,33 +27,121 @@ export default function Home() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const {
+    selectedRiskLevel,
+    setSelectedRiskLevel,
+    selectedStrategies,
+    setSelectedStrategies,
+  } = useStrategiesSet(MOCK_STRATEGIES_SET); // TODO: remove mock data
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
 
+  const createBotMessage = (botResponse: { result: string }): Message => {
+    let type: MessageType = "Text";
+    let text = "";
+    let data: MessagePortfolioData | undefined;
+
+    switch (botResponse.result) {
+      case "build_portfolio":
+        text =
+          "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ";
+        type = "Invest";
+        break;
+      case "pie_chart":
+        text = "What's your Risk/Yield and Airdrop portfolio preference?";
+        type = "Portfolio";
+        // Set this message as being edited
+        break;
+      case "edit_portfolio":
+        type = "Edit";
+        break;
+      case "review_portfolio":
+        type = "Review Portfolio";
+        data = {
+          risk: selectedRiskLevel,
+          strategies: selectedStrategies,
+        };
+        break;
+      default:
+        text = botResponse.result;
+        break;
+    }
+
+    // Add bot response to conversation
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      text,
+      sender: "bot",
+      timestamp: new Date(),
+      type,
+      data,
+    };
+
+    // For Portfolio and Edit types, set this message as being edited
+    if (type === "Portfolio" || type === "Edit") {
+      setIsEditing(true);
+    }
+
+    return botMessage;
+  };
+
+  const getMessageData = (message: Message) => {
+    const validateEditable = (message: Message) => {
+      return (
+        message.id === conversation[conversation.length - 1].id && // The latest message conversation
+        isEditing === true
+      );
+    };
+
+    const { data } = message;
+    const isEditable = validateEditable(message);
+
+    if (!isEditable && !data) {
+      throw new Error("Portfolio data is required");
+    }
+
+    const risk = isEditable ? selectedRiskLevel : data!.risk;
+    const strategies = isEditable ? selectedStrategies : data!.strategies;
+
+    return { isEditable, risk, strategies };
+  };
+
+  const nextStep = (
+    sendFn: (message: string) => Promise<{
+      result: string;
+    }>
+  ) => {
+    const settleMessage = (message: Message) => {
+      // Update the message with the current data
+      const updatedConversation = conversation.map((convMsg) => {
+        if (convMsg.id === message.id) {
+          return {
+            ...convMsg,
+            data: {
+              risk: selectedRiskLevel,
+              strategies: selectedStrategies,
+            },
+          };
+        }
+        return convMsg;
+      });
+      setConversation(updatedConversation);
+      setIsEditing(false);
+    };
+
+    settleMessage(conversation[conversation.length - 1]);
+    handleMessage("Change percentage", sendFn);
+  };
+
+  /// HANDLE FUNCTIONS ///
   const handleHotTopic = (topic: string) => {
     setCommand(topic);
     // Focus the input field after setting the command
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
-  };
-
-  const addUserMessage = (message: string) => {
-    if (message === "") return;
-    // Add user message to conversation
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: message,
-      sender: "user",
-      timestamp: new Date(),
-      type: "Text",
-    };
-
-    setConversation((prev) => [...prev, userMessage]);
-    setCommand("");
   };
 
   // TODO: Handle Ask AI error
@@ -141,7 +151,6 @@ export default function Home() {
     userMessage: string,
     sendMsg: (message: string) => Promise<{
       result: string;
-      type: MessageType;
     }>
   ) => {
     e.preventDefault();
@@ -154,6 +163,21 @@ export default function Home() {
       result: string;
     }>
   ) => {
+    const addUserMessage = (message: string) => {
+      if (message === "") return;
+      // Add user message to conversation
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        text: message,
+        sender: "user",
+        timestamp: new Date(),
+        type: "Text",
+      };
+
+      setConversation((prev) => [...prev, userMessage]);
+      setCommand("");
+    };
+
     addUserMessage(userInput);
 
     try {
@@ -196,7 +220,90 @@ export default function Home() {
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleAskAI(e as unknown as FormEvent, command, sendMessage);
+      handleAskAI(e as unknown as FormEvent, command, sendMockInvestMessage);
+    }
+  };
+
+  const renderBotMessageContent = (
+    message: Message,
+    handleMessage: (
+      userInput: string,
+      sendFn: (message: string) => Promise<{
+        result: string;
+      }>
+    ) => Promise<void>
+  ) => {
+    if (message.sender !== "bot") return null;
+
+    switch (message.type) {
+      case "Invest":
+        return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
+      case "Portfolio": {
+        const {
+          isEditable,
+          risk: messageRisk,
+          strategies,
+        } = getMessageData(message);
+
+        return (
+          <div className="overflow-x-auto max-w-full w-full flex justify-center">
+            <div className="w-full max-w-[320px] md:max-w-none">
+              <div className="flex flex-col gap-3">
+                <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
+                  {/* Risk preference selection */}
+                  <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
+                    {RISK_OPTIONS.map((risk) => (
+                      <RiskBadge
+                        key={risk}
+                        label={risk}
+                        isSelected={risk === messageRisk}
+                        isEditable={isEditable}
+                        setSelectedRiskLevel={setSelectedRiskLevel}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="flex items-center">
+                    <p className="text-gray text-xs md:text-sm font-normal px-1">
+                      {getRiskDescription(messageRisk)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <RiskPortfolio
+                nextStep={() => nextStep(sendMockChangePercentageMessage)}
+                riskPortfolioStrategies={strategies}
+              />
+            </div>
+          </div>
+        );
+      }
+      case "Edit": {
+        const { isEditable, strategies } = getMessageData(message);
+
+        return (
+          <div className="overflow-x-auto max-w-full">
+            <ChangePercentList
+              riskPortfolioStrategies={strategies}
+              setRiskPortfolioStrategies={setSelectedStrategies}
+              isEditable={isEditable}
+              nextStep={() => nextStep(sendMockReviewMessage)}
+            />
+          </div>
+        );
+      }
+      case "Review Portfolio": {
+        const { strategies } = getMessageData(message);
+
+        return (
+          <RiskPortfolio
+            nextStep={() => nextStep(sendMockChangePercentageMessage)}
+            riskPortfolioStrategies={strategies}
+          />
+        );
+      }
+      default:
+        return null;
     }
   };
 
@@ -332,13 +439,17 @@ export default function Home() {
                   value={command}
                   onChange={(e) => setCommand(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  className="flex-1 outline-none text-[#A0ACC5] font-[Manrope] font-medium text-base"
+                  className="flex-1 outline-none text-black font-[Manrope] font-medium text-base"
                   placeholder="Ask me anything about DeFi strategies or use the quick commands"
                 />
               </div>
               <button
                 onClick={(e) =>
-                  handleAskAI(e as unknown as FormEvent, command, sendMessage)
+                  handleAskAI(
+                    e as unknown as FormEvent,
+                    command,
+                    sendMockInvestMessage
+                  )
                 }
                 disabled={command.trim() === ""}
                 className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"

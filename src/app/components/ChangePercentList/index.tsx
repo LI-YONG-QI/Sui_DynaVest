@@ -1,22 +1,41 @@
 import React, { useState } from "react";
+import type { RiskPortfolioStrategies } from "@/app/utils/types";
 
-const initialStrategies = [
-  { name: "GMX Strategy", percentage: 20 },
-  { name: "AAVE Lending Strategy", percentage: 20 },
-  { name: "Uniswap Liquidity", percentage: 20 },
-  { name: "Liquid Staking", percentage: 20 },
-  { name: "Camelot Staking", percentage: 20 },
-];
-
-type EditListProps = {
-  handleReview: () => void;
+export type ChangePercentStrategy = {
+  name: string;
+  percentage: number;
 };
 
-const EditList: React.FC<EditListProps> = ({ handleReview }: EditListProps) => {
-  const [strategies, setStrategies] = useState(initialStrategies);
+type ChangePercentListProps = {
+  riskPortfolioStrategies: RiskPortfolioStrategies[];
+  setRiskPortfolioStrategies: (strategies: RiskPortfolioStrategies[]) => void;
+  nextStep: () => void;
+  isEditable: boolean;
+};
+
+const createChangePercentStrategy = (
+  strategies: RiskPortfolioStrategies[]
+): ChangePercentStrategy[] => {
+  return strategies.map((strategy) => ({
+    name: strategy.title,
+    percentage: strategy.allocation,
+  }));
+};
+
+const ChangePercentList = ({
+  riskPortfolioStrategies,
+  setRiskPortfolioStrategies,
+  nextStep,
+  isEditable,
+}: ChangePercentListProps) => {
+  const [strategies, setStrategies] = useState(
+    createChangePercentStrategy(riskPortfolioStrategies)
+  );
 
   const handleInputChange = (index: number, value: string) => {
-    // Only allow numbers
+    // Only allow edits when in editing mode
+    if (!isEditable) return;
+
     if (!/^\d*$/.test(value)) return;
 
     // Convert to number and limit to 0-100
@@ -30,6 +49,15 @@ const EditList: React.FC<EditListProps> = ({ handleReview }: EditListProps) => {
     };
 
     setStrategies(updatedStrategies);
+
+    // Update parent component's strategy state
+    const updatedRiskStrategies = [...riskPortfolioStrategies];
+    updatedRiskStrategies[index] = {
+      ...updatedRiskStrategies[index],
+      allocation: numValue,
+    };
+
+    setRiskPortfolioStrategies(updatedRiskStrategies);
   };
 
   return (
@@ -57,7 +85,7 @@ const EditList: React.FC<EditListProps> = ({ handleReview }: EditListProps) => {
         ))}
       </div>
       <button
-        onClick={handleReview}
+        onClick={nextStep}
         className="bg-[#5F79F1] text-white font-[Manrope] font-semibold text-sm rounded-lg py-3.5 px-5 flex gap-2.5"
       >
         <svg
@@ -81,4 +109,4 @@ const EditList: React.FC<EditListProps> = ({ handleReview }: EditListProps) => {
   );
 };
 
-export default EditList;
+export default ChangePercentList;
