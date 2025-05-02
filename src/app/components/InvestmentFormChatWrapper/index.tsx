@@ -7,8 +7,9 @@ import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestMod
 import { sendMockPortfolioMessage } from "@/test/sendMock";
 import { arbitrum } from "viem/chains";
 
-export const InvestmentFormWithChainFilter = ({
+export const InvestmentFormChatWrapper = ({
   handleMessage,
+  setDepositAmount,
 }: {
   handleMessage: (
     message: string,
@@ -16,6 +17,7 @@ export const InvestmentFormWithChainFilter = ({
       result: string;
     }>
   ) => Promise<void>;
+  setDepositAmount: (amount: string) => void;
 }) => {
   const [selectedChains, setSelectedChains] = useState<number[]>([arbitrum.id]);
   const [botStrategy, setBotStrategy] =
@@ -40,9 +42,10 @@ export const InvestmentFormWithChainFilter = ({
       </div>
       <InvestmentForm
         strategy={botStrategy}
-        handlePortfolio={(amount: string) =>
-          handleMessage(amount + " USDT", sendMockPortfolioMessage)
-        }
+        handlePortfolio={(amount: string) => {
+          setDepositAmount(amount);
+          handleMessage(amount + " USDT", sendMockPortfolioMessage);
+        }}
       />
     </div>
   );

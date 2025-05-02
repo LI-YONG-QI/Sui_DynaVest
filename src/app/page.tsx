@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
+import { useState, KeyboardEvent, useRef, useEffect } from "react";
 import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -11,7 +11,7 @@ import RiskPortfolio, {
   RiskBadge,
 } from "@/app/components/RiskPortfolio";
 import ChangePercentList from "@/app/components/ChangePercentList";
-import { InvestmentFormWithChainFilter } from "@/app/components/InvestmentFormWithChainFilter";
+import { InvestmentFormChatWrapper } from "@/app/components/InvestmentFormChatWrapper";
 import {
   sendMockChangePercentageMessage,
   sendMockReviewMessage,
@@ -29,6 +29,7 @@ export default function Home() {
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [depositAmount, setDepositAmount] = useState<string>("");
   const {
     selectedRiskLevel,
     setSelectedRiskLevel,
@@ -115,7 +116,7 @@ export default function Home() {
 
   const nextStep = (
     userInput: string,
-    sendFn: (message: string) => Promise<{
+    sendMsg: (message: string) => Promise<{
       result: string;
     }>
   ) => {
@@ -139,7 +140,7 @@ export default function Home() {
     };
 
     settleMessage(conversation[conversation.length - 1]);
-    handleMessage(userInput, sendFn);
+    handleMessage(userInput, sendMsg);
   };
 
   /// HANDLE FUNCTIONS ///
@@ -149,19 +150,6 @@ export default function Home() {
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
-  };
-
-  // TODO: Handle Ask AI error
-  // TODO: sendMsg should be `sendMessage` always (sendFn for dev)
-  const handleAskAI = async (
-    e: FormEvent,
-    userMessage: string,
-    sendMsg: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => {
-    e.preventDefault();
-    await handleMessage(userMessage, sendMsg);
   };
 
   const handleMessage = async (
@@ -227,24 +215,21 @@ export default function Home() {
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleAskAI(e as unknown as FormEvent, command, sendMessage);
+      handleMessage(command, sendMessage);
     }
   };
 
-  const renderBotMessageContent = (
-    message: Message,
-    handleMessage: (
-      userInput: string,
-      sendFn: (message: string) => Promise<{
-        result: string;
-      }>
-    ) => Promise<void>
-  ) => {
+  const renderBotMessageContent = (message: Message) => {
     if (message.sender !== "bot") return null;
 
     switch (message.type) {
       case "Invest":
-        return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
+        return (
+          <InvestmentFormChatWrapper
+            handleMessage={handleMessage}
+            setDepositAmount={setDepositAmount}
+          />
+        );
       case "Portfolio": {
         const {
           isEditable,
@@ -320,6 +305,23 @@ export default function Home() {
                 }
                 riskPortfolioStrategies={strategies}
               />
+            </div>
+          </div>
+        );
+      }
+      case "Build Portfolio": {
+        return (
+          <div>
+            <p className="my-4 text-lg font-bold">
+              ${depositAmount} USDC Portfolio complete!
+            </p>
+            <div className="flex flex-col gap-2">
+              {selectedStrategies.map((strategy, index) => (
+                <p className="text-sm text-gray-400" key={index}>
+                  {strategy.title} {strategy.allocation}% $
+                  {(strategy.allocation * Number(depositAmount)) / 100}
+                </p>
+              ))}
             </div>
           </div>
         );
@@ -466,9 +468,10 @@ export default function Home() {
                 />
               </div>
               <button
-                onClick={(e) =>
-                  handleAskAI(e as unknown as FormEvent, command, sendMessage)
-                }
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleMessage(command, sendMessage);
+                }}
                 disabled={command.trim() === ""}
                 className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"
               >
@@ -527,7 +530,7 @@ export default function Home() {
                         </div>
 
                         {/* Render bot message content by response type */}
-                        {renderBotMessageContent(message, handleMessage)}
+                        {renderBotMessageContent(message)}
 
                         <div
                           className={`text-xs mt-3 ${
