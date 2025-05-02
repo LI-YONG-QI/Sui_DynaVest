@@ -10,7 +10,7 @@ const DUMMY_DATA = [
     coin_symbol: "BNB",
     coin: "BNB",
     coin_icon: "crypto-icons/bnb.svg",
-    balance_coin: 550.06283286,
+    balance_coin: 550.06,
     balance_usd: 392387.32,
     profit_coin: 12.5,
     profit_usd: 8923.45,
@@ -21,8 +21,8 @@ const DUMMY_DATA = [
     coin_symbol: "USDT",
     coin: "TetherUS",
     coin_icon: "crypto-icons/usdt.svg",
-    balance_coin: 12345.67,
-    balance_usd: 12345.67,
+    balance_coin: 1331.67,
+    balance_usd: 1331.67,
     profit_coin: 234.56,
     profit_usd: 234.56,
   },
@@ -49,7 +49,7 @@ export default function StrategiesTableComponent() {
   };
 
   return (
-    <div className="w-full">
+    <div className="mx-4 w-[calc(100%-2rem)]">
       <table className="w-full border-separate border-spacing-y-3">
         <thead>
           <tr className="text-sm font-semibold text-gray-500">

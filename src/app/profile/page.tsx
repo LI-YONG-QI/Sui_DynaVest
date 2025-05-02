@@ -45,7 +45,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex-shrink-0">
               <Image
-                src="/profile-icon.svg"
+                src="/mock-profile-photo.png"
                 alt="Profile"
                 className="rounded-full bg-blue-500 object-cover"
                 width={48}
@@ -76,14 +76,14 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-1">
                   <span className="text-gray-400 text-xs sm:text-sm">
                     User Id
-                  </span>{" "}
-                  <span className="text-xs sm:text-sm font-bold">12345</span>
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold">82874</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-400 text-xs sm:text-sm">
                     Joined
-                  </span>{" "}
-                  <span className="text-xs sm:text-sm font-bold">12345</span>
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold">7231</span>
                 </div>
               </div>
             </div>
@@ -123,7 +123,7 @@ export default function ProfilePage() {
               Available Balance
             </h4>
             <p className="text-base sm:text-lg font-bold tracking-wide">
-              $ 123,456
+              $ 51,352
             </p>
           </div>
           <div>
@@ -148,7 +148,7 @@ export default function ProfilePage() {
             <button
               key={tab.value}
               onClick={() => setSelectedTab(tab.value)}
-              className={`py-2 px-1 sm:px-2 hover:bg-[#d0e0ff] border-b-4 font-bold transition-colors text-sm sm:text-base ${
+              className={`w-full py-2 px-1 sm:px-2 hover:bg-[#d0e0ff] border-b-4 font-bold transition-colors text-sm sm:text-base ${
                 selectedTab === tab.value
                   ? "font-bold border-black"
                   : "text-gray-400 border-transparent"

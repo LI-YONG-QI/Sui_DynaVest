@@ -21,7 +21,7 @@ const DUMMY_DATA = [
 
 export default function TransactionsTableComponent() {
   return (
-    <div className="w-full">
+    <div className="mx-4 w-[calc(100%-2rem)]">
       <table className="w-full border-separate border-spacing-y-3">
         <thead>
           <tr className="text-sm font-semibold text-gray-500">
