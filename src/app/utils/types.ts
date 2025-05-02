@@ -1,4 +1,5 @@
 import type { TypedData, Address } from "viem";
+import { RISK_OPTIONS } from "./constants/risk";
 
 export const PERMIT_TYPES = {
   Permit: [
@@ -23,7 +24,8 @@ export type Protocol =
   | "LST"
   | "BSC LST"
   | "Camelot"
-  | "GMX";
+  | "GMX"
+  | "Bot Strategy";
 
 export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;
@@ -61,3 +63,20 @@ export type Chain = {
   id: number;
   icon: string;
 };
+
+export type PieStrategy = {
+  id: number;
+  color: string;
+  name: string;
+  apy: string;
+  risk: string;
+  allocation: number;
+};
+
+export type RiskLevel = (typeof RISK_OPTIONS)[number];
+
+export type RiskPortfolioStrategies = StrategyMetadata & {
+  allocation: number;
+};
+
+export type StrategiesSet = Record<RiskLevel, RiskPortfolioStrategies[]>;

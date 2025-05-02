@@ -10,21 +10,21 @@ const DUMMY_DATA = [
     coin_symbol: "BNB",
     coin: "BNB",
     coin_icon: "crypto-icons/bnb.svg",
-    balance_coin: 550.06283286,
-    balance_usd: 392387.32,
-    profit_coin: 12.5,
-    profit_usd: 8923.45,
+    balance_coin: 2.3,
+    balance_usd: 1050.3,
+    profit_coin: 0.8,
+    profit_usd: 76.3,
   },
   {
     strategy_name: "AAVE Lending Strategy",
     strategy_icon: "crypto-icons/aave.svg",
-    coin_symbol: "USDT",
-    coin: "TetherUS",
-    coin_icon: "crypto-icons/usdt.svg",
-    balance_coin: 12345.67,
-    balance_usd: 12345.67,
-    profit_coin: 234.56,
-    profit_usd: 234.56,
+    coin_symbol: "USDC",
+    coin: "USD Coin",
+    coin_icon: "crypto-icons/usdc.svg",
+    balance_coin: 1250,
+    balance_usd: 1250,
+    profit_coin: 134.56,
+    profit_usd: 134.56,
   },
 ];
 
@@ -49,7 +49,7 @@ export default function StrategiesTableComponent() {
   };
 
   return (
-    <div className="w-full">
+    <div className="mx-4 w-[calc(100%-2rem)]">
       <table className="w-full border-separate border-spacing-y-3">
         <thead>
           <tr className="text-sm font-semibold text-gray-500">

@@ -1,3 +1,6 @@
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export const getRiskColor = (risk: {
   level: "Low" | "Medium" | "High";
   color: string;
@@ -28,3 +31,7 @@ export const formatCoin = (value: number, symbol: string) => {
     maximumFractionDigits: 6,
   })} ${symbol}`;
 };
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
