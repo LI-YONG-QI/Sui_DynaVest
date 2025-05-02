@@ -8,7 +8,6 @@ import type { Message, MessagePortfolioData, MessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
 import RiskPortfolio, {
   getRiskDescription,
-  RiskBadge,
 } from "@/app/components/RiskPortfolio";
 import ChangePercentList from "@/app/components/ChangePercentList";
 import { InvestmentFormChatWrapper } from "@/app/components/InvestmentFormChatWrapper";
@@ -20,7 +19,8 @@ import {
 } from "@/test/sendMock";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
-import { RISK_OPTIONS } from "./utils/constants/risk";
+import { RiskBadgeList } from "./components/RiskBadgeList";
+import DepositChatWrapper from "./components/DepositChatWrapper";
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -67,10 +67,16 @@ export default function Home() {
         };
         break;
       case "build_portfolio_2": // TODO: rename
-        // TODO: replace 100 with real user balance
+        // TODO: replace 100 with user real balance
         if (Number(depositAmount) < 100) {
-          text = `Oops, you have insufficient balance in your wallet. You can deposit or change amount.`;
+          text =
+            "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
           type = "Deposit Funds";
+          // TODO: data should'nt be included in the message
+          data = {
+            risk: selectedRiskLevel,
+            strategies: selectedStrategies,
+          };
         } else {
           text = "Start building portfolio...";
           type = "Build Portfolio";
@@ -92,7 +98,7 @@ export default function Home() {
     };
 
     // For Portfolio and Edit types, set this message as being edited
-    if (type === "Portfolio" || type === "Edit") {
+    if (type === "Portfolio" || type === "Edit" || type === "Deposit Funds") {
       setIsEditing(true);
     }
 
@@ -122,10 +128,7 @@ export default function Home() {
 
   const nextStep = (
     userInput: string,
-    sendMsg: (
-      message: string,
-      amount?: number
-    ) => Promise<{
+    sendMsg: (message: string) => Promise<{
       result: string;
     }>
   ) => {
@@ -250,19 +253,13 @@ export default function Home() {
           <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full max-w-[320px] md:max-w-none">
               <div className="flex flex-col gap-3">
-                <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
+                <div className="rounded-[0px_10px_10px_10px] p-4 flex flex-col gap-6">
                   {/* Risk preference selection */}
-                  <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
-                    {RISK_OPTIONS.map((risk) => (
-                      <RiskBadge
-                        key={risk}
-                        label={risk}
-                        isSelected={risk === messageRisk}
-                        isEditable={isEditable}
-                        setSelectedRiskLevel={setSelectedRiskLevel}
-                      />
-                    ))}
-                  </div>
+                  <RiskBadgeList
+                    selectedRisk={messageRisk}
+                    isEditable={isEditable}
+                    setSelectedRiskLevel={setSelectedRiskLevel}
+                  />
 
                   <div className="flex items-center">
                     <p className="text-gray text-xs md:text-sm font-normal px-1">
@@ -350,29 +347,15 @@ export default function Home() {
         );
       }
       case "Deposit Funds": {
+        const { isEditable } = getMessageData(message);
+
         return (
-          <div className="flex flex-col gap-4">
-            <p className="mt-4 text-lg font-bold">
-              Deposit funds to your wallet
-            </p>
-
-            <p>QRCODE !!!!</p>
-
-            <button
-              onClick={() =>
-                nextStep("Build portfolio", sendMockBuildPortfolioMessage)
-              }
-              className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
-            >
-              <MoveUpRight />
-              <span className="text-sm font-semibold">
-                Start Building Portfolio
-              </span>
-            </button>
-          </div>
+          <DepositChatWrapper
+            isEditable={isEditable}
+            nextStep={() => nextStep("", sendMockBuildPortfolioMessage)}
+          />
         );
       }
-
       default:
         return null;
     }
