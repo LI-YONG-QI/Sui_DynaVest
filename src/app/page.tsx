@@ -16,6 +16,7 @@ import {
   sendMockChangePercentageMessage,
   sendMockReviewMessage,
   sendMockInvestMessage,
+  sendMockBuildPortfolioMessage,
 } from "@/test/sendMock";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
@@ -64,6 +65,10 @@ export default function Home() {
           strategies: selectedStrategies,
         };
         break;
+      case "build_portfolio_2": // TODO: rename
+        text = "Start building portfolio...";
+        type = "Build Portfolio";
+        break;
       default:
         text = botResponse.result;
         break;
@@ -109,6 +114,7 @@ export default function Home() {
   };
 
   const nextStep = (
+    userInput: string,
     sendFn: (message: string) => Promise<{
       result: string;
     }>
@@ -127,12 +133,13 @@ export default function Home() {
         }
         return convMsg;
       });
+
       setConversation(updatedConversation);
       setIsEditing(false);
     };
 
     settleMessage(conversation[conversation.length - 1]);
-    handleMessage("Change percentage", sendFn);
+    handleMessage(userInput, sendFn);
   };
 
   /// HANDLE FUNCTIONS ///
@@ -272,7 +279,12 @@ export default function Home() {
               </div>
 
               <RiskPortfolio
-                nextStep={() => nextStep(sendMockChangePercentageMessage)}
+                buildPortfolio={() =>
+                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                }
+                changePercent={() =>
+                  nextStep("Change percentage", sendMockChangePercentageMessage)
+                }
                 riskPortfolioStrategies={strategies}
               />
             </div>
@@ -288,7 +300,7 @@ export default function Home() {
               riskPortfolioStrategies={strategies}
               setRiskPortfolioStrategies={setSelectedStrategies}
               isEditable={isEditable}
-              nextStep={() => nextStep(sendMockReviewMessage)}
+              nextStep={() => nextStep("", sendMockReviewMessage)}
             />
           </div>
         );
@@ -300,7 +312,12 @@ export default function Home() {
           <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full min-w-[600px] md:max-w-none">
               <RiskPortfolio
-                nextStep={() => nextStep(sendMockChangePercentageMessage)}
+                buildPortfolio={() =>
+                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                }
+                changePercent={() =>
+                  nextStep("Change percentage", sendMockChangePercentageMessage)
+                }
                 riskPortfolioStrategies={strategies}
               />
             </div>

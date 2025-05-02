@@ -35,3 +35,13 @@ export const sendMockReviewMessage = async (
     result: "review_portfolio",
   };
 };
+
+export const sendMockBuildPortfolioMessage = async (
+  message: string
+): Promise<{ result: string }> => {
+  console.log("message", message);
+
+  return {
+    result: "build_portfolio_2",
+  };
+};
