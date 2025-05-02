@@ -10,7 +10,8 @@ export type MessageType =
   | "Portfolio"
   | "Edit"
   | "Review Portfolio"
-  | "Build Portfolio";
+  | "Build Portfolio"
+  | "Deposit Funds";
 
 export interface Message {
   id: string;

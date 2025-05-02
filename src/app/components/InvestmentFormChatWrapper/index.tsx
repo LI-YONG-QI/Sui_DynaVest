@@ -13,7 +13,7 @@ export const InvestmentFormChatWrapper = ({
 }: {
   handleMessage: (
     message: string,
-    sendFn: (message: string) => Promise<{
+    sendMsg: (message: string) => Promise<{
       result: string;
     }>
   ) => Promise<void>;

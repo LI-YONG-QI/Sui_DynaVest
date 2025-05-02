@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, KeyboardEvent, useRef, useEffect } from "react";
-import { Undo2 } from "lucide-react";
+import { Undo2, FileCheck, MoveUpRight } from "lucide-react";
 import { format } from "date-fns";
 
 import type { Message, MessagePortfolioData, MessageType } from "./types";
@@ -67,8 +67,14 @@ export default function Home() {
         };
         break;
       case "build_portfolio_2": // TODO: rename
-        text = "Start building portfolio...";
-        type = "Build Portfolio";
+        // TODO: replace 100 with real user balance
+        if (Number(depositAmount) < 100) {
+          text = `Oops, you have insufficient balance in your wallet. You can deposit or change amount.`;
+          type = "Deposit Funds";
+        } else {
+          text = "Start building portfolio...";
+          type = "Build Portfolio";
+        }
         break;
       default:
         text = botResponse.result;
@@ -116,7 +122,10 @@ export default function Home() {
 
   const nextStep = (
     userInput: string,
-    sendMsg: (message: string) => Promise<{
+    sendMsg: (
+      message: string,
+      amount?: number
+    ) => Promise<{
       result: string;
     }>
   ) => {
@@ -311,8 +320,8 @@ export default function Home() {
       }
       case "Build Portfolio": {
         return (
-          <div>
-            <p className="my-4 text-lg font-bold">
+          <div className="flex flex-col gap-4">
+            <p className="mt-4 text-lg font-bold">
               ${depositAmount} USDC Portfolio complete!
             </p>
             <div className="flex flex-col gap-2">
@@ -323,9 +332,47 @@ export default function Home() {
                 </p>
               ))}
             </div>
+            <div className="flex gap-5">
+              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
+                <FileCheck />
+                <span className="text-sm font-semibold">
+                  Check my portfolio
+                </span>
+              </button>
+              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
+                <MoveUpRight />
+                <span className="text-sm font-semibold">
+                  Explore more DeFi Investment
+                </span>
+              </button>
+            </div>
           </div>
         );
       }
+      case "Deposit Funds": {
+        return (
+          <div className="flex flex-col gap-4">
+            <p className="mt-4 text-lg font-bold">
+              Deposit funds to your wallet
+            </p>
+
+            <p>QRCODE !!!!</p>
+
+            <button
+              onClick={() =>
+                nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+              }
+              className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
+            >
+              <MoveUpRight />
+              <span className="text-sm font-semibold">
+                Start Building Portfolio
+              </span>
+            </button>
+          </div>
+        );
+      }
+
       default:
         return null;
     }
