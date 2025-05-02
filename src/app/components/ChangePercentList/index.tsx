@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { RiskPortfolioStrategies } from "@/app/utils/types";
+import { toast } from "react-toastify";
 
 export type ChangePercentStrategy = {
   name: string;
@@ -60,6 +61,19 @@ const ChangePercentList = ({
     setRiskPortfolioStrategies(updatedRiskStrategies);
   };
 
+  const reviewChange = () => {
+    const totalPercentage = strategies.reduce(
+      (sum, strategy) => sum + strategy.percentage,
+      0
+    );
+    if (totalPercentage !== 100) {
+      toast.error("The total percentage must equal 100.");
+      return;
+    }
+
+    nextStep();
+  };
+
   return (
     <div className="w-full flex flex-col items-start gap-7">
       <div className="flex flex-col w-full gap-2">
@@ -85,7 +99,7 @@ const ChangePercentList = ({
         ))}
       </div>
       <button
-        onClick={nextStep}
+        onClick={reviewChange}
         className="bg-[#5F79F1] text-white font-[Manrope] font-semibold text-sm rounded-lg py-3.5 px-5 flex gap-2.5"
       >
         <svg

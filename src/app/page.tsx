@@ -246,7 +246,7 @@ export default function Home() {
         } = getMessageData(message);
 
         return (
-          <div className="overflow-x-auto max-w-full w-full flex justify-center">
+          <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full max-w-[320px] md:max-w-none">
               <div className="flex flex-col gap-3">
                 <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
@@ -270,6 +270,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
               <RiskPortfolio
                 nextStep={() => nextStep(sendMockChangePercentageMessage)}
                 riskPortfolioStrategies={strategies}
@@ -296,10 +297,14 @@ export default function Home() {
         const { strategies } = getMessageData(message);
 
         return (
-          <RiskPortfolio
-            nextStep={() => nextStep(sendMockChangePercentageMessage)}
-            riskPortfolioStrategies={strategies}
-          />
+          <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
+            <div className="w-full min-w-[600px] md:max-w-none">
+              <RiskPortfolio
+                nextStep={() => nextStep(sendMockChangePercentageMessage)}
+                riskPortfolioStrategies={strategies}
+              />
+            </div>
+          </div>
         );
       }
       default:
