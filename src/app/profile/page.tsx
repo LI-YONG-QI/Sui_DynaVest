@@ -123,12 +123,12 @@ export default function ProfilePage() {
               Available Balance
             </h4>
             <p className="text-base sm:text-lg font-bold tracking-wide">
-              $ 51,352
+              $ 1,352
             </p>
           </div>
           <div>
             <h4 className="text-xs sm:text-sm font-medium text-gray-300">
-              TVL
+              Total Asset
             </h4>
             <p className="text-base sm:text-lg font-bold tracking-wide">$15</p>
           </div>
@@ -137,7 +137,7 @@ export default function ProfilePage() {
               Total Profit
             </h4>
             <p className="text-green-500 font-bold tracking-wide text-base sm:text-lg">
-              $0.04
+              $ 213
             </p>
           </div>
         </div>

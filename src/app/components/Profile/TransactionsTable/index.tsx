@@ -2,20 +2,20 @@ import Image from "next/image";
 
 const DUMMY_DATA = [
   {
-    date: "2025-04-21",
+    date: "2025-04-29",
     strategy_name: "AAVE Lending Strategy",
     strategy_icon: "crypto-icons/aave.svg",
     transaction_type: "Invest",
     asset: "BNB",
-    amount: 100,
+    amount: 2,
   },
   {
-    date: "2025-04-19",
+    date: "2025-05-01",
     strategy_name: "AAVE Lending Strategy",
     strategy_icon: "crypto-icons/aave.svg",
     transaction_type: "Withdraw",
     asset: "USDT",
-    amount: 100,
+    amount: 1000,
   },
 ];
 
