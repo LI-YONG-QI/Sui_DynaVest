@@ -220,7 +220,7 @@ export default function Home() {
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleAskAI(e as unknown as FormEvent, command, sendMockInvestMessage);
+      handleAskAI(e as unknown as FormEvent, command, sendMessage);
     }
   };
 
@@ -445,11 +445,7 @@ export default function Home() {
               </div>
               <button
                 onClick={(e) =>
-                  handleAskAI(
-                    e as unknown as FormEvent,
-                    command,
-                    sendMockInvestMessage
-                  )
+                  handleAskAI(e as unknown as FormEvent, command, sendMessage)
                 }
                 disabled={command.trim() === ""}
                 className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"
