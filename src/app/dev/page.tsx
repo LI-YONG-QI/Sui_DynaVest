@@ -10,12 +10,7 @@ const page = () => {
   return (
     <div style={{ textAlign: "center" }}>
       <h2>掃描下方 QR Code 進行存款</h2>
-      <QRCodeSVG
-        value={uri}
-        size={100}
-        // 以下屬性可自行調整
-        level="H" // 容錯率：L, M, Q, H
-      />
+      <QRCodeSVG value={uri} size={100} level="H" />
       <p style={{ marginTop: "8px", wordBreak: "break-all" }}>
         URI: <code>{uri}</code>
       </p>

@@ -1,8 +1,9 @@
-import React, { SetStateAction, Dispatch, useState } from "react";
-import { useAccount } from "wagmi";
+import React, { SetStateAction, Dispatch, useState, useEffect } from "react";
+import { useAccount, useBalance } from "wagmi";
 import { MoveUpRight } from "lucide-react";
+import { MoonLoader } from "react-spinners";
 import { QRCodeSVG } from "qrcode.react";
-
+import { parseUnits } from "viem";
 import {
   sendMockBuildPortfolioMessage,
   sendMockPortfolioMessage,
@@ -17,6 +18,7 @@ const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 type DepositChatWrapperProps = {
   isEditable: boolean;
   nextStep: NextStepFn;
+  depositAmount: string;
   setDepositAmount: Dispatch<SetStateAction<string>>;
   strategy: StrategyMetadata;
 };
@@ -24,14 +26,36 @@ type DepositChatWrapperProps = {
 const DepositChatWrapper = ({
   isEditable,
   nextStep,
+  depositAmount,
   setDepositAmount,
   strategy,
 }: DepositChatWrapperProps) => {
   const { address } = useAccount();
   const [selectedAction, setSelectedAction] = useState<string>("Deposit");
-  const [isDeposit] = useState(true); // TODO: deal deposit logic
+  const [isDeposit, setIsDeposit] = useState(false); // TODO: deal deposit logic
+
+  const chainId = strategy.chainId;
+  const usdc = strategy.tokens[0].chains![chainId];
+  const { data: balance, dataUpdatedAt } = useBalance({
+    address,
+    token: usdc,
+    chainId,
+    query: {
+      enabled: !isDeposit,
+      refetchInterval: 3 * 1000,
+    },
+  });
 
   const uri = `ethereum:${address}`;
+
+  console.log(balance);
+  console.log(dataUpdatedAt);
+
+  useEffect(() => {
+    if (balance?.value) {
+      setIsDeposit(balance.value > BigInt(parseUnits(depositAmount, 6)));
+    }
+  }, [balance, depositAmount]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -63,6 +87,30 @@ const DepositChatWrapper = ({
             <p>{address}</p>
             <CopyButton text={address!} />
           </div>
+
+          <div className="pt-8 flex flex-col gap-4 self-start">
+            {isDeposit ? (
+              <>
+                <p>Deposit successfully</p>
+                <button
+                  onClick={() =>
+                    nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                  }
+                  className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
+                >
+                  <MoveUpRight />
+                  <span className="text-sm font-semibold">
+                    Start Building Portfolio
+                  </span>
+                </button>
+              </>
+            ) : (
+              <div className="flex gap-4 self-start">
+                <p>Waiting for deposit...</p>
+                <MoonLoader color="#5F79F1" size={20} />
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="w-[80%]">
@@ -73,23 +121,6 @@ const DepositChatWrapper = ({
               nextStep(amount + " USDT", sendMockPortfolioMessage);
             }}
           />
-        </div>
-      )}
-
-      {isDeposit && (
-        <div className="flex flex-col gap-4">
-          <p>Deposit successfully</p>
-          <button
-            onClick={() =>
-              nextStep("Build portfolio", sendMockBuildPortfolioMessage)
-            }
-            className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
-          >
-            <MoveUpRight />
-            <span className="text-sm font-semibold">
-              Start Building Portfolio
-            </span>
-          </button>
         </div>
       )}
     </div>

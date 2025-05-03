@@ -22,6 +22,9 @@ import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
 import { RiskBadgeList } from "./components/RiskBadgeList";
 import DepositChatWrapper from "./components/DepositChatWrapper";
 import { BOT_STRATEGY } from "./utils/constants/strategies";
+import { useChat } from "./contexts/ChatContext";
+import { useAccount, useBalance } from "wagmi";
+import { parseUnits } from "viem";
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -42,6 +45,14 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
+  const { closeChat } = useChat();
+
+  const { address } = useAccount();
+  const { data: balance } = useBalance({
+    address,
+    token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
+    chainId: selectedChains[0],
+  });
 
   const createBotMessage = (botResponse: { result: string }): Message => {
     let type: MessageType = "Text";
@@ -70,8 +81,7 @@ export default function Home() {
         };
         break;
       case "build_portfolio_2": // TODO: rename
-        // TODO: replace 100 with user real balance
-        if (Number(depositAmount) < 100) {
+        if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
           text =
             "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
           type = "Deposit Funds";
@@ -357,6 +367,7 @@ export default function Home() {
         return (
           <DepositChatWrapper
             setDepositAmount={setDepositAmount}
+            depositAmount={depositAmount}
             isEditable={isEditable}
             nextStep={nextStep}
             strategy={{
@@ -375,6 +386,10 @@ export default function Home() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation, isTyping]);
+
+  useEffect(() => {
+    closeChat();
+  }, []);
 
   return (
     <div className="h-[80vh]">
