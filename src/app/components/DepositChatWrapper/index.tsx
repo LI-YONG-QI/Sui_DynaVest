@@ -1,5 +1,7 @@
 import React, { SetStateAction, Dispatch, useState } from "react";
+import { useAccount } from "wagmi";
 import { MoveUpRight } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 import {
   sendMockBuildPortfolioMessage,
@@ -8,6 +10,7 @@ import {
 import { RiskBadge } from "../RiskPortfolio";
 import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
 import InvestmentForm from "../StrategyList/StrategyCard/InvestModal/InvestmentForm";
+import CopyButton from "../CopyButton";
 
 const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 
@@ -24,7 +27,11 @@ const DepositChatWrapper = ({
   setDepositAmount,
   strategy,
 }: DepositChatWrapperProps) => {
+  const { address } = useAccount();
   const [selectedAction, setSelectedAction] = useState<string>("Deposit");
+  const [isDeposit] = useState(true); // TODO: deal deposit logic
+
+  const uri = `ethereum:${address}`;
 
   return (
     <div className="flex flex-col gap-4">
@@ -43,7 +50,20 @@ const DepositChatWrapper = ({
       </div>
 
       {selectedAction === "Deposit" ? (
-        <p>QRCODE !!!!</p>
+        <div className="flex flex-col gap-2 items-center justify-center">
+          <div className="p-4 bg-white rounded-lg flex flex-col items-center justify-center">
+            <QRCodeSVG
+              value={uri}
+              size={100}
+              // 以下屬性可自行調整
+              level="H" // 容錯率：L, M, Q, H
+            />
+          </div>
+          <div className="flex gap-2 items-center justify-center">
+            <p>{address}</p>
+            <CopyButton text={address!} />
+          </div>
+        </div>
       ) : (
         <div className="w-[80%]">
           <InvestmentForm
@@ -56,15 +76,22 @@ const DepositChatWrapper = ({
         </div>
       )}
 
-      <button
-        onClick={() =>
-          nextStep("Build portfolio", sendMockBuildPortfolioMessage)
-        }
-        className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
-      >
-        <MoveUpRight />
-        <span className="text-sm font-semibold">Start Building Portfolio</span>
-      </button>
+      {isDeposit && (
+        <div className="flex flex-col gap-4">
+          <p>Deposit successfully</p>
+          <button
+            onClick={() =>
+              nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+            }
+            className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
+          >
+            <MoveUpRight />
+            <span className="text-sm font-semibold">
+              Start Building Portfolio
+            </span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
