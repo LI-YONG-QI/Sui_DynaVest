@@ -1,23 +1,29 @@
-import { sendMockBuildPortfolioMessage } from "@/test/sendMock";
-
+import React, { SetStateAction, Dispatch, useState } from "react";
 import { MoveUpRight } from "lucide-react";
-import React, { useState } from "react";
+
+import {
+  sendMockBuildPortfolioMessage,
+  sendMockPortfolioMessage,
+} from "@/test/sendMock";
 import { RiskBadge } from "../RiskPortfolio";
+import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
+import InvestmentForm from "../StrategyList/StrategyCard/InvestModal/InvestmentForm";
 
 const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
+
+type DepositChatWrapperProps = {
+  isEditable: boolean;
+  nextStep: NextStepFn;
+  setDepositAmount: Dispatch<SetStateAction<string>>;
+  strategy: StrategyMetadata;
+};
 
 const DepositChatWrapper = ({
   isEditable,
   nextStep,
-}: {
-  isEditable: boolean;
-  nextStep: (
-    userInput: string,
-    sendMsg: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => void;
-}) => {
+  setDepositAmount,
+  strategy,
+}: DepositChatWrapperProps) => {
   const [selectedAction, setSelectedAction] = useState<string>("Deposit");
 
   return (
@@ -36,7 +42,19 @@ const DepositChatWrapper = ({
         ))}
       </div>
 
-      {selectedAction === "Deposit" ? <p>QRCODE !!!!</p> : <p>Change Amount</p>}
+      {selectedAction === "Deposit" ? (
+        <p>QRCODE !!!!</p>
+      ) : (
+        <div className="w-[80%]">
+          <InvestmentForm
+            strategy={strategy}
+            handlePortfolio={(amount: string) => {
+              setDepositAmount(amount);
+              nextStep(amount + " USDT", sendMockPortfolioMessage);
+            }}
+          />
+        </div>
+      )}
 
       <button
         onClick={() =>

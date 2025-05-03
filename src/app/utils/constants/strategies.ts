@@ -12,11 +12,10 @@ export const BOT_STRATEGY: StrategyMetadata = {
     bgColor: "",
   },
   protocol: "Bot Strategy",
-  description:
-    "Staking CELO to operate network nodes helps to maintain security on the blockchain.",
-  image: "/crypto-icons/celo.svg",
-  externalLink: "https://stcelo.com",
-  learnMoreLink: "https://stcelo.com",
+  description: "Deposit USDC to multi strategies",
+  image: "",
+  externalLink: "",
+  learnMoreLink: "",
   tokens: [USDC],
   chainId: base.id,
 };

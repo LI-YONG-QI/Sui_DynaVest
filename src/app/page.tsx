@@ -21,6 +21,7 @@ import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
 import { RiskBadgeList } from "./components/RiskBadgeList";
 import DepositChatWrapper from "./components/DepositChatWrapper";
+import { BOT_STRATEGY } from "./utils/constants/strategies";
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -31,6 +32,8 @@ export default function Home() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [depositAmount, setDepositAmount] = useState<string>("");
   const {
+    selectedChains,
+    setSelectedChains,
     selectedRiskLevel,
     setSelectedRiskLevel,
     selectedStrategies,
@@ -238,7 +241,9 @@ export default function Home() {
       case "Invest":
         return (
           <InvestmentFormChatWrapper
-            handleMessage={handleMessage}
+            selectedChains={selectedChains}
+            setSelectedChains={setSelectedChains}
+            nextStep={nextStep}
             setDepositAmount={setDepositAmount}
           />
         );
@@ -351,8 +356,13 @@ export default function Home() {
 
         return (
           <DepositChatWrapper
+            setDepositAmount={setDepositAmount}
             isEditable={isEditable}
-            nextStep={() => nextStep("", sendMockBuildPortfolioMessage)}
+            nextStep={nextStep}
+            strategy={{
+              ...BOT_STRATEGY,
+              chainId: selectedChains[0],
+            }}
           />
         );
       }
