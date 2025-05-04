@@ -80,3 +80,12 @@ export type RiskPortfolioStrategies = StrategyMetadata & {
 };
 
 export type StrategiesSet = Record<RiskLevel, RiskPortfolioStrategies[]>;
+
+export type DepositAction = "Deposit" | "Change Amount";
+
+export type NextStepFn = (
+  userInput: string,
+  sendMsg: (message: string) => Promise<{
+    result: string;
+  }>
+) => void;

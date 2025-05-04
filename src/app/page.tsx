@@ -1,25 +1,30 @@
 "use client";
 
-import { useState, FormEvent, KeyboardEvent, useRef, useEffect } from "react";
-import { Undo2 } from "lucide-react";
+import { useState, KeyboardEvent, useRef, useEffect } from "react";
+import { Undo2, FileCheck, MoveUpRight } from "lucide-react";
 import { format } from "date-fns";
 
 import type { Message, MessagePortfolioData, MessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
 import RiskPortfolio, {
   getRiskDescription,
-  RiskBadge,
 } from "@/app/components/RiskPortfolio";
 import ChangePercentList from "@/app/components/ChangePercentList";
-import { InvestmentFormWithChainFilter } from "@/app/components/InvestmentFormWithChainFilter";
+import { InvestmentFormChatWrapper } from "@/app/components/InvestmentFormChatWrapper";
 import {
   sendMockChangePercentageMessage,
   sendMockReviewMessage,
   sendMockInvestMessage,
+  sendMockBuildPortfolioMessage,
 } from "@/test/sendMock";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
-import { RISK_OPTIONS } from "./utils/constants/risk";
+import { RiskBadgeList } from "./components/RiskBadgeList";
+import DepositChatWrapper from "./components/DepositChatWrapper";
+import { BOT_STRATEGY } from "./utils/constants/strategies";
+import { useChat } from "./contexts/ChatContext";
+import { useAccount, useBalance } from "wagmi";
+import { parseUnits } from "viem";
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -28,7 +33,10 @@ export default function Home() {
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [depositAmount, setDepositAmount] = useState<string>("");
   const {
+    selectedChains,
+    setSelectedChains,
     selectedRiskLevel,
     setSelectedRiskLevel,
     selectedStrategies,
@@ -37,6 +45,14 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
+  const { closeChat } = useChat();
+
+  const { address } = useAccount();
+  const { data: balance } = useBalance({
+    address,
+    token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
+    chainId: selectedChains[0],
+  });
 
   const createBotMessage = (botResponse: { result: string }): Message => {
     let type: MessageType = "Text";
@@ -64,6 +80,21 @@ export default function Home() {
           strategies: selectedStrategies,
         };
         break;
+      case "build_portfolio_2": // TODO: rename
+        if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
+          text =
+            "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
+          type = "Deposit Funds";
+          // TODO: data should'nt be included in the message
+          data = {
+            risk: selectedRiskLevel,
+            strategies: selectedStrategies,
+          };
+        } else {
+          text = "Start building portfolio...";
+          type = "Build Portfolio";
+        }
+        break;
       default:
         text = botResponse.result;
         break;
@@ -80,7 +111,7 @@ export default function Home() {
     };
 
     // For Portfolio and Edit types, set this message as being edited
-    if (type === "Portfolio" || type === "Edit") {
+    if (type === "Portfolio" || type === "Edit" || type === "Deposit Funds") {
       setIsEditing(true);
     }
 
@@ -109,7 +140,8 @@ export default function Home() {
   };
 
   const nextStep = (
-    sendFn: (message: string) => Promise<{
+    userInput: string,
+    sendMsg: (message: string) => Promise<{
       result: string;
     }>
   ) => {
@@ -127,12 +159,13 @@ export default function Home() {
         }
         return convMsg;
       });
+
       setConversation(updatedConversation);
       setIsEditing(false);
     };
 
     settleMessage(conversation[conversation.length - 1]);
-    handleMessage("Change percentage", sendFn);
+    handleMessage(userInput, sendMsg);
   };
 
   /// HANDLE FUNCTIONS ///
@@ -142,19 +175,6 @@ export default function Home() {
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
-  };
-
-  // TODO: Handle Ask AI error
-  // TODO: sendMsg should be `sendMessage` always (sendFn for dev)
-  const handleAskAI = async (
-    e: FormEvent,
-    userMessage: string,
-    sendMsg: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => {
-    e.preventDefault();
-    await handleMessage(userMessage, sendMsg);
   };
 
   const handleMessage = async (
@@ -220,24 +240,23 @@ export default function Home() {
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleAskAI(e as unknown as FormEvent, command, sendMessage);
+      handleMessage(command, sendMessage);
     }
   };
 
-  const renderBotMessageContent = (
-    message: Message,
-    handleMessage: (
-      userInput: string,
-      sendFn: (message: string) => Promise<{
-        result: string;
-      }>
-    ) => Promise<void>
-  ) => {
+  const renderBotMessageContent = (message: Message) => {
     if (message.sender !== "bot") return null;
 
     switch (message.type) {
       case "Invest":
-        return <InvestmentFormWithChainFilter handleMessage={handleMessage} />;
+        return (
+          <InvestmentFormChatWrapper
+            selectedChains={selectedChains}
+            setSelectedChains={setSelectedChains}
+            nextStep={nextStep}
+            setDepositAmount={setDepositAmount}
+          />
+        );
       case "Portfolio": {
         const {
           isEditable,
@@ -249,19 +268,13 @@ export default function Home() {
           <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full max-w-[320px] md:max-w-none">
               <div className="flex flex-col gap-3">
-                <div className="rounded-[0px_10px_10px_10px] p-ˋ flex flex-col gap-6">
+                <div className="rounded-[0px_10px_10px_10px] p-4 flex flex-col gap-6">
                   {/* Risk preference selection */}
-                  <div className="flex flex-wrap gap-[18px] items-center md:justify-start">
-                    {RISK_OPTIONS.map((risk) => (
-                      <RiskBadge
-                        key={risk}
-                        label={risk}
-                        isSelected={risk === messageRisk}
-                        isEditable={isEditable}
-                        setSelectedRiskLevel={setSelectedRiskLevel}
-                      />
-                    ))}
-                  </div>
+                  <RiskBadgeList
+                    selectedRisk={messageRisk}
+                    isEditable={isEditable}
+                    setSelectedRiskLevel={setSelectedRiskLevel}
+                  />
 
                   <div className="flex items-center">
                     <p className="text-gray text-xs md:text-sm font-normal px-1">
@@ -272,7 +285,12 @@ export default function Home() {
               </div>
 
               <RiskPortfolio
-                nextStep={() => nextStep(sendMockChangePercentageMessage)}
+                buildPortfolio={() =>
+                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                }
+                changePercent={() =>
+                  nextStep("Change percentage", sendMockChangePercentageMessage)
+                }
                 riskPortfolioStrategies={strategies}
               />
             </div>
@@ -288,7 +306,7 @@ export default function Home() {
               riskPortfolioStrategies={strategies}
               setRiskPortfolioStrategies={setSelectedStrategies}
               isEditable={isEditable}
-              nextStep={() => nextStep(sendMockReviewMessage)}
+              nextStep={() => nextStep("", sendMockReviewMessage)}
             />
           </div>
         );
@@ -300,11 +318,63 @@ export default function Home() {
           <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full min-w-[600px] md:max-w-none">
               <RiskPortfolio
-                nextStep={() => nextStep(sendMockChangePercentageMessage)}
+                buildPortfolio={() =>
+                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                }
+                changePercent={() =>
+                  nextStep("Change percentage", sendMockChangePercentageMessage)
+                }
                 riskPortfolioStrategies={strategies}
               />
             </div>
           </div>
+        );
+      }
+      case "Build Portfolio": {
+        return (
+          <div className="flex flex-col gap-4">
+            <p className="mt-4 text-lg font-bold">
+              ${depositAmount} USDC Portfolio complete!
+            </p>
+            <div className="flex flex-col gap-2">
+              {selectedStrategies.map((strategy, index) => (
+                <p className="text-sm text-gray-400" key={index}>
+                  {strategy.title} {strategy.allocation}% $
+                  {(strategy.allocation * Number(depositAmount)) / 100}
+                </p>
+              ))}
+            </div>
+            <div className="flex gap-5">
+              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
+                <FileCheck />
+                <span className="text-sm font-semibold">
+                  Check my portfolio
+                </span>
+              </button>
+              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
+                <MoveUpRight />
+                <span className="text-sm font-semibold">
+                  Explore more DeFi Investment
+                </span>
+              </button>
+            </div>
+          </div>
+        );
+      }
+      case "Deposit Funds": {
+        const { isEditable } = getMessageData(message);
+
+        return (
+          <DepositChatWrapper
+            setDepositAmount={setDepositAmount}
+            depositAmount={depositAmount}
+            isEditable={isEditable}
+            nextStep={nextStep}
+            strategy={{
+              ...BOT_STRATEGY,
+              chainId: selectedChains[0],
+            }}
+          />
         );
       }
       default:
@@ -316,6 +386,10 @@ export default function Home() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation, isTyping]);
+
+  useEffect(() => {
+    closeChat();
+  }, []);
 
   return (
     <div className="h-[80vh]">
@@ -449,9 +523,10 @@ export default function Home() {
                 />
               </div>
               <button
-                onClick={(e) =>
-                  handleAskAI(e as unknown as FormEvent, command, sendMessage)
-                }
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleMessage(command, sendMessage);
+                }}
                 disabled={command.trim() === ""}
                 className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"
               >
@@ -510,7 +585,7 @@ export default function Home() {
                         </div>
 
                         {/* Render bot message content by response type */}
-                        {renderBotMessageContent(message, handleMessage)}
+                        {renderBotMessageContent(message)}
 
                         <div
                           className={`text-xs mt-3 ${
