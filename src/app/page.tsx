@@ -16,6 +16,8 @@ import {
   sendMockReviewMessage,
   sendMockInvestMessage,
   sendMockBuildPortfolioMessage,
+  sendMockFindDeFiStrategiesMessage,
+  sendMockDeFiStrategiesCardMessage,
 } from "@/test/sendMock";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
@@ -25,6 +27,9 @@ import { BOT_STRATEGY } from "./utils/constants/strategies";
 import { useChat } from "./contexts/ChatContext";
 import { useAccount, useBalance } from "wagmi";
 import { parseUnits } from "viem";
+import ChainFilter from "./components/StrategyList/ChainFilter";
+import { RISK_OPTIONS } from "./utils/constants/risk";
+import Button from "./components/Button";
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -54,6 +59,12 @@ export default function Home() {
     chainId: selectedChains[0],
   });
 
+  // const parseChainsString = (chains: number[]) => {
+  //   return chains.map((chain) => {
+  //     return chain.toString();
+  //   });
+  // };
+
   const createBotMessage = (botResponse: { result: string }): Message => {
     let type: MessageType = "Text";
     let text = "";
@@ -68,13 +79,22 @@ export default function Home() {
       case "pie_chart":
         text = "What's your Risk/Yield and Airdrop portfolio preference?";
         type = "Portfolio";
-        // Set this message as being edited
         break;
       case "edit_portfolio":
         type = "Edit";
         break;
       case "review_portfolio":
         type = "Review Portfolio";
+        data = {
+          risk: selectedRiskLevel,
+          strategies: selectedStrategies,
+        };
+        break;
+      case "middle_risk_strategy":
+        text =
+          "No problem. What's your Chain and Risk preference? I'll find DeFi strategies meet your preference. ";
+        type = "Find Defi Strategies";
+        // TODO: data should'nt be included in the message
         data = {
           risk: selectedRiskLevel,
           strategies: selectedStrategies,
@@ -95,6 +115,17 @@ export default function Home() {
           type = "Build Portfolio";
         }
         break;
+      case "defi_strategies_card":
+        text = `Here’re some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${selectedChains.join(
+          " and "
+        )}  `;
+        type = "DeFi Strategies Cards";
+        // TODO: data should'nt be included in the message
+        data = {
+          risk: selectedRiskLevel,
+          strategies: selectedStrategies,
+        };
+        break;
       default:
         text = botResponse.result;
         break;
@@ -111,7 +142,12 @@ export default function Home() {
     };
 
     // For Portfolio and Edit types, set this message as being edited
-    if (type === "Portfolio" || type === "Edit" || type === "Deposit Funds") {
+    if (
+      type === "Portfolio" ||
+      type === "Edit" ||
+      type === "Deposit Funds" ||
+      type === "Find Defi Strategies"
+    ) {
       setIsEditing(true);
     }
 
@@ -274,6 +310,7 @@ export default function Home() {
                     selectedRisk={messageRisk}
                     isEditable={isEditable}
                     setSelectedRiskLevel={setSelectedRiskLevel}
+                    options={RISK_OPTIONS}
                   />
 
                   <div className="flex items-center">
@@ -377,6 +414,61 @@ export default function Home() {
           />
         );
       }
+      case "Find Defi Strategies": {
+        const { isEditable } = getMessageData(message);
+
+        return (
+          <div className="mt-4 flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <p className="font-[Manrope] font-medium text-sm">
+                Select Chains
+              </p>
+              <ChainFilter
+                selectedChains={selectedChains}
+                setSelectedChains={setSelectedChains}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="font-[Manrope] font-medium text-sm">Select Risk</p>
+              <RiskBadgeList
+                selectedRisk={selectedRiskLevel}
+                setSelectedRiskLevel={setSelectedRiskLevel}
+                options={RISK_OPTIONS}
+                isEditable={isEditable}
+              />
+            </div>
+            <Button
+              onClick={() =>
+                nextStep(
+                  `Find ${selectedRiskLevel} risk DeFi strategies on ${selectedChains.join(
+                    " and"
+                  )}`,
+                  sendMockDeFiStrategiesCardMessage
+                )
+              }
+              text="Find DeFi Strategies"
+              icon={<MoveUpRight />}
+            />
+          </div>
+        );
+      }
+
+      case "DeFi Strategies Cards": {
+        return (
+          <div className="mt-4 flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <p className="font-[Manrope] font-medium text-sm">
+                Select Chains
+              </p>
+              <ChainFilter
+                selectedChains={selectedChains}
+                setSelectedChains={setSelectedChains}
+              />
+            </div>
+          </div>
+        );
+      }
+
       default:
         return null;
     }
@@ -476,7 +568,15 @@ export default function Home() {
                     <span className="font-[Manrope] font-bold text-sm">
                       DeFi Strategy:
                     </span>
-                    <span className="font-[Manrope] font-medium text-sm truncate">
+                    <span
+                      onClick={() =>
+                        handleMessage(
+                          "Help me find the best DeFi strategies",
+                          sendMockFindDeFiStrategiesMessage
+                        )
+                      }
+                      className="font-[Manrope] font-medium text-sm truncate"
+                    >
                       Help me find the best DeFi strategies
                     </span>
                   </button>

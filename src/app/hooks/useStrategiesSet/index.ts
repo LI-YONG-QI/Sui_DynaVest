@@ -11,7 +11,7 @@ export const useStrategiesSet = (initialStrategiesSet: StrategiesSet) => {
   const [strategiesSet, setStrategiesSet] =
     useState<StrategiesSet>(initialStrategiesSet);
   const [selectedRiskLevel, setSelectedRiskLevel] =
-    useState<RiskLevel>("Balanced Risk");
+    useState<RiskLevel>("Balanced");
   const [selectedStrategies, setSelectedStrategies] = useState<
     RiskPortfolioStrategies[]
   >(strategiesSet[selectedRiskLevel]);

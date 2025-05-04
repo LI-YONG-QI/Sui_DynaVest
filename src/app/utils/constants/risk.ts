@@ -1,7 +1,7 @@
 export const RISK_OPTIONS = [
-  "Balanced Risk",
-  "Low Risk",
-  "Medium Risk",
-  "High Risk",
+  "Balanced",
+  "Low",
+  "Medium",
+  "High",
   "High Airdrop Potential",
 ] as const;
