@@ -33,7 +33,7 @@ export default function StrategyCard({
         {/* Header Section */}
         <div className="flex justify-between md:justify-around items-center w-full">
           <Image
-            src={image}
+            src={`/crypto-icons/chains/${chainId}.svg`}
             alt={title}
             width={60}
             height={60}
