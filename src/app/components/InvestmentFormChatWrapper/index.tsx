@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
-import { StrategyMetadata } from "@/app/utils/types";
+import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
 import ChainFilter from "@/app/components/StrategyList/ChainFilter";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
 import { sendMockPortfolioMessage } from "@/test/sendMock";
-import { arbitrum } from "viem/chains";
 
-export const InvestmentFormWithChainFilter = ({
-  handleMessage,
-}: {
-  handleMessage: (
-    message: string,
-    sendFn: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => Promise<void>;
-}) => {
-  const [selectedChains, setSelectedChains] = useState<number[]>([arbitrum.id]);
+interface InvestmentFormChatWrapperProps {
+  nextStep: NextStepFn;
+  setDepositAmount: (amount: string) => void;
+  selectedChains: number[];
+  setSelectedChains: Dispatch<SetStateAction<number[]>>;
+}
+
+export const InvestmentFormChatWrapper = ({
+  nextStep,
+  setDepositAmount,
+  selectedChains,
+  setSelectedChains,
+}: InvestmentFormChatWrapperProps) => {
   const [botStrategy, setBotStrategy] =
     useState<StrategyMetadata>(BOT_STRATEGY);
 
@@ -40,9 +41,10 @@ export const InvestmentFormWithChainFilter = ({
       </div>
       <InvestmentForm
         strategy={botStrategy}
-        handlePortfolio={(amount: string) =>
-          handleMessage(amount + " USDT", sendMockPortfolioMessage)
-        }
+        handlePortfolio={(amount: string) => {
+          setDepositAmount(amount);
+          nextStep(amount + " USDT", sendMockPortfolioMessage);
+        }}
       />
     </div>
   );

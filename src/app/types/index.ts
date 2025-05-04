@@ -9,7 +9,11 @@ export type MessageType =
   | "Invest"
   | "Portfolio"
   | "Edit"
-  | "Review Portfolio";
+  | "Review Portfolio"
+  | "Build Portfolio"
+  | "Deposit Funds"
+  | "Find Defi Strategies"
+  | "DeFi Strategies Cards";
 
 export interface Message {
   id: string;

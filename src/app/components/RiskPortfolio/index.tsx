@@ -7,7 +7,8 @@ import type { RiskPortfolioStrategies, RiskLevel } from "@/app/utils/types";
 import { createPieChartStrategies } from "@/app/utils/pie";
 
 interface RiskPortfolioProps {
-  nextStep: () => void;
+  buildPortfolio: () => void;
+  changePercent: () => void;
   riskPortfolioStrategies: RiskPortfolioStrategies[];
 }
 
@@ -58,7 +59,8 @@ export const getRiskDescription = (selectedRisk: RiskLevel) => {
 // Portfolio legend item component
 
 const RiskPortfolio = ({
-  nextStep,
+  buildPortfolio,
+  changePercent,
   riskPortfolioStrategies,
 }: RiskPortfolioProps) => {
   return (
@@ -75,7 +77,10 @@ const RiskPortfolio = ({
 
       {/* Action buttons */}
       <div className="w-full flex flex-col gap-5 md:flex-row">
-        <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
+        <button
+          onClick={buildPortfolio}
+          className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
+        >
           <svg
             width="24"
             height="24"
@@ -98,7 +103,7 @@ const RiskPortfolio = ({
 
         <button
           className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
-          onClick={nextStep}
+          onClick={changePercent}
         >
           <svg
             width="24"
