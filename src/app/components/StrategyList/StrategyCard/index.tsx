@@ -33,14 +33,14 @@ export default function StrategyCard({
         {/* Header Section */}
         <div className="flex justify-between md:justify-around items-center w-full">
           <Image
-            src={image}
+            src={`/crypto-icons/chains/${chainId}.svg`}
             alt={title}
             width={60}
             height={60}
             className="rounded-lg object-cover cursor-pointer"
             onClick={() => setIsModalOpen(true)}
           />
-          <div className="flex flex-col justify-center gap-2.5 w-[224px]">
+          <div className="ml-4 flex flex-col justify-center gap-2.5 w-[224px]">
             <div className="flex gap-[3px] self-stretch">
               <h3 className="font-[family-name:var(--font-manrope)] text-[18px] font-bold text-lg text-[#17181C]">
                 {title}

@@ -124,7 +124,7 @@ export default function InvestModal({
               {/* Strategy icon (spans 2 rows) */}
               <div className="mr-4">
                 <Image
-                  src={strategy.image}
+                  src={`/crypto-icons/chains/${strategy.chainId}.svg`}
                   alt={strategy.title}
                   width={60}
                   height={60}

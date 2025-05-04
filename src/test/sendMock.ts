@@ -1,3 +1,5 @@
+// TODO: replace with actual API call
+
 export const sendMockInvestMessage = async (
   message: string
 ): Promise<{ result: string }> => {
@@ -43,5 +45,23 @@ export const sendMockBuildPortfolioMessage = async (
 
   return {
     result: "build_portfolio_2",
+  };
+};
+
+export const sendMockFindDeFiStrategiesMessage = async (
+  message: string
+): Promise<{ result: string }> => {
+  console.log("message", message);
+  return {
+    result: "middle_risk_strategy",
+  };
+};
+
+export const sendMockDeFiStrategiesCardMessage = async (
+  message: string
+): Promise<{ result: string }> => {
+  console.log("message", message);
+  return {
+    result: "defi_strategies_card",
   };
 };
