@@ -30,6 +30,7 @@ import { parseUnits } from "viem";
 import ChainFilter from "./components/StrategyList/ChainFilter";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 import Button from "./components/Button";
+import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
 
 export default function Home() {
   const [command, setCommand] = useState("");
@@ -59,11 +60,7 @@ export default function Home() {
     chainId: selectedChains[0],
   });
 
-  // const parseChainsString = (chains: number[]) => {
-  //   return chains.map((chain) => {
-  //     return chain.toString();
-  //   });
-  // };
+  // TODO: build a high relation between `MessageType` and `createBotMessage` `renderBotMessageContent`
 
   const createBotMessage = (botResponse: { result: string }): Message => {
     let type: MessageType = "Text";
@@ -433,7 +430,10 @@ export default function Home() {
               <RiskBadgeList
                 selectedRisk={selectedRiskLevel}
                 setSelectedRiskLevel={setSelectedRiskLevel}
-                options={RISK_OPTIONS}
+                options={RISK_OPTIONS.filter(
+                  (option) =>
+                    option !== "Balanced" && option !== "High Airdrop Potential"
+                )}
                 isEditable={isEditable}
               />
             </div>
@@ -441,7 +441,7 @@ export default function Home() {
               onClick={() =>
                 nextStep(
                   `Find ${selectedRiskLevel} risk DeFi strategies on ${selectedChains.join(
-                    " and"
+                    " and "
                   )}`,
                   sendMockDeFiStrategiesCardMessage
                 )
@@ -455,17 +455,10 @@ export default function Home() {
 
       case "DeFi Strategies Cards": {
         return (
-          <div className="mt-4 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <p className="font-[Manrope] font-medium text-sm">
-                Select Chains
-              </p>
-              <ChainFilter
-                selectedChains={selectedChains}
-                setSelectedChains={setSelectedChains}
-              />
-            </div>
-          </div>
+          <StrategyListChatWrapper
+            selectedChains={selectedChains}
+            selectedRiskLevel={selectedRiskLevel}
+          />
         );
       }
 
