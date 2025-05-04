@@ -41,6 +41,7 @@ export type InvestStrategy = {
   };
   protocol: Protocol;
   description: string;
+  /** @deprecated This field is no longer in use */
   image: string;
   externalLink?: string;
   learnMoreLink?: string;
