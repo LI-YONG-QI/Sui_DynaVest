@@ -31,7 +31,7 @@ import ChainFilter from "./components/StrategyList/ChainFilter";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 import Button from "./components/Button";
 import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
-
+import { getChainName } from "./utils/constants/chains";
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
   const [command, setCommand] = useState("");
@@ -60,6 +60,10 @@ export default function Home() {
     token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
     chainId: selectedChains[0],
   });
+
+  const chainsName = selectedChains
+    .map((chainId) => getChainName(chainId))
+    .join(" / ");
 
   // TODO: build a high relation between `MessageType` and `createBotMessage` `renderBotMessageContent`
   const createBotMessage = (botResponse: { result: string }): Message => {
@@ -113,9 +117,7 @@ export default function Home() {
         }
         break;
       case "defi_strategies_card":
-        text = `Here’re some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${selectedChains.join(
-          " and "
-        )}  `;
+        text = `Here’re some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`;
         type = "DeFi Strategies Cards";
         // TODO: data should'nt be included in the message
         data = {
@@ -440,9 +442,7 @@ export default function Home() {
             <Button
               onClick={() =>
                 nextStep(
-                  `Find ${selectedRiskLevel} risk DeFi strategies on ${selectedChains.join(
-                    " and "
-                  )}`,
+                  `Find ${selectedRiskLevel} risk DeFi strategies on ${chainsName}`,
                   sendMockDeFiStrategiesCardMessage
                 )
               }
