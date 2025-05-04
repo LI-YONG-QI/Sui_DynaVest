@@ -33,6 +33,7 @@ import Button from "./components/Button";
 import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
 
 export default function Home() {
+  const [isInput, setIsInput] = useState(false);
   const [command, setCommand] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [conversation, setConversation] = useState<Message[]>([]);
@@ -61,7 +62,6 @@ export default function Home() {
   });
 
   // TODO: build a high relation between `MessageType` and `createBotMessage` `renderBotMessageContent`
-
   const createBotMessage = (botResponse: { result: string }): Message => {
     let type: MessageType = "Text";
     let text = "";
@@ -473,6 +473,15 @@ export default function Home() {
   }, [conversation, isTyping]);
 
   useEffect(() => {
+    const latestMessage = conversation[conversation.length - 1];
+    setIsInput(
+      latestMessage?.type === "Text" ||
+        latestMessage?.type === "Find Defi Strategies" ||
+        latestMessage?.type === "DeFi Strategies Cards"
+    );
+  }, [conversation]);
+
+  useEffect(() => {
     closeChat();
   }, []);
 
@@ -555,21 +564,16 @@ export default function Home() {
                   <button
                     className="w-full bg-[rgba(255,255,255,0.7)] text-black rounded-[14px] py-1.5 px-5 flex items-center gap-1.5"
                     onClick={() =>
-                      handleHotTopic("Help me find the best DeFi strategies")
+                      handleMessage(
+                        "Help me find the best DeFi strategies",
+                        sendMockFindDeFiStrategiesMessage
+                      )
                     }
                   >
                     <span className="font-[Manrope] font-bold text-sm">
                       DeFi Strategy:
                     </span>
-                    <span
-                      onClick={() =>
-                        handleMessage(
-                          "Help me find the best DeFi strategies",
-                          sendMockFindDeFiStrategiesMessage
-                        )
-                      }
-                      className="font-[Manrope] font-medium text-sm truncate"
-                    >
+                    <span className="font-[Manrope] font-medium text-sm truncate">
                       Help me find the best DeFi strategies
                     </span>
                   </button>
@@ -615,6 +619,7 @@ export default function Home() {
                   placeholder="Ask me anything about DeFi strategies or use the quick commands"
                 />
               </div>
+
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -723,27 +728,67 @@ export default function Home() {
             </div>
 
             {/* Command Form Input */}
-            <div className="flex flex-col fixed w-[95%] md:w-[70%] bottom-[70px] md:bottom-5 left-1/2 -translate-x-1/2 gap-4 z-10">
-              <div className="flex justify-center">
-                {/* Start new chat button  */}
+            <div className="flex flex-col w-[95%] md:w-[50%] gap-4 justify-center items-center fixed bottom-[10px] left-1/2 -translate-x-1/2 z-10">
+              <div
+                className={`flex w-full gap-4 ${
+                  isInput ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                <div className="flex-1 border border-[rgba(113,128,150,0.5)] bg-white rounded-lg px-5 py-2.5 flex items-center">
+                  <input
+                    ref={inputRef}
+                    value={command}
+                    onChange={(e) => setCommand(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    className="flex-1 outline-none text-black font-[Manrope] font-medium text-base"
+                    placeholder="Ask me anything about DeFi strategies or use the quick commands"
+                  />
+                </div>
                 <button
-                  className={`flex items-center gap-2.5 py-3 px-6 md:py-4 md:px-8 text-[16px] rounded-[11px] self-end ${
-                    loadingBotResponse || isTyping
-                      ? "bg-[#D3D8F3]"
-                      : "bg-[#9EACEB]"
-                  } text-[rgba(0,0,0,0.6)]`}
-                  disabled={loadingBotResponse || isTyping}
-                  onClick={() => {
-                    setConversation([]);
-                    window.scrollTo(0, 0);
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleMessage(command, sendMessage);
                   }}
+                  disabled={command.trim() === ""}
+                  className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"
                 >
-                  <Undo2 className="w-5 h-5" />
-
-                  <span className="font-[Plus Jakarta Sans] font-semibold text-sm">
-                    Start a new chat
-                  </span>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" />
+                  </svg>
                 </button>
+              </div>
+
+              <div className="flex flex-col relative w-[95%] md:w-[70%] gap-4">
+                <div className="flex justify-center">
+                  {/* Start new chat button  */}
+                  <button
+                    className={`flex items-center gap-2.5 py-3 px-6 md:py-4 md:px-8 text-[16px] rounded-[11px] self-end ${
+                      loadingBotResponse || isTyping
+                        ? "bg-[#D3D8F3]"
+                        : "bg-[#9EACEB]"
+                    } text-[rgba(0,0,0,0.6)]`}
+                    disabled={loadingBotResponse || isTyping}
+                    onClick={() => {
+                      setConversation([]);
+                      window.scrollTo(0, 0);
+                    }}
+                  >
+                    <Undo2 className="w-5 h-5" />
+
+                    <span className="font-[Plus Jakarta Sans] font-semibold text-sm">
+                      Start a new chat
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </>
