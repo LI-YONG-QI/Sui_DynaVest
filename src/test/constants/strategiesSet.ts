@@ -44,7 +44,7 @@ const generateAllocations = (
   if (count === 0) return [];
 
   switch (riskType) {
-    case "Low Risk":
+    case "Low":
       // More weight on first strategies (lower risk ones)
       return Array(count)
         .fill(0)
@@ -53,7 +53,7 @@ const generateAllocations = (
           Math.round((val / arr.reduce((a, b) => a + b, 0)) * 100)
         );
 
-    case "Medium Risk":
+    case "Medium":
       // Balanced allocation with peak in middle
       return Array(count)
         .fill(0)
@@ -66,7 +66,7 @@ const generateAllocations = (
           Math.round((val / arr.reduce((a, b) => a + b, 0)) * 100)
         );
 
-    case "High Risk":
+    case "High":
       // Higher weights on later (higher risk) strategies
       return Array(count)
         .fill(0)
@@ -81,7 +81,7 @@ const generateAllocations = (
       if (count === 2) return [80, 20];
       return [70, 30];
 
-    case "Balanced Risk":
+    case "Balanced":
     default:
       // Equal allocation
       return Array(count).fill(Math.round(100 / count));
@@ -90,26 +90,26 @@ const generateAllocations = (
 
 // Create the mock data structure
 export const MOCK_STRATEGIES_SET: StrategiesSet = {
-  "Balanced Risk": getBalancedStrategies().map((strategy, i, arr) =>
-    addAllocation(strategy, generateAllocations(arr, "Balanced Risk")[i])
+  Balanced: getBalancedStrategies().map((strategy, i, arr) =>
+    addAllocation(strategy, generateAllocations(arr, "Balanced")[i])
   ),
 
-  "Low Risk": getStrategiesByRisk("Low")
+  Low: getStrategiesByRisk("Low")
     .slice(0, 5)
     .map((strategy, i, arr) =>
-      addAllocation(strategy, generateAllocations(arr, "Low Risk")[i])
+      addAllocation(strategy, generateAllocations(arr, "Low")[i])
     ),
 
-  "Medium Risk": getStrategiesByRisk("Medium")
+  Medium: getStrategiesByRisk("Medium")
     .slice(0, 5)
     .map((strategy, i, arr) =>
-      addAllocation(strategy, generateAllocations(arr, "Medium Risk")[i])
+      addAllocation(strategy, generateAllocations(arr, "Medium")[i])
     ),
 
-  "High Risk": getStrategiesByRisk("High")
+  High: getStrategiesByRisk("High")
     .slice(0, 5)
     .map((strategy, i, arr) =>
-      addAllocation(strategy, generateAllocations(arr, "High Risk")[i])
+      addAllocation(strategy, generateAllocations(arr, "High")[i])
     ),
 
   "High Airdrop Potential": getAirdropStrategies().map((strategy, i, arr) =>

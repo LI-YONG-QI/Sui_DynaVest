@@ -40,7 +40,7 @@ export default function StrategyCard({
             className="rounded-lg object-cover cursor-pointer"
             onClick={() => setIsModalOpen(true)}
           />
-          <div className="flex flex-col justify-center gap-2.5 w-[224px]">
+          <div className="ml-4 flex flex-col justify-center gap-2.5 w-[224px]">
             <div className="flex gap-[3px] self-stretch">
               <h3 className="font-[family-name:var(--font-manrope)] text-[18px] font-bold text-lg text-[#17181C]">
                 {title}
