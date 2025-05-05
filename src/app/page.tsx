@@ -473,11 +473,15 @@ export default function Home() {
   }, [conversation, isTyping]);
 
   useEffect(() => {
-    const latestMessage = conversation[conversation.length - 1];
+    const latestBotMessages = conversation.filter(
+      (message) => message.sender === "bot"
+    );
+    const latestBotMessage = latestBotMessages[latestBotMessages.length - 1];
+
     setIsInput(
-      latestMessage?.type === "Text" ||
-        latestMessage?.type === "Find Defi Strategies" ||
-        latestMessage?.type === "DeFi Strategies Cards"
+      latestBotMessage?.type === "Text" ||
+        latestBotMessage?.type === "Find Defi Strategies" ||
+        latestBotMessage?.type === "DeFi Strategies Cards"
     );
   }, [conversation]);
 
