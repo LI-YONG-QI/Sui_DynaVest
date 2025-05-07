@@ -42,13 +42,12 @@ export default function Home() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false); // user can edit the component when isEditing is true
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { closeChat } = useChat();
   const [depositAmount, setDepositAmount] = useState<string>("");
 
-  // TODO: rename selectedChains
   const {
     chains,
     setChains,
@@ -101,6 +100,12 @@ export default function Home() {
           );
         }
         break;
+      case "build_portfolio":
+        data = {
+          risk: riskLevel,
+          strategies,
+        };
+        break;
       default:
         break;
     }
@@ -117,19 +122,17 @@ export default function Home() {
     return botMessage;
   };
 
+  /**
+   * Create a default message (flow of some actions (eg.build portfolio))
+   * @param type - The type of the message
+   * @returns The bot message
+   */
   const createDefaultMessage = (type: MessageType) => {
     return () => {
       let text = "";
       let data: MessagePortfolioData | undefined;
 
       switch (type) {
-        case "Invest":
-          text = "What's your investment size (Base by default)? ";
-          data = {
-            risk: riskLevel,
-            strategies,
-          };
-          break;
         case "Edit":
           text = "What's your Risk/Yield and Airdrop portfolio preference?";
           data = {
@@ -184,7 +187,7 @@ export default function Home() {
 
   const handleMessage = async (
     userInput: string,
-    getNextMessage?: () => Message
+    createDefaultMessage?: () => Message
   ) => {
     const addUserMessage = (message: string) => {
       if (message === "") return;
@@ -206,8 +209,8 @@ export default function Home() {
     try {
       let nextMsg: Message;
 
-      if (getNextMessage) {
-        nextMsg = getNextMessage();
+      if (createDefaultMessage) {
+        nextMsg = createDefaultMessage();
       } else {
         const botResponse = await sendMessage(userInput);
         if (!botResponse || !botResponse.type) return;
@@ -218,7 +221,8 @@ export default function Home() {
       if (
         nextMsg.type === "Portfolio" ||
         nextMsg.type === "Edit" ||
-        nextMsg.type === "Deposit Funds"
+        nextMsg.type === "Deposit Funds" ||
+        nextMsg.type === "Find Defi Strategies"
       ) {
         setIsEditing(true);
       }
@@ -474,10 +478,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
                     onClick={() =>
-                      handleMessage(
-                        "Build a diversified DeFi Portfolio",
-                        createDefaultMessage("Invest")
-                      )
+                      handleMessage("Build a diversified DeFi Portfolio")
                     }
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
@@ -517,10 +518,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[rgba(255,255,255,0.7)] text-black rounded-[14px] py-1.5 px-5 flex items-center gap-1.5"
                     onClick={() =>
-                      handleMessage(
-                        "Help me find the best DeFi strategies",
-                        createDefaultMessage("Find Defi Strategies")
-                      )
+                      handleMessage("Help me find the best DeFi strategies")
                     }
                   >
                     <span className="font-[Manrope] font-bold text-sm">

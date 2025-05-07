@@ -10,7 +10,7 @@ export const BOT_DEFAULT_RESPONSE_MAP: Record<
 > = {
   strategies: {
     type: "Find Defi Strategies",
-    text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
+    text: "No problem. What’s your Chain and Risk preference? I’ll find DeFi strategies meet your preference. ",
   },
   analyze_portfolio: {
     type: "Portfolio",
@@ -22,6 +22,6 @@ export const BOT_DEFAULT_RESPONSE_MAP: Record<
   },
   build_portfolio: {
     type: "Invest",
-    text: "Start building portfolio...",
+    text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat’s your investment size (amount)? ",
   },
 };
