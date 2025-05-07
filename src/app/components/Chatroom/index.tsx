@@ -43,11 +43,12 @@ const Chatroom = () => {
 
     try {
       const botResponse = await sendMessage(inputMessage);
-      if (!botResponse || !botResponse.result) return;
+      if (!botResponse || !botResponse.type) return;
+
       // Add bot response
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: botResponse.result,
+        text: botResponse.data?.answer ?? "",
         sender: "bot",
         timestamp: new Date(),
         type: "Text",

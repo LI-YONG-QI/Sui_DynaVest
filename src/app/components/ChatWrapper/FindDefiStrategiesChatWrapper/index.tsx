@@ -45,10 +45,7 @@ const FindDefiStrategiesChatWrapper: React.FC<
         <RiskBadgeList
           selectedRisk={selectedRiskLevel}
           setSelectedRiskLevel={setSelectedRiskLevel}
-          options={RISK_OPTIONS.filter(
-            (option) =>
-              option !== "balanced" && option !== "High Airdrop Potential"
-          )}
+          options={RISK_OPTIONS}
           isEditable={isEditable}
         />
       </div>

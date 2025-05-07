@@ -15,25 +15,25 @@ const addAllocation = (
 });
 
 // Filter strategies by risk level
-const getStrategiesByRisk = (riskLevel: "Low" | "Medium" | "High") => {
+const getStrategiesByRisk = (riskLevel: RiskLevel) => {
   return STRATEGIES_METADATA.filter((s) => s.risk.level === riskLevel);
 };
 
 // Get all unique strategies for high airdrop potential (using specific protocols)
-const getAirdropStrategies = () => {
-  return STRATEGIES_METADATA.filter(
-    (s) => ["Uniswap", "Flow"].includes(s.protocol) && s.risk.level === "High"
-  ).slice(0, 2);
-};
+// const getAirdropStrategies = () => {
+//   return STRATEGIES_METADATA.filter(
+//     (s) => ["Uniswap", "Flow"].includes(s.protocol) && s.risk.level === "high"
+//   ).slice(0, 2);
+// };
 
-// Get a mix of strategies for balanced risk
-const getBalancedStrategies = () => {
-  const lowRisk = getStrategiesByRisk("Low").slice(0, 1);
-  const mediumRisk = getStrategiesByRisk("Medium").slice(0, 2);
-  const highRisk = getStrategiesByRisk("High").slice(0, 2);
+// // Get a mix of strategies for balanced risk
+// const getBalancedStrategies = () => {
+//   const lowRisk = getStrategiesByRisk("low").slice(0, 1);
+//   const mediumRisk = getStrategiesByRisk("medium").slice(0, 2);
+//   const highRisk = getStrategiesByRisk("high").slice(0, 2);
 
-  return [...lowRisk, ...mediumRisk, ...highRisk];
-};
+//   return [...lowRisk, ...mediumRisk, ...highRisk];
+// };
 
 // Generate allocations based on strategy count and risk type
 const generateAllocations = (
@@ -44,7 +44,7 @@ const generateAllocations = (
   if (count === 0) return [];
 
   switch (riskType) {
-    case "Low":
+    case "low":
       // More weight on first strategies (lower risk ones)
       return Array(count)
         .fill(0)
@@ -53,7 +53,7 @@ const generateAllocations = (
           Math.round((val / arr.reduce((a, b) => a + b, 0)) * 100)
         );
 
-    case "Medium":
+    case "medium":
       // Balanced allocation with peak in middle
       return Array(count)
         .fill(0)
@@ -66,7 +66,7 @@ const generateAllocations = (
           Math.round((val / arr.reduce((a, b) => a + b, 0)) * 100)
         );
 
-    case "High":
+    case "high":
       // Higher weights on later (higher risk) strategies
       return Array(count)
         .fill(0)
@@ -75,47 +75,47 @@ const generateAllocations = (
           Math.round((val / arr.reduce((a, b) => a + b, 0)) * 100)
         );
 
-    case "High Airdrop Potential":
-      // Focus on the first airdrop strategy
-      if (count === 1) return [100];
-      if (count === 2) return [80, 20];
-      return [70, 30];
+    // case "high airdrop potential":
+    //   // Focus on the first airdrop strategy
+    //   if (count === 1) return [100];
+    //   if (count === 2) return [80, 20];
+    //   return [70, 30];
 
-    case "Balanced":
-    default:
-      // Equal allocation
-      return Array(count).fill(Math.round(100 / count));
+    // case "balanced":
+    // default:
+    //   // Equal allocation
+    //   return Array(count).fill(Math.round(100 / count));
   }
 };
 
 // Create the mock data structure
 export const MOCK_STRATEGIES_SET: StrategiesSet = {
-  Balanced: getBalancedStrategies().map((strategy, i, arr) =>
-    addAllocation(strategy, generateAllocations(arr, "Balanced")[i])
-  ),
+  // balanced: getBalancedStrategies().map((strategy, i, arr) =>
+  //   addAllocation(strategy, generateAllocations(arr, "balanced")[i])
+  // ),
 
-  Low: getStrategiesByRisk("Low")
+  low: getStrategiesByRisk("low")
     .slice(0, 5)
     .map((strategy, i, arr) =>
-      addAllocation(strategy, generateAllocations(arr, "Low")[i])
+      addAllocation(strategy, generateAllocations(arr, "low")[i])
     ),
 
-  Medium: getStrategiesByRisk("Medium")
+  medium: getStrategiesByRisk("medium")
     .slice(0, 5)
     .map((strategy, i, arr) =>
-      addAllocation(strategy, generateAllocations(arr, "Medium")[i])
+      addAllocation(strategy, generateAllocations(arr, "medium")[i])
     ),
 
-  High: getStrategiesByRisk("High")
+  high: getStrategiesByRisk("high")
     .slice(0, 5)
     .map((strategy, i, arr) =>
-      addAllocation(strategy, generateAllocations(arr, "High")[i])
+      addAllocation(strategy, generateAllocations(arr, "high")[i])
     ),
 
-  "High Airdrop Potential": getAirdropStrategies().map((strategy, i, arr) =>
-    addAllocation(
-      strategy,
-      generateAllocations(arr, "High Airdrop Potential")[i]
-    )
-  ),
+  // "high airdrop potential": getAirdropStrategies().map((strategy, i, arr) =>
+  //   addAllocation(
+  //     strategy,
+  //     generateAllocations(arr, "high airdrop potential")[i]
+  //   )
+  // ),
 };

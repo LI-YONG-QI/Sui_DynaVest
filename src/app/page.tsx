@@ -337,10 +337,10 @@ export default function Home() {
       case "Portfolio": {
         return (
           <PortfolioChatWrapper
-            messageRisk={messageRisk}
+            messageRisk={messageRisk!}
             isEditable={isEditable}
             setSelectedRiskLevel={setRiskLevel}
-            messageStrategies={messageStrategies}
+            messageStrategies={messageStrategies!}
             nextStep={nextStep}
             createDefaultMessage={createDefaultMessage}
           />
@@ -349,7 +349,7 @@ export default function Home() {
       case "Edit": {
         return (
           <EditChatWrapper
-            strategies={messageStrategies}
+            strategies={messageStrategies!}
             isEditable={isEditable}
             setStrategies={setStrategies}
             nextStep={nextStep}
@@ -360,7 +360,7 @@ export default function Home() {
       case "Review Portfolio": {
         return (
           <ReviewPortfolioChatWrapper
-            messageStrategies={messageStrategies}
+            messageStrategies={messageStrategies!}
             nextStep={nextStep}
             createDefaultMessage={createDefaultMessage}
           />

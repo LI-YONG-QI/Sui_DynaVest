@@ -36,7 +36,7 @@ export type InvestStrategy = {
   title: string;
   apy: number;
   risk: {
-    level: "Low" | "Medium" | "High";
+    level: RiskLevel;
     color: string;
     bgColor: string;
   };

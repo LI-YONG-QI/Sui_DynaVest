@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
+import { arbitrum } from "viem/chains";
 
 import type {
   RiskLevel,
   StrategiesSet,
   RiskPortfolioStrategies,
 } from "@/app/utils/types";
-import { arbitrum } from "viem/chains";
 
 export const usePortfolio = (initialStrategiesSet: StrategiesSet) => {
   const [strategiesSet, setStrategiesSet] =
     useState<StrategiesSet>(initialStrategiesSet);
-  const [riskLevel, setRiskLevel] = useState<RiskLevel>("balanced");
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("low");
   const [strategies, setStrategies] = useState<RiskPortfolioStrategies[]>(
     strategiesSet[riskLevel]
   );

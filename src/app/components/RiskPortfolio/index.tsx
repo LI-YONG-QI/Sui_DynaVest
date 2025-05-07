@@ -43,14 +43,14 @@ export const RiskBadge = ({
 
 export const getRiskDescription = (selectedRisk: RiskLevel) => {
   switch (selectedRisk) {
-    case "Low":
+    case "low":
       return "This portfolio focuses on lower-risk yield protocols prioritizing capital preservation.";
-    case "Medium":
+    case "medium":
       return "This portfolio balances moderate risk with potentially higher returns.";
-    case "High":
+    case "high":
       return "This portfolio focuses on high-risk, high-reward yield protocols.";
-    case "High Airdrop Potential":
-      return "This portfolio prioritizes protocols with potential future token airdrops.";
+    // case "High Airdrop Potential":
+    //   return "This portfolio prioritizes protocols with potential future token airdrops.";
     default:
       return "This portfolio will diversify equally in yield protocols of three risk levels.";
   }
