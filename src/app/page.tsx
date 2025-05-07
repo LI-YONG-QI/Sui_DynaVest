@@ -69,6 +69,11 @@ export default function Home() {
     .map((chainId) => getChainName(chainId))
     .join(" / ");
 
+  /**
+   * Process response from backend & Create a bot message
+   * @param botResponse - The bot response from ai backned
+   * @returns The bot message
+   */
   const createBotMessage = (botResponse: BotResponse): Message => {
     let data: MessagePortfolioData | undefined;
 
@@ -151,52 +156,6 @@ export default function Home() {
     };
   };
 
-  const getMessageData = (message: Message) => {
-    const validateEditable = (message: Message) => {
-      return (
-        message.id === conversation[conversation.length - 1].id && // The latest message conversation
-        isEditing === true
-      );
-    };
-
-    const { data } = message;
-    const isEditable = validateEditable(message);
-
-    if (!isEditable) {
-      if (isDynamicMessageType(message.type) && !data) {
-        throw new Error("Portfolio data is required");
-      }
-    }
-
-    const risk = isEditable ? riskLevel : data!.risk;
-    const messageStrategies = isEditable ? strategies : data!.strategies;
-
-    return { isEditable, risk, messageStrategies };
-  };
-
-  const nextStep = (userInput: string, getNextMessage: () => Message) => {
-    const settleMessage = (message: Message) => {
-      const updatedConversation = conversation.map((convMsg) => {
-        if (convMsg.id === message.id) {
-          return {
-            ...convMsg,
-            data: {
-              risk: riskLevel,
-              strategies,
-            },
-          };
-        }
-        return convMsg;
-      });
-
-      setConversation(updatedConversation);
-      setIsEditing(false);
-    };
-
-    settleMessage(conversation[conversation.length - 1]);
-    handleMessage(userInput, getNextMessage);
-  };
-
   const handleMessage = async (
     userInput: string,
     getNextMessage?: () => Message
@@ -255,7 +214,6 @@ export default function Home() {
       ]);
     }
   };
-
   /// HANDLE FUNCTIONS ///
   const handleHotTopic = (topic: string) => {
     setCommand(topic);
@@ -289,6 +247,52 @@ export default function Home() {
   };
 
   const renderBotMessageContent = (message: Message) => {
+    const getMessageData = (message: Message) => {
+      const validateEditable = (message: Message) => {
+        return (
+          message.id === conversation[conversation.length - 1].id && // The latest message conversation
+          isEditing === true
+        );
+      };
+
+      const { data } = message;
+      const isEditable = validateEditable(message);
+
+      if (!isEditable) {
+        if (isDynamicMessageType(message.type) && !data) {
+          throw new Error("Portfolio data is required");
+        }
+      }
+
+      const risk = isEditable ? riskLevel : data!.risk;
+      const messageStrategies = isEditable ? strategies : data!.strategies;
+
+      return { isEditable, risk, messageStrategies };
+    };
+
+    const nextStep = (userInput: string, getNextMessage: () => Message) => {
+      const settleMessage = (message: Message) => {
+        const updatedConversation = conversation.map((convMsg) => {
+          if (convMsg.id === message.id) {
+            return {
+              ...convMsg,
+              data: {
+                risk: riskLevel,
+                strategies,
+              },
+            };
+          }
+          return convMsg;
+        });
+
+        setConversation(updatedConversation);
+        setIsEditing(false);
+      };
+
+      settleMessage(conversation[conversation.length - 1]);
+      handleMessage(userInput, getNextMessage);
+    };
+
     if (message.sender !== "bot") return null;
 
     const {
