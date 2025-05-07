@@ -18,10 +18,8 @@ type MessageHandlerConfig = {
 // 定義一個消息類型映射
 type MessageTypeHandlers = {
   [K in MessageType]?: {
-    getText: (config: MessageHandlerConfig) => string;
-    getData?: (
-      config: MessageHandlerConfig
-    ) => MessagePortfolioData | undefined;
+    text: string;
+    data?: MessagePortfolioData;
     modifyType?: (config: MessageHandlerConfig) => MessageType;
   };
 };
@@ -35,71 +33,66 @@ function assertData<T>(
   }
 }
 
-export const useMessageHandler = () => {
-  // 定義所有消息類型的處理邏輯
+// Start of Selection
+export const useMessageHandler = (config: MessageHandlerConfig) => {
+  // Define the logic for handling all message types
   const messageTypeHandlers: MessageTypeHandlers = {
     Invest: {
-      getText: () => "What's your investment size (Base by default)?",
-      getData: (config) => ({
+      text: "What's your investment size (Base by default)?",
+      data: {
         risk: config.riskLevel,
         strategies: config.strategies,
-      }),
+      },
     },
     Edit: {
-      getText: () => "What's your Risk/Yield and Airdrop portfolio preference?",
-      getData: (config) => ({
+      text: "What's your Risk/Yield and Airdrop portfolio preference?",
+      data: {
         risk: config.riskLevel,
         strategies: config.strategies,
-      }),
+      },
     },
     "DeFi Strategies Cards": {
-      getText: (config) =>
-        `Here're some ${config.riskLevel} risk DeFi yield strategies from reputable and secured platform on ${config.chainsName}`,
-      getData: (config) => ({
+      text: `Here're some ${config.riskLevel} risk DeFi yield strategies from reputable and secured platform on ${config.chainsName}`,
+      data: {
         risk: config.riskLevel,
         strategies: config.strategies,
-      }),
+      },
     },
     "Review Portfolio": {
-      getText: () => "Here's your portfolio",
-      getData: (config) => ({
+      text: "Here's your portfolio",
+      data: {
         risk: config.riskLevel,
         strategies: config.strategies,
-      }),
+      },
     },
     "Build Portfolio": {
-      getText: (config) =>
-        config.hasEnoughBalance
-          ? "Start building portfolio..."
-          : "Oops, you have insufficient balance in your wallet. You can deposit or change amount.",
-      getData: (config) => ({
+      text: config.hasEnoughBalance
+        ? "Start building portfolio..."
+        : "Oops, you have insufficient balance in your wallet. You can deposit or change amount.",
+      data: {
         risk: config.riskLevel,
         strategies: config.strategies,
-      }),
-      modifyType: (config) =>
+      },
+      modifyType: () =>
         config.hasEnoughBalance ? "Build Portfolio" : "Deposit Funds",
     },
     "Find Defi Strategies": {
-      getText: () =>
-        "We will diversify your token into reputable and secured yield protocols based on your preference.",
-      getData: (config) => ({
+      text: "We will diversify your token into reputable and secured yield protocols based on your preference.",
+      data: {
         risk: config.riskLevel,
         strategies: config.strategies,
-      }),
+      },
     },
   };
 
-  // 處理機器人響應創建消息
-  const createBotMessage = (
-    botResponse: BotResponse,
-    config: MessageHandlerConfig
-  ): Message => {
+  // Handle bot response to create a message
+  const createBotMessage = (botResponse: BotResponse): Message => {
     let data: MessagePortfolioData | undefined;
     const baseConfig = BOT_DEFAULT_RESPONSE_MAP[botResponse.type];
     let text = baseConfig.text;
     const type = baseConfig.type;
 
-    // 處理特殊消息類型
+    // Handle special message types
     switch (botResponse.type) {
       case "question":
         assertData(
@@ -113,7 +106,7 @@ export const useMessageHandler = () => {
           botResponse.data,
           `CreateBotMessage: Not found data from bot response ${botResponse}`
         );
-        // data 在這種類型中不需要設置，由外部設置 riskLevel 和 chains
+        // Data does not need to be set for this type, riskLevel and chains are set externally
         break;
       case "build_portfolio":
         data = {
@@ -133,24 +126,21 @@ export const useMessageHandler = () => {
     };
   };
 
-  // 創建預設消息
-  const createDefaultMessage = (
-    type: MessageType,
-    config: MessageHandlerConfig
-  ): (() => Message) => {
+  // Create a default message
+  const createDefaultMessage = (type: MessageType): (() => Message) => {
     return () => {
       let messageType = type;
       let text = "";
       let data: MessagePortfolioData | undefined;
 
-      // 查找類型處理器
+      // Find the type handler
       const handler = messageTypeHandlers[type];
 
       if (handler) {
-        text = handler.getText(config);
+        text = handler.text;
 
-        if (handler.getData) {
-          data = handler.getData(config);
+        if (handler.data) {
+          data = handler.data;
         }
 
         if (handler.modifyType) {

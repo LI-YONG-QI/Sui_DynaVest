@@ -70,10 +70,7 @@ export default function Home() {
   const chainsName = chains.map((chainId) => getChainName(chainId)).join(" / ");
 
   // 使用消息處理器
-  const { createBotMessage, createDefaultMessage } = useMessageHandler();
-
-  // 創建消息配置
-  const getMessageConfig = () => ({
+  const { createBotMessage, createDefaultMessage } = useMessageHandler({
     riskLevel,
     strategies,
     chains,
@@ -83,15 +80,17 @@ export default function Home() {
       parseUnits(depositAmount, 6) <= (balance?.value ?? BigInt(0)),
   });
 
+  // 創建消息配置
+
   /**
    * Process response from backend & Create a bot message
    * @param botResponse - The bot response from ai backned
    * @returns The bot message
    */
   const handleBotResponse = (botResponse: BotResponse): Message => {
-    const message = createBotMessage(botResponse, getMessageConfig());
+    const message = createBotMessage(botResponse);
 
-    // 特殊處理某些響應類型
+    // Side Effect
     if (botResponse.type === "strategies" && botResponse.data) {
       setRiskLevel(botResponse.data.risk_level as RiskLevel);
       setChains([8453]);
@@ -106,7 +105,7 @@ export default function Home() {
    * @returns The bot message
    */
   const handleDefaultMessage = (type: MessageType) => {
-    return createDefaultMessage(type, getMessageConfig());
+    return createDefaultMessage(type);
   };
 
   const handleMessage = async (
