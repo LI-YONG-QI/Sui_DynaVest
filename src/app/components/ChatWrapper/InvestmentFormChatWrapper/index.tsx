@@ -41,7 +41,7 @@ interface InvestmentFormChatWrapperProps {
   setSelectedChains: Dispatch<SetStateAction<number[]>>;
 }
 
-export const InvestmentFormChatWrapper = ({
+const InvestmentFormChatWrapper = ({
   nextStep,
   setDepositAmount,
   selectedChains,
@@ -77,3 +77,5 @@ export const InvestmentFormChatWrapper = ({
     </div>
   );
 };
+
+export default InvestmentFormChatWrapper;

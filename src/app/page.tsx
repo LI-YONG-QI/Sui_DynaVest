@@ -1,63 +1,32 @@
 "use client";
 
 import { useState, KeyboardEvent, useRef, useEffect } from "react";
-import { Undo2, FileCheck, MoveUpRight } from "lucide-react";
+import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
-
-import type { Message, MessagePortfolioData, MessageType } from "./types";
-import { DynamicMessageType } from "./types";
-import useChatbot from "@/app/hooks/useChatbotResponse";
-import RiskPortfolio, {
-  getRiskDescription,
-} from "@/app/components/RiskPortfolio";
-import ChangePercentList from "@/app/components/ChangePercentList";
-import { InvestmentFormChatWrapper } from "@/app/components/InvestmentFormChatWrapper";
-
-import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
-import { usePortfolio } from "@/app/hooks/useStrategiesSet";
-import { RiskBadgeList } from "./components/RiskBadgeList";
-import DepositChatWrapper from "./components/DepositChatWrapper";
-import { BOT_STRATEGY } from "./utils/constants/strategies";
-import { useChat } from "./contexts/ChatContext";
-import ChainFilter from "./components/StrategyList/ChainFilter";
-import { RISK_OPTIONS } from "./utils/constants/risk";
-import Button from "./components/Button";
-import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
-import { getChainName } from "./utils/constants/chains";
-import type { BotResponse, BotResponseType } from "./utils/types";
 import { useAccount } from "wagmi";
 import { useBalance } from "wagmi";
 import { parseUnits } from "viem";
 
-const BOT_DEFAULT_RESPONSE_MAP: Record<
-  BotResponseType,
-  {
-    type: MessageType;
-    text: string;
-    isEdit: boolean;
-  }
-> = {
-  strategies: {
-    type: "Find Defi Strategies",
-    text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
-    isEdit: false,
-  },
-  analyze_portfolio: {
-    type: "Portfolio",
-    text: "What's your Risk/Yield and Airdrop portfolio preference?",
-    isEdit: true,
-  },
-  question: {
-    type: "Text",
-    text: "",
-    isEdit: false,
-  },
-  build_portfolio: {
-    type: "Invest",
-    text: "Start building portfolio...",
-    isEdit: false,
-  },
-};
+import type { Message, MessagePortfolioData, MessageType } from "./types";
+import { DynamicMessageType } from "./types";
+import useChatbot from "@/app/hooks/useChatbotResponse";
+import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
+import { usePortfolio } from "@/app/hooks/useStrategiesSet";
+import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
+import { useChat } from "@/app/contexts/ChatContext";
+import { getChainName } from "@/app/utils/constants/chains";
+import { BOT_DEFAULT_RESPONSE_MAP } from "@/app/utils/constants/bot";
+import type { BotResponse } from "@/app/utils/types";
+import {
+  PortfolioChatWrapper,
+  EditChatWrapper,
+  ReviewPortfolioChatWrapper,
+  BuildPortfolioChatWrapper,
+  FindDefiStrategiesChatWrapper,
+  DefiStrategiesCardsChatWrapper,
+  InvestmentFormChatWrapper,
+  DepositChatWrapper,
+} from "@/app/components/ChatWrapper";
 
 const isDynamicMessageType = (
   type: MessageType
@@ -139,6 +108,10 @@ export default function Home() {
           break;
         case "DeFi Strategies Cards":
           text = `Here're some ${riskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`;
+          data = {
+            risk: riskLevel,
+            strategies,
+          };
           break;
         case "Review Portfolio":
           text = "Here's your portfolio";
@@ -336,105 +309,42 @@ export default function Home() {
         );
       case "Portfolio": {
         return (
-          <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
-            <div className="w-full max-w-[320px] md:max-w-none">
-              <div className="flex flex-col gap-3">
-                <div className="rounded-[0px_10px_10px_10px] p-4 flex flex-col gap-6">
-                  {/* Risk preference selection */}
-                  <RiskBadgeList
-                    selectedRisk={messageRisk}
-                    isEditable={isEditable}
-                    setSelectedRiskLevel={setRiskLevel}
-                    options={RISK_OPTIONS}
-                  />
-
-                  <div className="flex items-center">
-                    <p className="text-gray text-xs md:text-sm font-normal px-1">
-                      {getRiskDescription(messageRisk)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <RiskPortfolio
-                buildPortfolio={() =>
-                  nextStep(
-                    "Build portfolio",
-                    createDefaultMessage("Build Portfolio")
-                  )
-                }
-                changePercent={() =>
-                  nextStep("Change percentage", createDefaultMessage("Edit"))
-                }
-                riskPortfolioStrategies={messageStrategies}
-              />
-            </div>
-          </div>
+          <PortfolioChatWrapper
+            messageRisk={messageRisk}
+            isEditable={isEditable}
+            setSelectedRiskLevel={setRiskLevel}
+            messageStrategies={messageStrategies}
+            nextStep={nextStep}
+            createDefaultMessage={createDefaultMessage}
+          />
         );
       }
       case "Edit": {
         return (
-          <div className="overflow-x-auto max-w-full">
-            <ChangePercentList
-              riskPortfolioStrategies={messageStrategies}
-              setRiskPortfolioStrategies={setStrategies}
-              isEditable={isEditable}
-              nextStep={() =>
-                nextStep("", createDefaultMessage("Review Portfolio"))
-              }
-            />
-          </div>
+          <EditChatWrapper
+            strategies={messageStrategies}
+            isEditable={isEditable}
+            setStrategies={setStrategies}
+            nextStep={nextStep}
+            createDefaultMessage={createDefaultMessage}
+          />
         );
       }
       case "Review Portfolio": {
         return (
-          <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
-            <div className="w-full min-w-[600px] md:max-w-none">
-              <RiskPortfolio
-                buildPortfolio={() =>
-                  nextStep(
-                    "Build portfolio",
-                    createDefaultMessage("Build Portfolio")
-                  )
-                }
-                changePercent={() =>
-                  nextStep("Change percentage", createDefaultMessage("Edit"))
-                }
-                riskPortfolioStrategies={messageStrategies}
-              />
-            </div>
-          </div>
+          <ReviewPortfolioChatWrapper
+            messageStrategies={messageStrategies}
+            nextStep={nextStep}
+            createDefaultMessage={createDefaultMessage}
+          />
         );
       }
       case "Build Portfolio": {
         return (
-          <div className="flex flex-col gap-4">
-            <p className="mt-4 text-lg font-bold">
-              ${depositAmount} USDC Portfolio complete!
-            </p>
-            <div className="flex flex-col gap-2">
-              {strategies.map((strategy, index) => (
-                <p className="text-sm text-gray-400" key={index}>
-                  {strategy.title} {strategy.allocation}% $
-                  {(strategy.allocation * Number(depositAmount)) / 100}
-                </p>
-              ))}
-            </div>
-            <div className="flex gap-5">
-              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
-                <FileCheck />
-                <span className="text-sm font-semibold">
-                  Check my portfolio
-                </span>
-              </button>
-              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
-                <MoveUpRight />
-                <span className="text-sm font-semibold">
-                  Explore more DeFi Investment
-                </span>
-              </button>
-            </div>
-          </div>
+          <BuildPortfolioChatWrapper
+            depositAmount={depositAmount}
+            strategies={strategies}
+          />
         );
       }
       case "Deposit Funds": {
@@ -454,45 +364,22 @@ export default function Home() {
       }
       case "Find Defi Strategies": {
         return (
-          <div className="mt-4 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <p className="font-[Manrope] font-medium text-sm">
-                Select Chains
-              </p>
-              <ChainFilter
-                selectedChains={selectedChains}
-                setSelectedChains={setSelectedChains}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <p className="font-[Manrope] font-medium text-sm">Select Risk</p>
-              <RiskBadgeList
-                selectedRisk={riskLevel}
-                setSelectedRiskLevel={setRiskLevel}
-                options={RISK_OPTIONS.filter(
-                  (option) =>
-                    option !== "Balanced" && option !== "High Airdrop Potential"
-                )}
-                isEditable={isEditable}
-              />
-            </div>
-            <Button
-              onClick={() =>
-                nextStep(
-                  `Find ${riskLevel} risk DeFi strategies on ${chainsName}`,
-                  createDefaultMessage("DeFi Strategies Cards")
-                )
-              }
-              text="Find DeFi Strategies"
-              icon={<MoveUpRight />}
-            />
-          </div>
+          <FindDefiStrategiesChatWrapper
+            selectedChains={selectedChains}
+            setSelectedChains={setSelectedChains}
+            selectedRiskLevel={riskLevel}
+            setSelectedRiskLevel={setRiskLevel}
+            isEditable={isEditable}
+            nextStep={nextStep}
+            createDefaultMessage={createDefaultMessage}
+            chainsName={chainsName}
+          />
         );
       }
 
       case "DeFi Strategies Cards": {
         return (
-          <StrategyListChatWrapper
+          <DefiStrategiesCardsChatWrapper
             selectedChains={selectedChains}
             selectedRiskLevel={riskLevel}
           />

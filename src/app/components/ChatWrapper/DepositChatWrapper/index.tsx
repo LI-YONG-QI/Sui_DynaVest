@@ -7,9 +7,9 @@ import { parseUnits } from "viem";
 
 import type { Message, MessageType } from "@/app/types";
 import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
-import { RiskBadge } from "../RiskPortfolio";
-import InvestmentForm from "../StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import CopyButton from "../CopyButton";
+import { RiskBadge } from "../../RiskPortfolio";
+import InvestmentForm from "../../StrategyList/StrategyCard/InvestModal/InvestmentForm";
+import CopyButton from "../../CopyButton";
 
 const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 
