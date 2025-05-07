@@ -4,16 +4,29 @@ import { RiskLevel, RiskPortfolioStrategies } from "../utils/types";
 
 export type MessageStrategy = Record<string, number>;
 
+export type MessagePortfolioData = {
+  risk: RiskLevel;
+  strategies: RiskPortfolioStrategies[];
+};
+
+export const StaticMessageType = [
+  "Text",
+  "DeFi Strategies Cards",
+  "Deposit Funds",
+  "Find Defi Strategies",
+  "Review Portfolio",
+] as const;
+
+export const DynamicMessageType = [
+  "Invest",
+  "Portfolio",
+  "Edit",
+  "Build Portfolio",
+] as const;
+
 export type MessageType =
-  | "Text"
-  | "Invest"
-  | "Portfolio"
-  | "Edit"
-  | "Review Portfolio"
-  | "Build Portfolio"
-  | "Deposit Funds"
-  | "Find Defi Strategies"
-  | "DeFi Strategies Cards";
+  | (typeof StaticMessageType)[number]
+  | (typeof DynamicMessageType)[number];
 
 export interface Message {
   id: string;
@@ -22,9 +35,4 @@ export interface Message {
   timestamp: Date;
   type: MessageType;
   data?: MessagePortfolioData;
-}
-
-export interface MessagePortfolioData {
-  risk: RiskLevel;
-  strategies: RiskPortfolioStrategies[];
 }

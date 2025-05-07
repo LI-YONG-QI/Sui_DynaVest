@@ -4,7 +4,35 @@ import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
 import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
 import ChainFilter from "@/app/components/StrategyList/ChainFilter";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import { sendMockPortfolioMessage } from "@/test/sendMock";
+import type { Message, MessagePortfolioData } from "@/app/types";
+import { MessageType } from "@/app/types";
+
+export const createDefaultMessage = (type: MessageType) => {
+  return () => {
+    let text = "";
+    let data: MessagePortfolioData | undefined;
+
+    switch (type) {
+      case "Portfolio":
+        text = "What's your Risk/Yield and Airdrop portfolio preference?";
+        type = "Portfolio";
+        break;
+      default:
+        text = "";
+    }
+
+    const res: Message = {
+      id: (Date.now() + 1).toString(),
+      text,
+      sender: "bot",
+      timestamp: new Date(),
+      type,
+      data,
+    };
+
+    return res;
+  };
+};
 
 interface InvestmentFormChatWrapperProps {
   nextStep: NextStepFn;
@@ -43,7 +71,7 @@ export const InvestmentFormChatWrapper = ({
         strategy={botStrategy}
         handlePortfolio={(amount: string) => {
           setDepositAmount(amount);
-          nextStep(amount + " USDT", sendMockPortfolioMessage);
+          nextStep(amount + " USDT", createDefaultMessage("Portfolio"));
         }}
       />
     </div>

@@ -14,7 +14,6 @@ import { PieStrategy } from "@/app/utils/types";
 import { createChartConfig, createChartData, COLORS } from "@/app/utils/pie";
 
 // Simple color palette for the chart
-
 export function PortfolioPieChart({
   pieStrategies,
 }: {

@@ -1,5 +1,6 @@
 import type { TypedData, Address } from "viem";
 import { RISK_OPTIONS } from "./constants/risk";
+import { Message } from "../types";
 
 export const PERMIT_TYPES = {
   Permit: [
@@ -86,7 +87,23 @@ export type DepositAction = "Deposit" | "Change Amount";
 
 export type NextStepFn = (
   userInput: string,
-  sendMsg: (message: string) => Promise<{
-    result: string;
-  }>
+  getNextMessage: () => Message
 ) => void;
+
+export type BotResponse = {
+  type: BotResponseType;
+  data?: BotResponseData;
+};
+
+export type BotResponseType =
+  | "strategies"
+  | "question"
+  | "build_portfolio"
+  | "analyze_portfolio";
+
+export type BotResponseData = {
+  risk_level: string;
+  chain: string;
+} & {
+  answer: string;
+};

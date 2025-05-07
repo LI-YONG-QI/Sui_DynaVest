@@ -5,33 +5,34 @@ import { Undo2, FileCheck, MoveUpRight } from "lucide-react";
 import { format } from "date-fns";
 
 import type { Message, MessagePortfolioData, MessageType } from "./types";
+import { DynamicMessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
 import RiskPortfolio, {
   getRiskDescription,
 } from "@/app/components/RiskPortfolio";
 import ChangePercentList from "@/app/components/ChangePercentList";
 import { InvestmentFormChatWrapper } from "@/app/components/InvestmentFormChatWrapper";
-import {
-  sendMockChangePercentageMessage,
-  sendMockReviewMessage,
-  sendMockInvestMessage,
-  sendMockBuildPortfolioMessage,
-  sendMockFindDeFiStrategiesMessage,
-  sendMockDeFiStrategiesCardMessage,
-} from "@/test/sendMock";
+
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
 import { RiskBadgeList } from "./components/RiskBadgeList";
 import DepositChatWrapper from "./components/DepositChatWrapper";
 import { BOT_STRATEGY } from "./utils/constants/strategies";
 import { useChat } from "./contexts/ChatContext";
-import { useAccount, useBalance } from "wagmi";
-import { parseUnits } from "viem";
+// import { useAccount, useBalance } from "wagmi";
 import ChainFilter from "./components/StrategyList/ChainFilter";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 import Button from "./components/Button";
 import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
 import { getChainName } from "./utils/constants/chains";
+import type { BotResponse, BotResponseType } from "./utils/types";
+
+const isDynamicMessageType = (
+  type: MessageType
+): type is (typeof DynamicMessageType)[number] => {
+  const dynamicTypes = DynamicMessageType as readonly string[];
+  return dynamicTypes.includes(type);
+};
 
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
@@ -55,12 +56,12 @@ export default function Home() {
     useChatbot();
   const { closeChat } = useChat();
 
-  const { address } = useAccount();
-  const { data: balance } = useBalance({
-    address,
-    token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
-    chainId: selectedChains[0],
-  });
+  // const { address } = useAccount();
+  // const { data: balance } = useBalance({
+  //   address,
+  //   token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
+  //   chainId: selectedChains[0],
+  // });
 
   const chainsName = selectedChains
     .map((chainId) => getChainName(chainId))
@@ -68,104 +69,104 @@ export default function Home() {
 
   // Create a mapping between bot response results and message types
 
-  const BOT_RESPONSE_MAP: Record<
-    string,
+  const BOT_DEFAULT_RESPONSE_MAP: Record<
+    BotResponseType,
     {
       type: MessageType;
       text: string;
       isEdit: boolean;
-      shouldIncludeData?: boolean;
     }
   > = {
-    build_portfolio: {
-      type: "Invest",
+    strategies: {
+      type: "Find Defi Strategies",
       text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
       isEdit: false,
     },
-    pie_chart: {
+    analyze_portfolio: {
       type: "Portfolio",
       text: "What's your Risk/Yield and Airdrop portfolio preference?",
       isEdit: true,
     },
-    edit_portfolio: {
-      type: "Edit",
-      text: "",
-      isEdit: true,
-    },
-    review_portfolio: {
-      type: "Review Portfolio",
+    question: {
+      type: "Text",
       text: "",
       isEdit: false,
-      shouldIncludeData: true,
     },
-    middle_risk_strategy: {
-      type: "Find Defi Strategies",
-      text: "No problem. What's your Chain and Risk preference? I'll find DeFi strategies meet your preference. ",
-      isEdit: true,
-    },
-    defi_strategies_card: {
-      type: "DeFi Strategies Cards",
-      text: `Here're some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`,
+    build_portfolio: {
+      type: "Invest",
+      text: "Start building portfolio...",
       isEdit: false,
     },
   };
 
-  const createBotMessage = (botResponse: { result: string }): Message => {
-    let type: MessageType = "Text";
-    let text = "";
+  const createBotMessage = (botResponse: BotResponse): Message => {
     let data: MessagePortfolioData | undefined;
 
-    // Handle the special case for insufficient balance first
-    if (botResponse.result === "build_portfolio_completed") {
-      if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
-        type = "Deposit Funds";
-        text =
-          "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
-
-        setIsEditing(true);
-      } else {
-        type = "Build Portfolio";
-        text = "Start building portfolio...";
-      }
-    } else {
-      // Use the mapping for other cases
-      const config = BOT_RESPONSE_MAP[botResponse.result];
-
-      if (config) {
-        type = config.type;
-        text = config.text;
-
-        setIsEditing(config.isEdit);
-      } else {
-        // Default case
-        text = botResponse.result;
-      }
-    }
-
-    // Include portfolio data when needed for rendering
-    if (
-      type === "Review Portfolio" ||
-      type === "Deposit Funds" ||
-      type === "Find Defi Strategies" ||
-      type === "DeFi Strategies Cards"
-    ) {
-      data = {
-        risk: selectedRiskLevel,
-        strategies: selectedStrategies,
-      };
-    }
+    const config = BOT_DEFAULT_RESPONSE_MAP[botResponse.type];
 
     // Create the message object
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
-      text,
+      text: config.text,
       sender: "bot",
       timestamp: new Date(),
-      type,
+      type: config.type,
       data,
     };
 
     return botMessage;
+  };
+
+  const createDefaultMessage = (type: MessageType) => {
+    return () => {
+      let text = "";
+      let data: MessagePortfolioData | undefined;
+
+      switch (type) {
+        case "Invest":
+          text = "What's your investment size (Base by default)? ";
+          data = {
+            risk: selectedRiskLevel,
+            strategies: selectedStrategies,
+          };
+          break;
+        case "Edit":
+          text = "What's your Risk/Yield and Airdrop portfolio preference?";
+          data = {
+            risk: selectedRiskLevel,
+            strategies: selectedStrategies,
+          };
+          break;
+        case "DeFi Strategies Cards":
+          text = `Here're some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`;
+          break;
+        case "Review Portfolio":
+          text = "Here's your portfolio";
+          data = {
+            risk: selectedRiskLevel,
+            strategies: selectedStrategies,
+          };
+          break;
+        case "Build Portfolio":
+          text = "Start building portfolio...";
+          data = {
+            risk: selectedRiskLevel,
+            strategies: selectedStrategies,
+          };
+          break;
+      }
+
+      const res: Message = {
+        id: (Date.now() + 1).toString(),
+        text,
+        sender: "bot",
+        timestamp: new Date(),
+        type,
+        data,
+      };
+
+      return res;
+    };
   };
 
   const getMessageData = (message: Message) => {
@@ -179,8 +180,10 @@ export default function Home() {
     const { data } = message;
     const isEditable = validateEditable(message);
 
-    if (!isEditable && !data) {
-      throw new Error("Portfolio data is required");
+    if (!isEditable) {
+      if (isDynamicMessageType(message.type) && !data) {
+        throw new Error("Portfolio data is required");
+      }
     }
 
     const risk = isEditable ? selectedRiskLevel : data!.risk;
@@ -189,12 +192,7 @@ export default function Home() {
     return { isEditable, risk, strategies };
   };
 
-  const nextStep = (
-    userInput: string,
-    sendMsg: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => {
+  const nextStep = (userInput: string, getNextMessage: () => Message) => {
     const settleMessage = (message: Message) => {
       // Update the message with the current data
       const updatedConversation = conversation.map((convMsg) => {
@@ -215,23 +213,12 @@ export default function Home() {
     };
 
     settleMessage(conversation[conversation.length - 1]);
-    handleMessage(userInput, sendMsg);
-  };
-
-  /// HANDLE FUNCTIONS ///
-  const handleHotTopic = (topic: string) => {
-    setCommand(topic);
-    // Focus the input field after setting the command
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 0);
+    handleMessage(userInput, getNextMessage);
   };
 
   const handleMessage = async (
     userInput: string,
-    sendMsg: (message: string) => Promise<{
-      result: string;
-    }>
+    getNextMessage?: () => Message
   ) => {
     const addUserMessage = (message: string) => {
       if (message === "") return;
@@ -251,28 +238,50 @@ export default function Home() {
     addUserMessage(userInput);
 
     try {
-      const botResponse = await sendMsg(userInput);
-      if (!botResponse || !botResponse.result) return;
+      let nextMsg: Message;
 
-      // Replace "build_portfolio_2" with "build_portfolio_completed"
-      if (botResponse.result === "build_portfolio_2") {
-        botResponse.result = "build_portfolio_completed";
+      if (getNextMessage) {
+        nextMsg = getNextMessage();
+      } else {
+        const botResponse = await sendMessage(userInput);
+        if (!botResponse || !botResponse.type) return;
+
+        nextMsg = createBotMessage(botResponse);
       }
 
-      const botMessage = createBotMessage(botResponse);
+      if (
+        nextMsg.type === "Portfolio" ||
+        nextMsg.type === "Edit" ||
+        nextMsg.type === "Deposit Funds" ||
+        nextMsg.type === "Find Defi Strategies"
+      ) {
+        setIsEditing(true);
+      }
 
-      await handleTypingText(botMessage);
-    } catch {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Sorry, I couldn't process your request. Please try again.",
-        sender: "bot",
-        timestamp: new Date(),
-        type: "Text",
-      };
-
-      setConversation((prev) => [...prev, errorMessage]);
+      await handleTypingText(nextMsg);
+      setConversation((prev) => [...prev, nextMsg]);
+    } catch (error) {
+      console.error(error);
+      setConversation((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          text: "Sorry, I couldn't process your request. Please try again.",
+          sender: "bot",
+          timestamp: new Date(),
+          type: "Text",
+        },
+      ]);
     }
+  };
+
+  /// HANDLE FUNCTIONS ///
+  const handleHotTopic = (topic: string) => {
+    setCommand(topic);
+    // Focus the input field after setting the command
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
   };
 
   const handleTypingText = async (botMessage: Message) => {
@@ -289,14 +298,12 @@ export default function Home() {
 
     setIsTyping(false);
     setTypingText("");
-    setConversation((prev) => [...prev, botMessage]);
   };
-
   // Handle key press in input field
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleMessage(command, sendMessage);
+      handleMessage(command);
     }
   };
 
@@ -344,10 +351,13 @@ export default function Home() {
 
               <RiskPortfolio
                 buildPortfolio={() =>
-                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                  nextStep(
+                    "Build portfolio",
+                    createDefaultMessage("Build Portfolio")
+                  )
                 }
                 changePercent={() =>
-                  nextStep("Change percentage", sendMockChangePercentageMessage)
+                  nextStep("Change percentage", createDefaultMessage("Edit"))
                 }
                 riskPortfolioStrategies={strategies}
               />
@@ -364,7 +374,9 @@ export default function Home() {
               riskPortfolioStrategies={strategies}
               setRiskPortfolioStrategies={setSelectedStrategies}
               isEditable={isEditable}
-              nextStep={() => nextStep("", sendMockReviewMessage)}
+              nextStep={() =>
+                nextStep("", createDefaultMessage("Review Portfolio"))
+              }
             />
           </div>
         );
@@ -377,10 +389,13 @@ export default function Home() {
             <div className="w-full min-w-[600px] md:max-w-none">
               <RiskPortfolio
                 buildPortfolio={() =>
-                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                  nextStep(
+                    "Build portfolio",
+                    createDefaultMessage("Build Portfolio")
+                  )
                 }
                 changePercent={() =>
-                  nextStep("Change percentage", sendMockChangePercentageMessage)
+                  nextStep("Change percentage", createDefaultMessage("Edit"))
                 }
                 riskPortfolioStrategies={strategies}
               />
@@ -465,7 +480,7 @@ export default function Home() {
               onClick={() =>
                 nextStep(
                   `Find ${selectedRiskLevel} risk DeFi strategies on ${chainsName}`,
-                  sendMockDeFiStrategiesCardMessage
+                  createDefaultMessage("DeFi Strategies Cards")
                 )
               }
               text="Find DeFi Strategies"
@@ -547,7 +562,7 @@ export default function Home() {
                     onClick={() =>
                       handleMessage(
                         "Build a diversified DeFi Portfolio",
-                        sendMockInvestMessage
+                        createDefaultMessage("Invest")
                       )
                     }
                   >
@@ -560,7 +575,7 @@ export default function Home() {
                     onClick={() =>
                       handleMessage(
                         "Analyze and adjust my DeFi Portfolio",
-                        sendMessage
+                        createDefaultMessage("Build Portfolio")
                       )
                     }
                   >
@@ -570,9 +585,7 @@ export default function Home() {
                   </button>
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
-                    onClick={() =>
-                      handleMessage("Deposit into my wallet", sendMessage)
-                    }
+                    onClick={() => handleMessage("Deposit into my wallet")}
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
                       Deposit into my wallet
@@ -592,7 +605,7 @@ export default function Home() {
                     onClick={() =>
                       handleMessage(
                         "Help me find the best DeFi strategies",
-                        sendMockFindDeFiStrategiesMessage
+                        createDefaultMessage("Find Defi Strategies")
                       )
                     }
                   >
@@ -649,7 +662,7 @@ export default function Home() {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  handleMessage(command, sendMessage);
+                  handleMessage(command);
                 }}
                 disabled={command.trim() === ""}
                 className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"
@@ -773,7 +786,7 @@ export default function Home() {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    handleMessage(command, sendMessage);
+                    handleMessage(command);
                   }}
                   disabled={command.trim() === ""}
                   className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"
