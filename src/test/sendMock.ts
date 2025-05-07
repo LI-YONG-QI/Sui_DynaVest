@@ -44,7 +44,7 @@ export const sendMockBuildPortfolioMessage = async (
   console.log("message", message);
 
   return {
-    result: "build_portfolio_2",
+    result: "build_portfolio_completed",
   };
 };
 

@@ -32,6 +32,7 @@ import { RISK_OPTIONS } from "./utils/constants/risk";
 import Button from "./components/Button";
 import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
 import { getChainName } from "./utils/constants/chains";
+
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
   const [command, setCommand] = useState("");
@@ -65,72 +66,96 @@ export default function Home() {
     .map((chainId) => getChainName(chainId))
     .join(" / ");
 
-  // TODO: build a high relation between `MessageType` and `createBotMessage` `renderBotMessageContent`
+  // Create a mapping between bot response results and message types
+
+  const BOT_RESPONSE_MAP: Record<
+    string,
+    {
+      type: MessageType;
+      text: string;
+      isEdit: boolean;
+      shouldIncludeData?: boolean;
+    }
+  > = {
+    build_portfolio: {
+      type: "Invest",
+      text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
+      isEdit: false,
+    },
+    pie_chart: {
+      type: "Portfolio",
+      text: "What's your Risk/Yield and Airdrop portfolio preference?",
+      isEdit: true,
+    },
+    edit_portfolio: {
+      type: "Edit",
+      text: "",
+      isEdit: true,
+    },
+    review_portfolio: {
+      type: "Review Portfolio",
+      text: "",
+      isEdit: false,
+      shouldIncludeData: true,
+    },
+    middle_risk_strategy: {
+      type: "Find Defi Strategies",
+      text: "No problem. What's your Chain and Risk preference? I'll find DeFi strategies meet your preference. ",
+      isEdit: true,
+    },
+    defi_strategies_card: {
+      type: "DeFi Strategies Cards",
+      text: `Here're some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`,
+      isEdit: false,
+    },
+  };
+
   const createBotMessage = (botResponse: { result: string }): Message => {
     let type: MessageType = "Text";
     let text = "";
     let data: MessagePortfolioData | undefined;
 
-    switch (botResponse.result) {
-      case "build_portfolio":
+    // Handle the special case for insufficient balance first
+    if (botResponse.result === "build_portfolio_completed") {
+      if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
+        type = "Deposit Funds";
         text =
-          "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ";
-        type = "Invest";
-        break;
-      case "pie_chart":
-        text = "What's your Risk/Yield and Airdrop portfolio preference?";
-        type = "Portfolio";
-        break;
-      case "edit_portfolio":
-        type = "Edit";
-        break;
-      case "review_portfolio":
-        type = "Review Portfolio";
-        data = {
-          risk: selectedRiskLevel,
-          strategies: selectedStrategies,
-        };
-        break;
-      case "middle_risk_strategy":
-        text =
-          "No problem. What's your Chain and Risk preference? I'll find DeFi strategies meet your preference. ";
-        type = "Find Defi Strategies";
-        // TODO: data should'nt be included in the message
-        data = {
-          risk: selectedRiskLevel,
-          strategies: selectedStrategies,
-        };
-        break;
-      case "build_portfolio_2": // TODO: rename
-        if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
-          text =
-            "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
-          type = "Deposit Funds";
-          // TODO: data should'nt be included in the message
-          data = {
-            risk: selectedRiskLevel,
-            strategies: selectedStrategies,
-          };
-        } else {
-          text = "Start building portfolio...";
-          type = "Build Portfolio";
-        }
-        break;
-      case "defi_strategies_card":
-        text = `Here’re some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`;
-        type = "DeFi Strategies Cards";
-        // TODO: data should'nt be included in the message
-        data = {
-          risk: selectedRiskLevel,
-          strategies: selectedStrategies,
-        };
-        break;
-      default:
+          "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
+
+        setIsEditing(true);
+      } else {
+        type = "Build Portfolio";
+        text = "Start building portfolio...";
+      }
+    } else {
+      // Use the mapping for other cases
+      const config = BOT_RESPONSE_MAP[botResponse.result];
+
+      if (config) {
+        type = config.type;
+        text = config.text;
+
+        setIsEditing(config.isEdit);
+      } else {
+        // Default case
         text = botResponse.result;
-        break;
+      }
     }
 
-    // Add bot response to conversation
+    // Include portfolio data when needed for rendering
+    if (
+      type === "Review Portfolio" ||
+      type === "Deposit Funds" ||
+      type === "Find Defi Strategies" ||
+      type === "DeFi Strategies Cards"
+    ) {
+      data = {
+        risk: selectedRiskLevel,
+        strategies: selectedStrategies,
+      };
+    }
+
+    // Create the message object
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
       text,
@@ -139,16 +164,6 @@ export default function Home() {
       type,
       data,
     };
-
-    // For Portfolio and Edit types, set this message as being edited
-    if (
-      type === "Portfolio" ||
-      type === "Edit" ||
-      type === "Deposit Funds" ||
-      type === "Find Defi Strategies"
-    ) {
-      setIsEditing(true);
-    }
 
     return botMessage;
   };
@@ -238,6 +253,12 @@ export default function Home() {
     try {
       const botResponse = await sendMsg(userInput);
       if (!botResponse || !botResponse.result) return;
+
+      // Replace "build_portfolio_2" with "build_portfolio_completed"
+      if (botResponse.result === "build_portfolio_2") {
+        botResponse.result = "build_portfolio_completed";
+      }
+
       const botMessage = createBotMessage(botResponse);
 
       await handleTypingText(botMessage);
@@ -282,6 +303,7 @@ export default function Home() {
   const renderBotMessageContent = (message: Message) => {
     if (message.sender !== "bot") return null;
 
+    // Use a mapping between message types and their render functions
     switch (message.type) {
       case "Invest":
         return (
@@ -473,11 +495,15 @@ export default function Home() {
   }, [conversation, isTyping]);
 
   useEffect(() => {
-    const latestMessage = conversation[conversation.length - 1];
+    const latestBotMessages = conversation.filter(
+      (message) => message.sender === "bot"
+    );
+    const latestBotMessage = latestBotMessages[latestBotMessages.length - 1];
+
     setIsInput(
-      latestMessage?.type === "Text" ||
-        latestMessage?.type === "Find Defi Strategies" ||
-        latestMessage?.type === "DeFi Strategies Cards"
+      latestBotMessage?.type === "Text" ||
+        latestBotMessage?.type === "Find Defi Strategies" ||
+        latestBotMessage?.type === "DeFi Strategies Cards"
     );
   }, [conversation]);
 
