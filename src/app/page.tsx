@@ -7,7 +7,7 @@ import { useAccount } from "wagmi";
 import { useBalance } from "wagmi";
 import { parseUnits } from "viem";
 
-import type { Message, MessagePortfolioData, MessageType } from "./types";
+import type { Message, MessageType } from "./types";
 import { DynamicMessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
@@ -15,8 +15,9 @@ import { usePortfolio } from "@/app/hooks/usePortfolio";
 import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
 import { useChat } from "@/app/contexts/ChatContext";
 import { getChainName } from "@/app/utils/constants/chains";
-import { BOT_DEFAULT_RESPONSE_MAP } from "@/app/utils/constants/bot";
 import type { BotResponse, RiskLevel } from "@/app/utils/types";
+import { useMessageHandler } from "@/app/hooks/useMessageHandler";
+import { getComponentByMessageType } from "@/app/components/ChatWrapper/ChatComponentMap";
 import {
   PortfolioChatWrapper,
   EditChatWrapper,
@@ -68,58 +69,35 @@ export default function Home() {
 
   const chainsName = chains.map((chainId) => getChainName(chainId)).join(" / ");
 
+  // 使用消息處理器
+  const { createBotMessage, createDefaultMessage } = useMessageHandler();
+
+  // 創建消息配置
+  const getMessageConfig = () => ({
+    riskLevel,
+    strategies,
+    chains,
+    depositAmount,
+    chainsName,
+    hasEnoughBalance:
+      parseUnits(depositAmount, 6) <= (balance?.value ?? BigInt(0)),
+  });
+
   /**
    * Process response from backend & Create a bot message
    * @param botResponse - The bot response from ai backned
    * @returns The bot message
    */
-  const createBotMessage = (botResponse: BotResponse): Message => {
-    let data: MessagePortfolioData | undefined;
+  const handleBotResponse = (botResponse: BotResponse): Message => {
+    const message = createBotMessage(botResponse, getMessageConfig());
 
-    const config = BOT_DEFAULT_RESPONSE_MAP[botResponse.type];
-
-    switch (botResponse.type) {
-      case "question":
-        if (botResponse.data) {
-          config.text = botResponse.data.answer;
-        } else {
-          throw new Error(
-            `CreateBotMessage: Not found data from bot response ${botResponse}`
-          );
-        }
-
-        break;
-      case "strategies":
-        if (botResponse.data) {
-          console.log("botResponse.data", botResponse.data);
-          setRiskLevel(botResponse.data.risk_level as RiskLevel);
-          setChains([8453]);
-        } else {
-          throw new Error(
-            `CreateBotMessage: Not found data from bot response ${botResponse}`
-          );
-        }
-        break;
-      case "build_portfolio":
-        data = {
-          risk: riskLevel,
-          strategies,
-        };
-        break;
-      default:
-        break;
+    // 特殊處理某些響應類型
+    if (botResponse.type === "strategies" && botResponse.data) {
+      setRiskLevel(botResponse.data.risk_level as RiskLevel);
+      setChains([8453]);
     }
 
-    const botMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      text: config.text,
-      sender: "bot",
-      timestamp: new Date(),
-      type: config.type,
-      data,
-    };
-
-    return botMessage;
+    return message;
   };
 
   /**
@@ -127,67 +105,13 @@ export default function Home() {
    * @param type - The type of the message
    * @returns The bot message
    */
-  const createDefaultMessage = (type: MessageType) => {
-    return () => {
-      let text = "";
-      let data: MessagePortfolioData | undefined;
-
-      switch (type) {
-        case "Edit":
-          text = "What's your Risk/Yield and Airdrop portfolio preference?";
-          data = {
-            risk: riskLevel,
-            strategies,
-          };
-          break;
-        case "DeFi Strategies Cards":
-          text = `Here're some ${riskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`;
-          data = {
-            risk: riskLevel,
-            strategies,
-          };
-          break;
-        case "Review Portfolio":
-          text = "Here's your portfolio";
-          data = {
-            risk: riskLevel,
-            strategies,
-          };
-          break;
-        case "Build Portfolio":
-          {
-            if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
-              text =
-                "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
-              type = "Deposit Funds";
-            } else {
-              text = "Start building portfolio...";
-              type = "Build Portfolio";
-              data = {
-                risk: riskLevel,
-                strategies,
-              };
-            }
-          }
-          break;
-      }
-
-      const res: Message = {
-        id: (Date.now() + 1).toString(),
-        text,
-        sender: "bot",
-        timestamp: new Date(),
-        type,
-        data,
-      };
-
-      return res;
-    };
+  const handleDefaultMessage = (type: MessageType) => {
+    return createDefaultMessage(type, getMessageConfig());
   };
 
   const handleMessage = async (
     userInput: string,
-    createDefaultMessage?: () => Message
+    getNextMessage?: () => Message
   ) => {
     const addUserMessage = (message: string) => {
       if (message === "") return;
@@ -209,13 +133,13 @@ export default function Home() {
     try {
       let nextMsg: Message;
 
-      if (createDefaultMessage) {
-        nextMsg = createDefaultMessage();
+      if (getNextMessage) {
+        nextMsg = getNextMessage();
       } else {
         const botResponse = await sendMessage(userInput);
         if (!botResponse || !botResponse.type) return;
 
-        nextMsg = createBotMessage(botResponse);
+        nextMsg = handleBotResponse(botResponse);
       }
 
       if (
@@ -328,95 +252,90 @@ export default function Home() {
       messageStrategies,
     } = getMessageData(message);
 
+    // 使用組件映射
+    const Component = getComponentByMessageType(message.type);
+    if (!Component) return null;
+
+    // 準備通用 props
+    const commonProps = {
+      isEditable,
+      nextStep,
+      createDefaultMessage: handleDefaultMessage,
+    };
+
+    // 根據消息類型準備特定 props
     switch (message.type) {
       case "Invest":
         return (
           <InvestmentFormChatWrapper
+            {...commonProps}
             setSelectedChains={setChains}
             selectedChains={chains}
             nextStep={nextStep}
             setDepositAmount={setDepositAmount}
           />
         );
-      case "Portfolio": {
+      case "Portfolio":
         return (
           <PortfolioChatWrapper
+            {...commonProps}
             messageRisk={messageRisk!}
-            isEditable={isEditable}
             setSelectedRiskLevel={setRiskLevel}
             messageStrategies={messageStrategies!}
-            nextStep={nextStep}
-            createDefaultMessage={createDefaultMessage}
           />
         );
-      }
-      case "Edit": {
+      case "Edit":
         return (
           <EditChatWrapper
+            {...commonProps}
             strategies={messageStrategies!}
-            isEditable={isEditable}
             setStrategies={setStrategies}
-            nextStep={nextStep}
-            createDefaultMessage={createDefaultMessage}
           />
         );
-      }
-      case "Review Portfolio": {
+      case "Review Portfolio":
         return (
           <ReviewPortfolioChatWrapper
+            {...commonProps}
             messageStrategies={messageStrategies!}
-            nextStep={nextStep}
-            createDefaultMessage={createDefaultMessage}
           />
         );
-      }
-      case "Build Portfolio": {
+      case "Build Portfolio":
         return (
           <BuildPortfolioChatWrapper
             depositAmount={depositAmount}
             strategies={strategies}
           />
         );
-      }
-      case "Deposit Funds": {
+      case "Deposit Funds":
         return (
           <DepositChatWrapper
+            {...commonProps}
             setDepositAmount={setDepositAmount}
             depositAmount={depositAmount}
-            isEditable={isEditable}
-            nextStep={nextStep}
-            createDefaultMessage={createDefaultMessage}
             strategy={{
               ...BOT_STRATEGY,
               chainId: chains[0],
             }}
           />
         );
-      }
-      case "Find Defi Strategies": {
+      case "Find Defi Strategies":
         return (
           <FindDefiStrategiesChatWrapper
+            {...commonProps}
             selectedChains={chains}
             setSelectedChains={setChains}
             selectedRiskLevel={riskLevel}
             setSelectedRiskLevel={setRiskLevel}
-            isEditable={isEditable}
-            nextStep={nextStep}
-            createDefaultMessage={createDefaultMessage}
             chainsName={chainsName}
           />
         );
-      }
-
-      case "DeFi Strategies Cards": {
+      case "DeFi Strategies Cards":
         return (
           <DefiStrategiesCardsChatWrapper
             selectedChains={chains}
             selectedRiskLevel={riskLevel}
           />
         );
-      }
-
       default:
         return null;
     }
@@ -490,7 +409,7 @@ export default function Home() {
                     onClick={() =>
                       handleMessage(
                         "Analyze and adjust my DeFi Portfolio",
-                        createDefaultMessage("Build Portfolio")
+                        handleDefaultMessage("Build Portfolio")
                       )
                     }
                   >
