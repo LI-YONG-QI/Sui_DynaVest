@@ -4,12 +4,10 @@ import { MoveUpRight } from "lucide-react";
 import { MoonLoader } from "react-spinners";
 import { QRCodeSVG } from "qrcode.react";
 import { parseUnits } from "viem";
-import {
-  sendMockBuildPortfolioMessage,
-  sendMockPortfolioMessage,
-} from "@/test/sendMock";
-import { RiskBadge } from "../RiskPortfolio";
+
+import type { Message, MessageType } from "@/app/types";
 import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
+import { RiskBadge } from "../RiskPortfolio";
 import InvestmentForm from "../StrategyList/StrategyCard/InvestModal/InvestmentForm";
 import CopyButton from "../CopyButton";
 
@@ -18,6 +16,7 @@ const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 type DepositChatWrapperProps = {
   isEditable: boolean;
   nextStep: NextStepFn;
+  createDefaultMessage: (type: MessageType) => () => Message;
   depositAmount: string;
   setDepositAmount: Dispatch<SetStateAction<string>>;
   strategy: StrategyMetadata;
@@ -26,6 +25,7 @@ type DepositChatWrapperProps = {
 const DepositChatWrapper = ({
   isEditable,
   nextStep,
+  createDefaultMessage,
   depositAmount,
   setDepositAmount,
   strategy,
@@ -94,7 +94,10 @@ const DepositChatWrapper = ({
                 <p>Deposit successfully</p>
                 <button
                   onClick={() =>
-                    nextStep("Build portfolio", sendMockBuildPortfolioMessage)
+                    nextStep(
+                      "Build portfolio",
+                      createDefaultMessage("Build Portfolio")
+                    )
                   }
                   className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
                 >
@@ -118,7 +121,7 @@ const DepositChatWrapper = ({
             strategy={strategy}
             handlePortfolio={(amount: string) => {
               setDepositAmount(amount);
-              nextStep(amount + " USDT", sendMockPortfolioMessage);
+              nextStep(amount + " USDT", createDefaultMessage("Portfolio"));
             }}
           />
         </div>

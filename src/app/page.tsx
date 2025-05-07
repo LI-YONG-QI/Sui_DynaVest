@@ -14,18 +14,50 @@ import ChangePercentList from "@/app/components/ChangePercentList";
 import { InvestmentFormChatWrapper } from "@/app/components/InvestmentFormChatWrapper";
 
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
-import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
+import { usePortfolio } from "@/app/hooks/useStrategiesSet";
 import { RiskBadgeList } from "./components/RiskBadgeList";
 import DepositChatWrapper from "./components/DepositChatWrapper";
 import { BOT_STRATEGY } from "./utils/constants/strategies";
 import { useChat } from "./contexts/ChatContext";
-// import { useAccount, useBalance } from "wagmi";
 import ChainFilter from "./components/StrategyList/ChainFilter";
 import { RISK_OPTIONS } from "./utils/constants/risk";
 import Button from "./components/Button";
 import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
 import { getChainName } from "./utils/constants/chains";
 import type { BotResponse, BotResponseType } from "./utils/types";
+import { useAccount } from "wagmi";
+import { useBalance } from "wagmi";
+import { parseUnits } from "viem";
+
+const BOT_DEFAULT_RESPONSE_MAP: Record<
+  BotResponseType,
+  {
+    type: MessageType;
+    text: string;
+    isEdit: boolean;
+  }
+> = {
+  strategies: {
+    type: "Find Defi Strategies",
+    text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
+    isEdit: false,
+  },
+  analyze_portfolio: {
+    type: "Portfolio",
+    text: "What's your Risk/Yield and Airdrop portfolio preference?",
+    isEdit: true,
+  },
+  question: {
+    type: "Text",
+    text: "",
+    isEdit: false,
+  },
+  build_portfolio: {
+    type: "Invest",
+    text: "Start building portfolio...",
+    isEdit: false,
+  },
+};
 
 const isDynamicMessageType = (
   type: MessageType
@@ -42,69 +74,37 @@ export default function Home() {
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { closeChat } = useChat();
   const [depositAmount, setDepositAmount] = useState<string>("");
   const {
     selectedChains,
     setSelectedChains,
-    selectedRiskLevel,
-    setSelectedRiskLevel,
-    selectedStrategies,
-    setSelectedStrategies,
-  } = useStrategiesSet(MOCK_STRATEGIES_SET); // TODO: remove mock data
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+    riskLevel,
+    setRiskLevel,
+    strategies,
+    setStrategies,
+  } = usePortfolio(MOCK_STRATEGIES_SET); // TODO: remove mock data
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
-  const { closeChat } = useChat();
 
-  // const { address } = useAccount();
-  // const { data: balance } = useBalance({
-  //   address,
-  //   token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
-  //   chainId: selectedChains[0],
-  // });
+  const { address } = useAccount();
+  const { data: balance } = useBalance({
+    address,
+    token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
+    chainId: selectedChains[0],
+  });
 
   const chainsName = selectedChains
     .map((chainId) => getChainName(chainId))
     .join(" / ");
-
-  // Create a mapping between bot response results and message types
-
-  const BOT_DEFAULT_RESPONSE_MAP: Record<
-    BotResponseType,
-    {
-      type: MessageType;
-      text: string;
-      isEdit: boolean;
-    }
-  > = {
-    strategies: {
-      type: "Find Defi Strategies",
-      text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
-      isEdit: false,
-    },
-    analyze_portfolio: {
-      type: "Portfolio",
-      text: "What's your Risk/Yield and Airdrop portfolio preference?",
-      isEdit: true,
-    },
-    question: {
-      type: "Text",
-      text: "",
-      isEdit: false,
-    },
-    build_portfolio: {
-      type: "Invest",
-      text: "Start building portfolio...",
-      isEdit: false,
-    },
-  };
 
   const createBotMessage = (botResponse: BotResponse): Message => {
     let data: MessagePortfolioData | undefined;
 
     const config = BOT_DEFAULT_RESPONSE_MAP[botResponse.type];
 
-    // Create the message object
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
       text: config.text,
@@ -126,33 +126,42 @@ export default function Home() {
         case "Invest":
           text = "What's your investment size (Base by default)? ";
           data = {
-            risk: selectedRiskLevel,
-            strategies: selectedStrategies,
+            risk: riskLevel,
+            strategies,
           };
           break;
         case "Edit":
           text = "What's your Risk/Yield and Airdrop portfolio preference?";
           data = {
-            risk: selectedRiskLevel,
-            strategies: selectedStrategies,
+            risk: riskLevel,
+            strategies,
           };
           break;
         case "DeFi Strategies Cards":
-          text = `Here're some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`;
+          text = `Here're some ${riskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`;
           break;
         case "Review Portfolio":
           text = "Here's your portfolio";
           data = {
-            risk: selectedRiskLevel,
-            strategies: selectedStrategies,
+            risk: riskLevel,
+            strategies,
           };
           break;
         case "Build Portfolio":
-          text = "Start building portfolio...";
-          data = {
-            risk: selectedRiskLevel,
-            strategies: selectedStrategies,
-          };
+          {
+            if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
+              text =
+                "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
+              type = "Deposit Funds";
+            } else {
+              text = "Start building portfolio...";
+              type = "Build Portfolio";
+              data = {
+                risk: riskLevel,
+                strategies,
+              };
+            }
+          }
           break;
       }
 
@@ -186,22 +195,21 @@ export default function Home() {
       }
     }
 
-    const risk = isEditable ? selectedRiskLevel : data!.risk;
-    const strategies = isEditable ? selectedStrategies : data!.strategies;
+    const risk = isEditable ? riskLevel : data!.risk;
+    const messageStrategies = isEditable ? strategies : data!.strategies;
 
-    return { isEditable, risk, strategies };
+    return { isEditable, risk, messageStrategies };
   };
 
   const nextStep = (userInput: string, getNextMessage: () => Message) => {
     const settleMessage = (message: Message) => {
-      // Update the message with the current data
       const updatedConversation = conversation.map((convMsg) => {
         if (convMsg.id === message.id) {
           return {
             ...convMsg,
             data: {
-              risk: selectedRiskLevel,
-              strategies: selectedStrategies,
+              risk: riskLevel,
+              strategies,
             },
           };
         }
@@ -310,7 +318,12 @@ export default function Home() {
   const renderBotMessageContent = (message: Message) => {
     if (message.sender !== "bot") return null;
 
-    // Use a mapping between message types and their render functions
+    const {
+      isEditable,
+      risk: messageRisk,
+      messageStrategies,
+    } = getMessageData(message);
+
     switch (message.type) {
       case "Invest":
         return (
@@ -322,12 +335,6 @@ export default function Home() {
           />
         );
       case "Portfolio": {
-        const {
-          isEditable,
-          risk: messageRisk,
-          strategies,
-        } = getMessageData(message);
-
         return (
           <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full max-w-[320px] md:max-w-none">
@@ -337,7 +344,7 @@ export default function Home() {
                   <RiskBadgeList
                     selectedRisk={messageRisk}
                     isEditable={isEditable}
-                    setSelectedRiskLevel={setSelectedRiskLevel}
+                    setSelectedRiskLevel={setRiskLevel}
                     options={RISK_OPTIONS}
                   />
 
@@ -359,20 +366,18 @@ export default function Home() {
                 changePercent={() =>
                   nextStep("Change percentage", createDefaultMessage("Edit"))
                 }
-                riskPortfolioStrategies={strategies}
+                riskPortfolioStrategies={messageStrategies}
               />
             </div>
           </div>
         );
       }
       case "Edit": {
-        const { isEditable, strategies } = getMessageData(message);
-
         return (
           <div className="overflow-x-auto max-w-full">
             <ChangePercentList
-              riskPortfolioStrategies={strategies}
-              setRiskPortfolioStrategies={setSelectedStrategies}
+              riskPortfolioStrategies={messageStrategies}
+              setRiskPortfolioStrategies={setStrategies}
               isEditable={isEditable}
               nextStep={() =>
                 nextStep("", createDefaultMessage("Review Portfolio"))
@@ -382,8 +387,6 @@ export default function Home() {
         );
       }
       case "Review Portfolio": {
-        const { strategies } = getMessageData(message);
-
         return (
           <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
             <div className="w-full min-w-[600px] md:max-w-none">
@@ -397,7 +400,7 @@ export default function Home() {
                 changePercent={() =>
                   nextStep("Change percentage", createDefaultMessage("Edit"))
                 }
-                riskPortfolioStrategies={strategies}
+                riskPortfolioStrategies={messageStrategies}
               />
             </div>
           </div>
@@ -410,7 +413,7 @@ export default function Home() {
               ${depositAmount} USDC Portfolio complete!
             </p>
             <div className="flex flex-col gap-2">
-              {selectedStrategies.map((strategy, index) => (
+              {strategies.map((strategy, index) => (
                 <p className="text-sm text-gray-400" key={index}>
                   {strategy.title} {strategy.allocation}% $
                   {(strategy.allocation * Number(depositAmount)) / 100}
@@ -435,14 +438,13 @@ export default function Home() {
         );
       }
       case "Deposit Funds": {
-        const { isEditable } = getMessageData(message);
-
         return (
           <DepositChatWrapper
             setDepositAmount={setDepositAmount}
             depositAmount={depositAmount}
             isEditable={isEditable}
             nextStep={nextStep}
+            createDefaultMessage={createDefaultMessage}
             strategy={{
               ...BOT_STRATEGY,
               chainId: selectedChains[0],
@@ -451,8 +453,6 @@ export default function Home() {
         );
       }
       case "Find Defi Strategies": {
-        const { isEditable } = getMessageData(message);
-
         return (
           <div className="mt-4 flex flex-col gap-4">
             <div className="flex items-center gap-2">
@@ -467,8 +467,8 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <p className="font-[Manrope] font-medium text-sm">Select Risk</p>
               <RiskBadgeList
-                selectedRisk={selectedRiskLevel}
-                setSelectedRiskLevel={setSelectedRiskLevel}
+                selectedRisk={riskLevel}
+                setSelectedRiskLevel={setRiskLevel}
                 options={RISK_OPTIONS.filter(
                   (option) =>
                     option !== "Balanced" && option !== "High Airdrop Potential"
@@ -479,7 +479,7 @@ export default function Home() {
             <Button
               onClick={() =>
                 nextStep(
-                  `Find ${selectedRiskLevel} risk DeFi strategies on ${chainsName}`,
+                  `Find ${riskLevel} risk DeFi strategies on ${chainsName}`,
                   createDefaultMessage("DeFi Strategies Cards")
                 )
               }
@@ -494,7 +494,7 @@ export default function Home() {
         return (
           <StrategyListChatWrapper
             selectedChains={selectedChains}
-            selectedRiskLevel={selectedRiskLevel}
+            selectedRiskLevel={riskLevel}
           />
         );
       }

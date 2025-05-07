@@ -7,28 +7,27 @@ import type {
 } from "@/app/utils/types";
 import { arbitrum } from "viem/chains";
 
-export const useStrategiesSet = (initialStrategiesSet: StrategiesSet) => {
+export const usePortfolio = (initialStrategiesSet: StrategiesSet) => {
   const [strategiesSet, setStrategiesSet] =
     useState<StrategiesSet>(initialStrategiesSet);
-  const [selectedRiskLevel, setSelectedRiskLevel] =
-    useState<RiskLevel>("Balanced");
-  const [selectedStrategies, setSelectedStrategies] = useState<
-    RiskPortfolioStrategies[]
-  >(strategiesSet[selectedRiskLevel]);
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("Balanced");
+  const [strategies, setStrategies] = useState<RiskPortfolioStrategies[]>(
+    strategiesSet[riskLevel]
+  );
   const [selectedChains, setSelectedChains] = useState<number[]>([arbitrum.id]);
 
   useEffect(() => {
-    setSelectedStrategies(strategiesSet[selectedRiskLevel]);
-  }, [selectedRiskLevel, strategiesSet]);
+    setStrategies(strategiesSet[riskLevel]);
+  }, [riskLevel, strategiesSet]);
 
   return {
     strategiesSet,
     selectedChains,
     setSelectedChains,
     setStrategiesSet,
-    selectedRiskLevel,
-    setSelectedRiskLevel,
-    selectedStrategies,
-    setSelectedStrategies,
+    riskLevel,
+    setRiskLevel,
+    strategies,
+    setStrategies,
   };
 };
