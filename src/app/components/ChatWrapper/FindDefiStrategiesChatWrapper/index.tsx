@@ -1,10 +1,10 @@
 import React, { Dispatch, SetStateAction } from "react";
-import { MoveUpRight } from "lucide-react";
 
 import { RiskLevel } from "@/app/utils/types";
 import ChainFilter from "../../StrategyList/ChainFilter";
 import { RiskBadgeList } from "../../RiskBadgeList";
 import { RISK_OPTIONS } from "@/app/utils/constants/risk";
+import { MoveUpRight } from "lucide-react";
 import Button from "../../Button";
 import { Message, MessageType } from "@/app/types";
 
@@ -47,7 +47,7 @@ const FindDefiStrategiesChatWrapper: React.FC<
           setSelectedRiskLevel={setSelectedRiskLevel}
           options={RISK_OPTIONS.filter(
             (option) =>
-              option !== "Balanced" && option !== "High Airdrop Potential"
+              option !== "balanced" && option !== "High Airdrop Potential"
           )}
           isEditable={isEditable}
         />

@@ -11,12 +11,12 @@ import type { Message, MessagePortfolioData, MessageType } from "./types";
 import { DynamicMessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
-import { usePortfolio } from "@/app/hooks/useStrategiesSet";
+import { usePortfolio } from "@/app/hooks/usePortfolio";
 import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
 import { useChat } from "@/app/contexts/ChatContext";
 import { getChainName } from "@/app/utils/constants/chains";
 import { BOT_DEFAULT_RESPONSE_MAP } from "@/app/utils/constants/bot";
-import type { BotResponse } from "@/app/utils/types";
+import type { BotResponse, RiskLevel } from "@/app/utils/types";
 import {
   PortfolioChatWrapper,
   EditChatWrapper,
@@ -47,9 +47,11 @@ export default function Home() {
 
   const { closeChat } = useChat();
   const [depositAmount, setDepositAmount] = useState<string>("");
+
+  // TODO: rename selectedChains
   const {
-    selectedChains,
-    setSelectedChains,
+    chains,
+    setChains,
     riskLevel,
     setRiskLevel,
     strategies,
@@ -61,13 +63,11 @@ export default function Home() {
   const { address } = useAccount();
   const { data: balance } = useBalance({
     address,
-    token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
-    chainId: selectedChains[0],
+    token: BOT_STRATEGY.tokens[0].chains![chains[0]],
+    chainId: chains[0],
   });
 
-  const chainsName = selectedChains
-    .map((chainId) => getChainName(chainId))
-    .join(" / ");
+  const chainsName = chains.map((chainId) => getChainName(chainId)).join(" / ");
 
   /**
    * Process response from backend & Create a bot message
@@ -78,6 +78,32 @@ export default function Home() {
     let data: MessagePortfolioData | undefined;
 
     const config = BOT_DEFAULT_RESPONSE_MAP[botResponse.type];
+
+    switch (botResponse.type) {
+      case "question":
+        if (botResponse.data) {
+          config.text = botResponse.data.answer;
+        } else {
+          throw new Error(
+            `CreateBotMessage: Not found data from bot response ${botResponse}`
+          );
+        }
+
+        break;
+      case "strategies":
+        if (botResponse.data) {
+          console.log("botResponse.data", botResponse.data);
+          setRiskLevel(botResponse.data.risk_level as RiskLevel);
+          setChains([8453]);
+        } else {
+          throw new Error(
+            `CreateBotMessage: Not found data from bot response ${botResponse}`
+          );
+        }
+        break;
+      default:
+        break;
+    }
 
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
@@ -192,8 +218,7 @@ export default function Home() {
       if (
         nextMsg.type === "Portfolio" ||
         nextMsg.type === "Edit" ||
-        nextMsg.type === "Deposit Funds" ||
-        nextMsg.type === "Find Defi Strategies"
+        nextMsg.type === "Deposit Funds"
       ) {
         setIsEditing(true);
       }
@@ -258,14 +283,12 @@ export default function Home() {
       const { data } = message;
       const isEditable = validateEditable(message);
 
-      if (!isEditable) {
-        if (isDynamicMessageType(message.type) && !data) {
-          throw new Error("Portfolio data is required");
-        }
+      if (!isEditable && isDynamicMessageType(message.type) && !data) {
+        throw new Error("Portfolio data is required");
       }
 
-      const risk = isEditable ? riskLevel : data!.risk;
-      const messageStrategies = isEditable ? strategies : data!.strategies;
+      const risk = isEditable ? riskLevel : data?.risk;
+      const messageStrategies = isEditable ? strategies : data?.strategies;
 
       return { isEditable, risk, messageStrategies };
     };
@@ -305,8 +328,8 @@ export default function Home() {
       case "Invest":
         return (
           <InvestmentFormChatWrapper
-            selectedChains={selectedChains}
-            setSelectedChains={setSelectedChains}
+            setSelectedChains={setChains}
+            selectedChains={chains}
             nextStep={nextStep}
             setDepositAmount={setDepositAmount}
           />
@@ -361,7 +384,7 @@ export default function Home() {
             createDefaultMessage={createDefaultMessage}
             strategy={{
               ...BOT_STRATEGY,
-              chainId: selectedChains[0],
+              chainId: chains[0],
             }}
           />
         );
@@ -369,8 +392,8 @@ export default function Home() {
       case "Find Defi Strategies": {
         return (
           <FindDefiStrategiesChatWrapper
-            selectedChains={selectedChains}
-            setSelectedChains={setSelectedChains}
+            selectedChains={chains}
+            setSelectedChains={setChains}
             selectedRiskLevel={riskLevel}
             setSelectedRiskLevel={setRiskLevel}
             isEditable={isEditable}
@@ -384,7 +407,7 @@ export default function Home() {
       case "DeFi Strategies Cards": {
         return (
           <DefiStrategiesCardsChatWrapper
-            selectedChains={selectedChains}
+            selectedChains={chains}
             selectedRiskLevel={riskLevel}
           />
         );
