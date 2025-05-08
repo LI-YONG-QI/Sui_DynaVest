@@ -7,7 +7,9 @@ import { useAccount } from "wagmi";
 import { useBalance } from "wagmi";
 import { parseUnits } from "viem";
 
-import type { Message, MessageType } from "./types";
+// import type { Message, MessageType } from "./types";
+import type { Message } from "@/app/classes/message";
+
 import { DynamicMessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
@@ -28,13 +30,13 @@ import {
   InvestmentFormChatWrapper,
   DepositChatWrapper,
 } from "@/app/components/ChatWrapper";
-
-const isDynamicMessageType = (
-  type: MessageType
-): type is (typeof DynamicMessageType)[number] => {
-  const dynamicTypes = DynamicMessageType as readonly string[];
-  return dynamicTypes.includes(type);
-};
+import {
+  EditMessage,
+  PortfolioMessage,
+  BuildPortfolioMessage,
+  InvestMessage,
+  TextMessage,
+} from "./classes/message";
 
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
@@ -43,128 +45,21 @@ export default function Home() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false); // user can edit the component when isEditing is true
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { closeChat } = useChat();
-  const [depositAmount, setDepositAmount] = useState<string>("");
-
-  const {
-    chains,
-    setChains,
-    riskLevel,
-    setRiskLevel,
-    strategies,
-    setStrategies,
-  } = usePortfolio(MOCK_STRATEGIES_SET); // TODO: remove mock data
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
 
-  const { address } = useAccount();
-  const { data: balance } = useBalance({
-    address,
-    token: BOT_STRATEGY.tokens[0].chains![chains[0]],
-    chainId: chains[0],
-  });
+  const { closeChat } = useChat();
 
-  const chainsName = chains.map((chainId) => getChainName(chainId)).join(" / ");
-  const hasEnoughBalance =
-    parseUnits(depositAmount, 6) <= (balance?.value ?? BigInt(0));
+  const addBotMessage = async (message: Message) => {
+    console.log("From Bot");
+    console.log(message);
 
-  // 使用消息處理器
-  const { createBotMessage, createDefaultMessage } = useMessageHandler({
-    riskLevel,
-    strategies,
-    chains,
-    depositAmount,
-    chainsName,
-    hasEnoughBalance,
-  });
-
-  /**
-   * Process response from backend & Create a bot message
-   * @param botResponse - The bot response from ai backned
-   * @returns The bot message
-   */
-  const handleBotResponse = (botResponse: BotResponse): Message => {
-    const message = createBotMessage(botResponse);
-
-    // Side Effect
-    if (botResponse.type === "strategies" && botResponse.data) {
-      setRiskLevel(botResponse.data.risk_level as RiskLevel);
-      setChains([8453]);
-    }
-
-    return message;
+    await handleTypingText(message);
+    setConversation((prev) => [...prev, message]);
   };
 
-  /**
-   * Create a default message (flow of some actions (eg.build portfolio))
-   * @param type - The type of the message
-   * @returns The bot message
-   */
-  const handleDefaultMessage = (type: MessageType) => {
-    return createDefaultMessage(type);
-  };
-
-  const handleMessage = async (
-    userInput: string,
-    getNextMessage?: () => Message
-  ) => {
-    const addUserMessage = (message: string) => {
-      if (message === "") return;
-      // Add user message to conversation
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        text: message,
-        sender: "user",
-        timestamp: new Date(),
-        type: "Text",
-      };
-
-      setConversation((prev) => [...prev, userMessage]);
-      setCommand("");
-    };
-
-    addUserMessage(userInput);
-
-    try {
-      let nextMsg: Message;
-
-      if (getNextMessage) {
-        nextMsg = getNextMessage();
-      } else {
-        const botResponse = await sendMessage(userInput);
-        if (!botResponse || !botResponse.type) return;
-
-        nextMsg = handleBotResponse(botResponse);
-      }
-
-      if (
-        nextMsg.type === "Portfolio" ||
-        nextMsg.type === "Edit" ||
-        nextMsg.type === "Deposit Funds" ||
-        nextMsg.type === "Find Defi Strategies"
-      ) {
-        setIsEditing(true);
-      }
-
-      await handleTypingText(nextMsg);
-      setConversation((prev) => [...prev, nextMsg]);
-    } catch (error) {
-      console.error(error);
-      setConversation((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          text: "Sorry, I couldn't process your request. Please try again.",
-          sender: "bot",
-          timestamp: new Date(),
-          type: "Text",
-        },
-      ]);
-    }
-  };
   /// HANDLE FUNCTIONS ///
   const handleHotTopic = (topic: string) => {
     setCommand(topic);
@@ -177,7 +72,7 @@ export default function Home() {
   const handleTypingText = async (botMessage: Message) => {
     setIsTyping(true);
     let currentText = "";
-    const textToType = botMessage.text;
+    const textToType = botMessage.metadata.text;
 
     for (let i = 0; i < textToType.length; i++) {
       currentText += textToType[i];
@@ -198,144 +93,58 @@ export default function Home() {
   };
 
   const renderBotMessageContent = (message: Message) => {
-    const getMessageData = (message: Message) => {
-      const validateEditable = (message: Message) => {
-        return (
-          message.id === conversation[conversation.length - 1].id && // The latest message conversation
-          isEditing === true
-        );
-      };
+    if (message instanceof InvestMessage) {
+      return (
+        <InvestmentFormChatWrapper
+          message={message}
+          addBotMessage={addBotMessage}
+        />
+      );
+    } else if (message instanceof PortfolioMessage) {
+      return (
+        <PortfolioChatWrapper message={message} addBotMessage={addBotMessage} />
+      );
+    }
+  };
 
-      const { data } = message;
-      const isEditable = validateEditable(message);
+  const testHandleMessage = async (userInput: string) => {
+    const addUserMessage = (message: string) => {
+      if (message === "") return;
+      // Add user message to conversation
+      const userMessage: Message = new TextMessage({
+        id: Date.now().toString(),
+        text: message,
+        sender: "user",
+        timestamp: new Date(),
+      });
 
-      if (!isEditable && isDynamicMessageType(message.type) && !data) {
-        throw new Error("Portfolio data is required");
-      }
-
-      const risk = isEditable ? riskLevel : data?.risk;
-      const messageStrategies = isEditable ? strategies : data?.strategies;
-
-      return { isEditable, risk, messageStrategies };
+      setConversation((prev) => [...prev, userMessage]);
+      setCommand("");
     };
 
-    const nextStep = (userInput: string, getNextMessage: () => Message) => {
-      const settleMessage = (message: Message) => {
-        const updatedConversation = conversation.map((convMsg) => {
-          if (convMsg.id === message.id) {
-            return {
-              ...convMsg,
-              data: {
-                risk: riskLevel,
-                strategies,
-              },
-            };
-          }
-          return convMsg;
-        });
+    addUserMessage(userInput);
 
-        setConversation(updatedConversation);
-        setIsEditing(false);
-      };
+    try {
+      const nextMsg = new InvestMessage({
+        id: (Date.now() + 1).toString(),
+        text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat’s your investment size (amount)? ",
+        sender: "bot",
+        timestamp: new Date(),
+      });
 
-      settleMessage(conversation[conversation.length - 1]);
-      handleMessage(userInput, getNextMessage);
-    };
-
-    if (message.sender !== "bot") return null;
-
-    const {
-      isEditable,
-      risk: messageRisk,
-      messageStrategies,
-    } = getMessageData(message);
-
-    // 使用組件映射
-    const Component = getComponentByMessageType(message.type);
-    if (!Component) return null;
-
-    // 準備通用 props
-    const commonProps = {
-      isEditable,
-      nextStep,
-      createDefaultMessage: handleDefaultMessage,
-    };
-
-    // 根據消息類型準備特定 props
-    switch (message.type) {
-      case "Invest":
-        return (
-          <InvestmentFormChatWrapper
-            {...commonProps}
-            setSelectedChains={setChains}
-            selectedChains={chains}
-            nextStep={nextStep}
-            setDepositAmount={setDepositAmount}
-          />
-        );
-      case "Portfolio":
-        return (
-          <PortfolioChatWrapper
-            {...commonProps}
-            messageRisk={messageRisk!}
-            setSelectedRiskLevel={setRiskLevel}
-            messageStrategies={messageStrategies!}
-          />
-        );
-      case "Edit":
-        return (
-          <EditChatWrapper
-            {...commonProps}
-            strategies={messageStrategies!}
-            setStrategies={setStrategies}
-          />
-        );
-      case "Review Portfolio":
-        return (
-          <ReviewPortfolioChatWrapper
-            {...commonProps}
-            messageStrategies={messageStrategies!}
-          />
-        );
-      case "Build Portfolio":
-        return (
-          <BuildPortfolioChatWrapper
-            depositAmount={depositAmount}
-            strategies={strategies}
-          />
-        );
-      case "Deposit Funds":
-        return (
-          <DepositChatWrapper
-            {...commonProps}
-            setDepositAmount={setDepositAmount}
-            depositAmount={depositAmount}
-            strategy={{
-              ...BOT_STRATEGY,
-              chainId: chains[0],
-            }}
-          />
-        );
-      case "Find Defi Strategies":
-        return (
-          <FindDefiStrategiesChatWrapper
-            {...commonProps}
-            selectedChains={chains}
-            setSelectedChains={setChains}
-            selectedRiskLevel={riskLevel}
-            setSelectedRiskLevel={setRiskLevel}
-            chainsName={chainsName}
-          />
-        );
-      case "DeFi Strategies Cards":
-        return (
-          <DefiStrategiesCardsChatWrapper
-            selectedChains={chains}
-            selectedRiskLevel={riskLevel}
-          />
-        );
-      default:
-        return null;
+      await handleTypingText(nextMsg);
+      setConversation((prev) => [...prev, nextMsg]);
+    } catch (error) {
+      console.error(error);
+      setConversation((prev) => [
+        ...prev,
+        new TextMessage({
+          id: (Date.now() + 1).toString(),
+          text: "Sorry, I couldn't process your request. Please try again.",
+          sender: "bot",
+          timestamp: new Date(),
+        }),
+      ]);
     }
   };
 
@@ -346,14 +155,15 @@ export default function Home() {
 
   useEffect(() => {
     const latestBotMessages = conversation.filter(
-      (message) => message.sender === "bot"
+      (message) => message.metadata.sender === "bot"
     );
     const latestBotMessage = latestBotMessages[latestBotMessages.length - 1];
 
     setIsInput(
-      latestBotMessage?.type === "Text" ||
-        latestBotMessage?.type === "Find Defi Strategies" ||
-        latestBotMessage?.type === "DeFi Strategies Cards"
+      latestBotMessage instanceof InvestMessage ||
+        latestBotMessage instanceof PortfolioMessage ||
+        latestBotMessage instanceof EditMessage ||
+        latestBotMessage instanceof BuildPortfolioMessage
     );
   }, [conversation]);
 
@@ -395,7 +205,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
                     onClick={() =>
-                      handleMessage("Build a diversified DeFi Portfolio")
+                      testHandleMessage("Build a diversified DeFi Portfolio")
                     }
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
@@ -534,20 +344,22 @@ export default function Home() {
                   {/* Conversion */}
                   {conversation.map((message) => (
                     <div
-                      key={message.id}
+                      key={message.metadata.id}
                       className={`flex flex-col ${
-                        message.sender === "user" ? "items-end" : "items-start"
+                        message.metadata.sender === "user"
+                          ? "items-end"
+                          : "items-start"
                       }`}
                     >
                       <div
                         className={`max-w-[90%] md:max-w-[80%] rounded-2xl py-3 ${
-                          message.sender === "user"
+                          message.metadata.sender === "user"
                             ? "bg-white text-black px-4"
                             : "bg-transparent text-gray-800"
                         }`}
                       >
                         <div className="whitespace-pre-wrap break-words">
-                          {message.text}
+                          {message.metadata.text}
                         </div>
 
                         {/* Render bot message content by response type */}
@@ -555,12 +367,12 @@ export default function Home() {
 
                         <div
                           className={`text-xs mt-3 ${
-                            message.sender === "user"
+                            message.metadata.sender === "user"
                               ? "text-gray-500"
                               : "text-black"
                           }`}
                         >
-                          {format(message.timestamp, "HH:mm")}
+                          {format(message.metadata.timestamp, "HH:mm")}
                         </div>
                       </div>
                     </div>

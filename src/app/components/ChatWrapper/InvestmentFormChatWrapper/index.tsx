@@ -1,78 +1,52 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
-import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
+import type { StrategyMetadata } from "@/app/utils/types";
 import ChainFilter from "@/app/components/StrategyList/ChainFilter";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import type { Message, MessagePortfolioData } from "@/app/types";
-import { MessageType } from "@/app/types";
+import { InvestMessage } from "@/app/classes/message";
 
-export const createDefaultMessage = (type: MessageType) => {
-  return () => {
-    let text = "";
-    let data: MessagePortfolioData | undefined;
-
-    switch (type) {
-      case "Portfolio":
-        text = "What's your Risk/Yield and Airdrop portfolio preference?";
-        type = "Portfolio";
-        break;
-      default:
-        text = "";
-    }
-
-    const res: Message = {
-      id: (Date.now() + 1).toString(),
-      text,
-      sender: "bot",
-      timestamp: new Date(),
-      type,
-      data,
-    };
-
-    return res;
-  };
-};
-
+import type { Message } from "@/app/classes/message";
 interface InvestmentFormChatWrapperProps {
-  nextStep: NextStepFn;
-  setDepositAmount: (amount: string) => void;
-  selectedChains: number[];
-  setSelectedChains: Dispatch<SetStateAction<number[]>>;
+  message: InvestMessage;
+  addBotMessage: (message: Message) => Promise<void>;
 }
 
 const InvestmentFormChatWrapper = ({
-  nextStep,
-  setDepositAmount,
-  selectedChains,
-  setSelectedChains,
+  message,
+  addBotMessage,
 }: InvestmentFormChatWrapperProps) => {
   const [botStrategy, setBotStrategy] =
     useState<StrategyMetadata>(BOT_STRATEGY);
 
+  const [chain, setChain] = useState<number>(message.chain);
+
   useEffect(() => {
     setBotStrategy({
       ...BOT_STRATEGY,
-      chainId: selectedChains[0],
+      chainId: chain,
     });
-  }, [selectedChains]);
+  }, [chain]);
+
+  const handlePortfolio = async (amount: string) => {
+    message.amount = amount;
+    message.chain = chain;
+    await addBotMessage(message.next());
+  };
 
   return (
     <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-gray-300 w-[80%]">
       <div className="flex items-center gap-2">
         <p className="font-[Manrope] font-medium text-sm"> Select Chains </p>
         <ChainFilter
-          selectedChains={selectedChains}
-          setSelectedChains={setSelectedChains}
+          selectedChains={[chain]}
+          setSelectedChain={setChain}
           selectionMode="single"
         />
       </div>
       <InvestmentForm
         strategy={botStrategy}
-        handlePortfolio={(amount: string) => {
-          setDepositAmount(amount);
-          nextStep(amount + " USDT", createDefaultMessage("Portfolio"));
-        }}
+        handlePortfolio={handlePortfolio}
       />
     </div>
   );

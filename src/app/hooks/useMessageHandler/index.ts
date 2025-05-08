@@ -34,7 +34,7 @@ function assertData<T>(
 }
 
 // Start of Selection
-export const useMessageHandler = (config: MessageHandlerConfig) => {
+export const useMessageHandler = () => {
   // Define the logic for handling all message types
   const messageTypeHandlers: MessageTypeHandlers = {
     Text: {

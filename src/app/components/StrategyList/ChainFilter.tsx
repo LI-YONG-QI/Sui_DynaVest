@@ -4,7 +4,8 @@ import { Dispatch, Fragment, SetStateAction } from "react";
 
 interface ChainFilterProps {
   selectedChains: number[];
-  setSelectedChains: Dispatch<SetStateAction<number[]>>;
+  setSelectedChains?: Dispatch<SetStateAction<number[]>>;
+  setSelectedChain?: Dispatch<SetStateAction<number>>;
   className?: string;
   selectionMode?: "single" | "multiple";
 }
@@ -12,6 +13,7 @@ interface ChainFilterProps {
 export default function ChainFilter({
   selectedChains,
   setSelectedChains,
+  setSelectedChain,
   className = "",
   selectionMode = "multiple",
 }: ChainFilterProps) {
@@ -34,13 +36,21 @@ export default function ChainFilter({
               }`}
             onClick={() => {
               if (selectionMode === "single") {
-                setSelectedChains([chain.id]);
+                if (setSelectedChain) {
+                  setSelectedChain(chain.id);
+                } else {
+                  throw new Error("setSelectedChain is required");
+                }
               } else {
-                setSelectedChains((prev) =>
-                  prev.includes(chain.id)
-                    ? prev.filter((id) => id !== chain.id)
-                    : [...prev, chain.id]
-                );
+                if (setSelectedChains) {
+                  setSelectedChains((prev) =>
+                    prev.includes(chain.id)
+                      ? prev.filter((id) => id !== chain.id)
+                      : [...prev, chain.id]
+                  );
+                } else {
+                  throw new Error("setSelectedChains is required");
+                }
               }
             }}
             aria-label={chain.name}
