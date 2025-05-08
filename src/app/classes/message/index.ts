@@ -1,4 +1,8 @@
-import { RiskPortfolioStrategies, StrategiesSet } from "@/app/utils/types";
+import type {
+  RiskLevel,
+  RiskPortfolioStrategies,
+  StrategiesSet,
+} from "@/app/utils/types";
 import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
 import { arbitrum } from "viem/chains";
 
@@ -13,6 +17,14 @@ export abstract class Message {
   constructor(public metadata: MessageMetadata) {}
 
   abstract next(action?: string): Message;
+
+  protected createDefaultMetadata(text: string): MessageMetadata {
+    return {
+      ...this.metadata,
+      text,
+      id: Date.now().toString(),
+    };
+  }
 }
 
 export class TextMessage extends Message {
@@ -38,7 +50,7 @@ export class InvestMessage extends Message {
 
   next(): Message {
     return new PortfolioMessage(
-      { ...this.metadata, text: "Portfolio", id: Date.now().toString() },
+      this.createDefaultMetadata("Portfolio"),
       this.amount,
       this.chain,
       MOCK_STRATEGIES_SET // TODO: get real strategies set
@@ -48,6 +60,7 @@ export class InvestMessage extends Message {
 
 export class PortfolioMessage extends Message {
   public strategies: RiskPortfolioStrategies[] = [];
+  public risk: RiskLevel = "low";
 
   constructor(
     metadata: MessageMetadata,
@@ -61,10 +74,13 @@ export class PortfolioMessage extends Message {
   next(action: "build" | "edit"): Message {
     switch (action) {
       case "build":
-        return new BuildPortfolioMessage(this.metadata, this.strategies);
+        return new BuildPortfolioMessage(
+          this.createDefaultMetadata("Build"),
+          this.strategies
+        );
       case "edit":
         return new EditMessage(
-          this.metadata,
+          this.createDefaultMetadata("Edit"),
           this.amount,
           this.chain,
           this.strategies
