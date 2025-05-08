@@ -28,6 +28,9 @@ export type MessageType =
   | (typeof StaticMessageType)[number]
   | (typeof DynamicMessageType)[number];
 
+/**
+ * @deprecated use Message from classes/message instead
+ */
 export interface Message {
   id: string;
   text: string;

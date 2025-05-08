@@ -1,14 +1,7 @@
 import React from "react";
 import { FileCheck, MoveUpRight } from "lucide-react";
 
-import { RiskPortfolioStrategies } from "@/app/utils/types";
-import { Message } from "@/app/classes/message";
 import { BuildPortfolioMessage } from "@/app/classes/message";
-
-// interface BuildPortfolioChatWrapperProps {
-//   depositAmount: string;
-//   strategies: RiskPortfolioStrategies[];
-// }
 
 interface BuildPortfolioChatWrapperProps {
   message: BuildPortfolioMessage;

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 
 import { RiskLevel, RiskPortfolioStrategies } from "@/app/utils/types";
-import { RiskBadgeList } from "../../RiskBadgeList";
+import type { Message, PortfolioMessage } from "@/app/classes/message";
 import { RISK_OPTIONS } from "@/app/utils/constants/risk";
-import { getRiskDescription } from "../../RiskPortfolio";
-
-import type { Message } from "@/app/classes/message";
-import { PortfolioMessage } from "@/app/classes/message";
 import { createPieChartStrategies } from "@/app/utils/pie";
+import { getRiskDescription } from "../../RiskPortfolio";
 import { PortfolioPieChart } from "../../RiskPortfolio/PieChart";
+import { RiskBadgeList } from "../../RiskBadgeList";
 
 interface PortfolioChatWrapperProps {
   message: PortfolioMessage;
