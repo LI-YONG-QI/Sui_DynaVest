@@ -50,7 +50,7 @@ export class InvestMessage extends Message {
 
   next(): Message {
     return new PortfolioMessage(
-      this.createDefaultMetadata("Portfolio"),
+      this.createDefaultMetadata(`Portfolio: ${this.amount} USDC`),
       this.amount,
       this.chain,
       MOCK_STRATEGIES_SET // TODO: get real strategies set
@@ -64,9 +64,9 @@ export class PortfolioMessage extends Message {
 
   constructor(
     metadata: MessageMetadata,
-    public amount: string,
-    public chain: number,
-    public strategiesSet: StrategiesSet
+    public readonly amount: string,
+    public readonly chain: number,
+    public readonly strategiesSet: StrategiesSet
   ) {
     super(metadata);
   }
@@ -93,15 +93,49 @@ export class PortfolioMessage extends Message {
 export class EditMessage extends Message {
   constructor(
     metadata: MessageMetadata,
-    public amount: string,
-    public chain: number,
+    public readonly amount: string,
+    public readonly chain: number,
     public strategies: RiskPortfolioStrategies[]
   ) {
     super(metadata);
   }
 
   next(): Message {
-    return new TextMessage(this.metadata);
+    return new ReviewPortfolioMessage(
+      this.createDefaultMetadata("Review"),
+      this.amount,
+      this.chain,
+      this.strategies
+    );
+  }
+}
+
+export class ReviewPortfolioMessage extends Message {
+  constructor(
+    metadata: MessageMetadata,
+    public readonly amount: string,
+    public readonly chain: number,
+    public readonly strategies: RiskPortfolioStrategies[]
+  ) {
+    super(metadata);
+  }
+
+  next(action: "build" | "edit"): Message {
+    switch (action) {
+      case "build":
+        return new BuildPortfolioMessage(
+          this.createDefaultMetadata("Build"),
+          this.amount,
+          this.strategies
+        );
+      case "edit":
+        return new EditMessage(
+          this.createDefaultMetadata("Edit"),
+          this.amount,
+          this.chain,
+          this.strategies
+        );
+    }
   }
 }
 
@@ -124,5 +158,38 @@ export class BuildPortfolioMessage extends Message {
     });
 
     console.log("Portfolio built successfully");
+  }
+}
+
+export class DepositMessage extends Message {
+  constructor(
+    metadata: MessageMetadata,
+    public amount: string,
+    public readonly chain: number,
+    public strategies: RiskPortfolioStrategies[]
+  ) {
+    super(metadata);
+  }
+
+  next(action: "build" | "portfolio"): Message {
+    switch (action) {
+      case "portfolio":
+        return new PortfolioMessage(
+          this.createDefaultMetadata(`Portfolio: ${this.amount} USDC`),
+          this.amount,
+          this.chain,
+          MOCK_STRATEGIES_SET
+        );
+      case "build":
+        return new BuildPortfolioMessage(
+          this.createDefaultMetadata("Build"),
+          this.amount,
+          this.strategies
+        );
+    }
+  }
+
+  execute(): void {
+    console.log("Deposit executed successfully");
   }
 }

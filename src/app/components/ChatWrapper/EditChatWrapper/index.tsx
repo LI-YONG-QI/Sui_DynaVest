@@ -1,32 +1,37 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { useState } from "react";
 
-import type { Message, MessageType } from "@/app/types";
 import type { RiskPortfolioStrategies } from "@/app/utils/types";
 
 import ChangePercentList from "../../ChangePercentList";
+import { EditMessage } from "@/app/classes/message";
+import { Message } from "@/app/classes/message";
 
 interface EditChatWrapperProps {
-  strategies: RiskPortfolioStrategies[];
-  isEditable: boolean;
-  setStrategies: Dispatch<SetStateAction<RiskPortfolioStrategies[]>>;
-  nextStep: (userInput: string, getNextMessage: () => Message) => void;
-  createDefaultMessage: (type: MessageType) => () => Message;
+  message: EditMessage;
+  addBotMessage: (message: Message) => Promise<void>;
 }
 
 const EditChatWrapper: React.FC<EditChatWrapperProps> = ({
-  strategies,
-  isEditable,
-  setStrategies,
-  nextStep,
-  createDefaultMessage,
+  message,
+  addBotMessage,
 }) => {
+  const [strategies, setStrategies] = useState<RiskPortfolioStrategies[]>(
+    message.strategies
+  );
+
+  const nextMessage = async () => {
+    // Settle message attributes
+    message.strategies = strategies;
+    await addBotMessage(message.next());
+  };
+
   return (
     <div className="overflow-x-auto max-w-full">
       <ChangePercentList
         riskPortfolioStrategies={strategies}
         setRiskPortfolioStrategies={setStrategies}
-        isEditable={isEditable}
-        nextStep={() => nextStep("", createDefaultMessage("Review Portfolio"))}
+        isEditable={true} // TODO: mock true
+        nextStep={nextMessage}
       />
     </div>
   );

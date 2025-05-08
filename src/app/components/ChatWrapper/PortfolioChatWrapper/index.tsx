@@ -10,15 +10,6 @@ import { PortfolioMessage } from "@/app/classes/message";
 import { createPieChartStrategies } from "@/app/utils/pie";
 import { PortfolioPieChart } from "../../RiskPortfolio/PieChart";
 
-// interface PortfolioDisplayProps {
-//   messageRisk: RiskLevel;
-//   isEditable: boolean;
-//   setSelectedRiskLevel: Dispatch<SetStateAction<RiskLevel>>;
-//   messageStrategies: RiskPortfolioStrategies[];
-//   nextStep: (userInput: string, getNextMessage: () => Message) => void;
-//   createDefaultMessage: (type: MessageType) => () => Message;
-// }
-
 interface PortfolioChatWrapperProps {
   message: PortfolioMessage;
   addBotMessage: (message: Message) => Promise<void>;

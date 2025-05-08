@@ -36,6 +36,8 @@ import {
   BuildPortfolioMessage,
   InvestMessage,
   TextMessage,
+  ReviewPortfolioMessage,
+  DepositMessage,
 } from "./classes/message";
 
 export default function Home() {
@@ -106,13 +108,27 @@ export default function Home() {
       );
     } else if (message instanceof BuildPortfolioMessage) {
       return <BuildPortfolioChatWrapper message={message} />;
+    } else if (message instanceof EditMessage) {
+      return (
+        <EditChatWrapper message={message} addBotMessage={addBotMessage} />
+      );
+    } else if (message instanceof ReviewPortfolioMessage) {
+      return (
+        <ReviewPortfolioChatWrapper
+          message={message}
+          addBotMessage={addBotMessage}
+        />
+      );
+    } else if (message instanceof DepositMessage) {
+      return (
+        <DepositChatWrapper message={message} addBotMessage={addBotMessage} />
+      );
     }
   };
 
   const testHandleMessage = async (userInput: string) => {
     const addUserMessage = (message: string) => {
       if (message === "") return;
-      // Add user message to conversation
       const userMessage: Message = new TextMessage({
         id: Date.now().toString(),
         text: message,
