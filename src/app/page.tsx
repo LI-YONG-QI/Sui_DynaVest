@@ -105,11 +105,7 @@ export default function Home() {
         <PortfolioChatWrapper message={message} addBotMessage={addBotMessage} />
       );
     } else if (message instanceof BuildPortfolioMessage) {
-      return (
-        <BuildPortfolioChatWrapper
-          message={message}
-          addBotMessage={addBotMessage}
-      );
+      return <BuildPortfolioChatWrapper message={message} />;
     }
   };
 

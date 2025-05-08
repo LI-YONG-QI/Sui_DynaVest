@@ -2,26 +2,31 @@ import React from "react";
 import { FileCheck, MoveUpRight } from "lucide-react";
 
 import { RiskPortfolioStrategies } from "@/app/utils/types";
+import { Message } from "@/app/classes/message";
+import { BuildPortfolioMessage } from "@/app/classes/message";
+
+// interface BuildPortfolioChatWrapperProps {
+//   depositAmount: string;
+//   strategies: RiskPortfolioStrategies[];
+// }
 
 interface BuildPortfolioChatWrapperProps {
-  depositAmount: string;
-  strategies: RiskPortfolioStrategies[];
+  message: BuildPortfolioMessage;
 }
 
 const BuildPortfolioChatWrapper: React.FC<BuildPortfolioChatWrapperProps> = ({
-  depositAmount,
-  strategies,
+  message,
 }) => {
   return (
     <div className="flex flex-col gap-4">
       <p className="mt-4 text-lg font-bold">
-        ${depositAmount} USDC Portfolio complete!
+        ${message.amount} USDC Portfolio complete!
       </p>
       <div className="flex flex-col gap-2">
-        {strategies.map((strategy, index) => (
+        {message.strategies.map((strategy, index) => (
           <p className="text-sm text-gray-400" key={index}>
             {strategy.title} {strategy.allocation}% $
-            {(strategy.allocation * Number(depositAmount)) / 100}
+            {(strategy.allocation * Number(message.amount)) / 100}
           </p>
         ))}
       </div>

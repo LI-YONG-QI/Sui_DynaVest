@@ -34,9 +34,10 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
   );
 
   const nextMessage = async (action: "build" | "edit") => {
+    // Settle message attributes
     message.risk = risk;
-    const n = message.next(action);
-    await addBotMessage(n);
+    message.strategies = strategies;
+    await addBotMessage(message.next(action));
   };
 
   useEffect(() => {

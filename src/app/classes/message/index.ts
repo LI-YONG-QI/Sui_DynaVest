@@ -76,6 +76,7 @@ export class PortfolioMessage extends Message {
       case "build":
         return new BuildPortfolioMessage(
           this.createDefaultMetadata("Build"),
+          this.amount,
           this.strategies
         );
       case "edit":
@@ -107,6 +108,7 @@ export class EditMessage extends Message {
 export class BuildPortfolioMessage extends Message {
   constructor(
     metadata: MessageMetadata,
+    public amount: string,
     public strategies: RiskPortfolioStrategies[]
   ) {
     super(metadata);
