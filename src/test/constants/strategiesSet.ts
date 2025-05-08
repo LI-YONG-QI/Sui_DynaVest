@@ -1,9 +1,9 @@
-import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
+import { STRATEGIES_METADATA } from "@/constants/strategies";
 import type {
   StrategiesSet,
   RiskLevel,
   RiskPortfolioStrategies,
-} from "@/app/utils/types";
+} from "@/types";
 
 // Helper function to convert StrategyMetadata to RiskPortfolioStrategies with allocation
 const addAllocation = (
@@ -75,16 +75,8 @@ const generateAllocations = (
           Math.round((val / arr.reduce((a, b) => a + b, 0)) * 100)
         );
 
-    // case "high airdrop potential":
-    //   // Focus on the first airdrop strategy
-    //   if (count === 1) return [100];
-    //   if (count === 2) return [80, 20];
-    //   return [70, 30];
-
-    // case "balanced":
-    // default:
-    //   // Equal allocation
-    //   return Array(count).fill(Math.round(100 / count));
+    default:
+      throw new Error("Invalid risk type");
   }
 };
 

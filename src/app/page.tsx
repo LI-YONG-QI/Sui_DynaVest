@@ -4,18 +4,7 @@ import { useState, KeyboardEvent, useRef, useEffect } from "react";
 import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
 
-import type { Message } from "@/app/classes/message";
-import useChatbot from "@/app/hooks/useChatbotResponse";
-import { useChat } from "@/app/contexts/ChatContext";
-import {
-  PortfolioChatWrapper,
-  EditChatWrapper,
-  ReviewPortfolioChatWrapper,
-  BuildPortfolioChatWrapper,
-  InvestmentFormChatWrapper,
-  DepositChatWrapper,
-  DefiStrategiesCardsChatWrapper,
-} from "@/app/components/ChatWrapper";
+import type { Message } from "@/classes/message";
 import {
   EditMessage,
   PortfolioMessage,
@@ -26,9 +15,21 @@ import {
   DepositMessage,
   FindStrategiesMessage,
   StrategiesCardsMessage,
-} from "./classes/message";
-import { BotResponse } from "./utils/types";
-import FindStrategiesChatWrapper from "./components/ChatWrapper/FindStrategiesChatWrapper";
+} from "@/classes/message";
+import useChatbot from "@/hooks/useChatbotResponse";
+import { useChat } from "@/contexts/ChatContext";
+import {
+  PortfolioChatWrapper,
+  EditChatWrapper,
+  ReviewPortfolioChatWrapper,
+  BuildPortfolioChatWrapper,
+  InvestmentFormChatWrapper,
+  DepositChatWrapper,
+  DefiStrategiesCardsChatWrapper,
+} from "@/components/ChatWrapper";
+import { BotResponse } from "@/types";
+
+import FindStrategiesChatWrapper from "@/components/ChatWrapper/FindStrategiesChatWrapper";
 import { arbitrum } from "viem/chains";
 export default function Home() {
   const [isInput, setIsInput] = useState(false);

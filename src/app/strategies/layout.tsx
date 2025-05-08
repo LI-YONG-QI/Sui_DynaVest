@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
-import { useChat } from "../contexts/ChatContext";
+
+import { useChat } from "@/contexts/ChatContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { openChat } = useChat();

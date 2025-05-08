@@ -1,6 +1,6 @@
 "use client";
 
-import StrategyList from "../components/StrategyList";
+import StrategyList from "@/components/StrategyList";
 
 export default function StrategiesPage() {
   return (

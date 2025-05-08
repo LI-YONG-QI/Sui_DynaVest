@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { AaveV3Strategy } from "@/app/server/aave";
-import type { AaveParams } from "@/app/utils/strategies/aave";
+import { AaveV3Strategy } from "@/server/aave";
+import type { AaveParams } from "@/classes/strategies/aave";
 
 export async function GET() {
   return NextResponse.json({ message: "Hello, world!" });

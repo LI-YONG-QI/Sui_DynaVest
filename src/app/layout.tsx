@@ -8,12 +8,13 @@ import {
   Bricolage_Grotesque,
 } from "next/font/google";
 import localFont from "next/font/local";
+
 import "./globals.css";
 import Providers from "@/providers";
-import Header from "./components/Header";
-import BottomNav from "./components/BottomNav";
-import { ChatProvider } from "./contexts/ChatContext";
-import Chatroom from "./components/Chatroom";
+import Header from "@/components/Header";
+import BottomNav from "@/components/BottomNav";
+import { ChatProvider } from "@/contexts/ChatContext";
+import Chatroom from "@/components/Chatroom";
 import { ToastContainer } from "react-toastify";
 
 const lilyScript = localFont({
