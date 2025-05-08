@@ -3,30 +3,15 @@
 import { useState, KeyboardEvent, useRef, useEffect } from "react";
 import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
-import { useAccount } from "wagmi";
-import { useBalance } from "wagmi";
-import { parseUnits } from "viem";
 
-// import type { Message, MessageType } from "./types";
 import type { Message } from "@/app/classes/message";
-
-import { DynamicMessageType } from "./types";
 import useChatbot from "@/app/hooks/useChatbotResponse";
-import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
-import { usePortfolio } from "@/app/hooks/usePortfolio";
-import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
 import { useChat } from "@/app/contexts/ChatContext";
-import { getChainName } from "@/app/utils/constants/chains";
-import type { BotResponse, RiskLevel } from "@/app/utils/types";
-import { useMessageHandler } from "@/app/hooks/useMessageHandler";
-import { getComponentByMessageType } from "@/app/components/ChatWrapper/ChatComponentMap";
 import {
   PortfolioChatWrapper,
   EditChatWrapper,
   ReviewPortfolioChatWrapper,
   BuildPortfolioChatWrapper,
-  FindDefiStrategiesChatWrapper,
-  DefiStrategiesCardsChatWrapper,
   InvestmentFormChatWrapper,
   DepositChatWrapper,
 } from "@/app/components/ChatWrapper";
@@ -39,6 +24,7 @@ import {
   ReviewPortfolioMessage,
   DepositMessage,
 } from "./classes/message";
+import { BotResponse } from "./utils/types";
 
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
@@ -54,14 +40,40 @@ export default function Home() {
 
   const { closeChat } = useChat();
 
-  const addBotMessage = async (message: Message) => {
-    console.log("From Bot");
-    console.log(message);
+  const parseBotResponse = (botResponse: BotResponse) => {
+    let nextMessage: Message;
 
+    switch (botResponse.type) {
+      case "build_portfolio":
+        nextMessage = new InvestMessage({
+          id: (Date.now() + 1).toString(),
+          text: "Invest start",
+          sender: "bot",
+          timestamp: new Date(),
+        });
+        break;
+      case "question":
+        if (!botResponse.data?.answer) {
+          throw new Error("Invalid bot response data");
+        }
+        nextMessage = new TextMessage({
+          id: (Date.now() + 1).toString(),
+          text: botResponse.data?.answer,
+          sender: "bot",
+          timestamp: new Date(),
+        });
+        break;
+      default:
+        throw new Error("Invalid bot response type");
+    }
+
+    return nextMessage;
+  };
+
+  const addBotMessage = async (message: Message) => {
     await handleTypingText(message);
     setConversation((prev) => [...prev, message]);
   };
-
   /// HANDLE FUNCTIONS ///
   const handleHotTopic = (topic: string) => {
     setCommand(topic);
@@ -126,7 +138,7 @@ export default function Home() {
     }
   };
 
-  const testHandleMessage = async (userInput: string) => {
+  const handleMessage = async (userInput: string) => {
     const addUserMessage = (message: string) => {
       if (message === "") return;
       const userMessage: Message = new TextMessage({
@@ -143,15 +155,11 @@ export default function Home() {
     addUserMessage(userInput);
 
     try {
-      const nextMsg = new InvestMessage({
-        id: (Date.now() + 1).toString(),
-        text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat’s your investment size (amount)? ",
-        sender: "bot",
-        timestamp: new Date(),
-      });
+      const botResponse = await sendMessage(userInput);
+      const nextMessage = parseBotResponse(botResponse);
 
-      await handleTypingText(nextMsg);
-      setConversation((prev) => [...prev, nextMsg]);
+      await handleTypingText(nextMessage);
+      setConversation((prev) => [...prev, nextMessage]);
     } catch (error) {
       console.error(error);
       setConversation((prev) => [
@@ -177,12 +185,7 @@ export default function Home() {
     );
     const latestBotMessage = latestBotMessages[latestBotMessages.length - 1];
 
-    setIsInput(
-      latestBotMessage instanceof InvestMessage ||
-        latestBotMessage instanceof PortfolioMessage ||
-        latestBotMessage instanceof EditMessage ||
-        latestBotMessage instanceof BuildPortfolioMessage
-    );
+    setIsInput(latestBotMessage instanceof TextMessage);
   }, [conversation]);
 
   useEffect(() => {
@@ -223,7 +226,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
                     onClick={() =>
-                      testHandleMessage("Build a diversified DeFi Portfolio")
+                      handleMessage("Build a diversified DeFi Portfolio")
                     }
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
@@ -233,10 +236,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
                     onClick={() =>
-                      handleMessage(
-                        "Analyze and adjust my DeFi Portfolio",
-                        handleDefaultMessage("Build Portfolio")
-                      )
+                      handleMessage("Analyze and adjust my DeFi Portfolio")
                     }
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
