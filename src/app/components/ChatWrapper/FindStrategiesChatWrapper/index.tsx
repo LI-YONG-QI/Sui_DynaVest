@@ -17,10 +17,13 @@ const FindStrategiesChatWrapper: FC<FindStrategiesChatWrapperProps> = ({
   message,
   addBotMessage,
 }) => {
-  const [chain, setChain] = useState<number>(message.chain);
-  const [risk, setRisk] = useState<RiskLevel>("low");
+  const [chains, setChains] = useState<number[]>(message.chains);
+  const [risk, setRisk] = useState<RiskLevel>(message.risk);
 
   const nextMessage = async () => {
+    message.chains = chains;
+    message.risk = risk;
+
     await addBotMessage(message.next());
   };
 
@@ -28,7 +31,7 @@ const FindStrategiesChatWrapper: FC<FindStrategiesChatWrapperProps> = ({
     <div className="mt-4 flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <p className="font-[Manrope] font-medium text-sm">Select Chains</p>
-        <ChainFilter selectedChains={[chain]} setSelectedChain={setChain} />
+        <ChainFilter selectedChains={chains} setSelectedChains={setChains} />
       </div>
       <div className="flex items-center gap-2">
         <p className="font-[Manrope] font-medium text-sm">Select Risk</p>

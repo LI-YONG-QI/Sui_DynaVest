@@ -1,20 +1,19 @@
 import React from "react";
 
-import type { RiskLevel } from "@/app/utils/types";
 import StrategyListChatWrapper from "../StrategyListChatWrapper";
+import { StrategiesCardsMessage } from "@/app/classes/message";
 
 interface DefiStrategiesCardsChatWrapperProps {
-  selectedChains: number[];
-  selectedRiskLevel: RiskLevel;
+  message: StrategiesCardsMessage;
 }
 
 const DefiStrategiesCardsChatWrapper: React.FC<
   DefiStrategiesCardsChatWrapperProps
-> = ({ selectedChains, selectedRiskLevel }) => {
+> = ({ message }) => {
   return (
     <StrategyListChatWrapper
-      selectedChains={selectedChains}
-      selectedRiskLevel={selectedRiskLevel}
+      selectedChains={message.chains}
+      selectedRiskLevel={message.risk}
     />
   );
 };

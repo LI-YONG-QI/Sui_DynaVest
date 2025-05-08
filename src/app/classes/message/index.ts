@@ -209,26 +209,19 @@ export class DepositMessage extends Message {
 }
 
 export class FindStrategiesMessage extends Message {
-  public risk: RiskLevel = "low";
-  public chain: number = arbitrum.id;
-
-  constructor(metadata: MessageMetadata, _risk?: RiskLevel, _chain?: number) {
+  constructor(
+    metadata: MessageMetadata,
+    public risk: RiskLevel,
+    public chains: number[]
+  ) {
     super(metadata);
-
-    if (_risk) {
-      this.risk = _risk;
-    }
-
-    if (_chain) {
-      this.chain = _chain;
-    }
   }
 
   next(): Message {
     return new StrategiesCardsMessage(
       this.createDefaultMetadata("DeFi Strategies Cards"),
       this.risk,
-      this.chain
+      this.chains
     );
   }
 }
@@ -237,7 +230,7 @@ export class StrategiesCardsMessage extends Message {
   constructor(
     metadata: MessageMetadata,
     public readonly risk: RiskLevel,
-    public readonly chain: number
+    public readonly chains: number[]
   ) {
     super(metadata);
   }

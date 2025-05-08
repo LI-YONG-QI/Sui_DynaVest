@@ -14,6 +14,7 @@ import {
   BuildPortfolioChatWrapper,
   InvestmentFormChatWrapper,
   DepositChatWrapper,
+  DefiStrategiesCardsChatWrapper,
 } from "@/app/components/ChatWrapper";
 import {
   EditMessage,
@@ -24,9 +25,11 @@ import {
   ReviewPortfolioMessage,
   DepositMessage,
   FindStrategiesMessage,
+  StrategiesCardsMessage,
 } from "./classes/message";
 import { BotResponse } from "./utils/types";
 import FindStrategiesChatWrapper from "./components/ChatWrapper/FindStrategiesChatWrapper";
+import { arbitrum } from "viem/chains";
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
   const [command, setCommand] = useState("");
@@ -54,15 +57,32 @@ export default function Home() {
         });
         break;
       case "question":
-        if (!botResponse.data?.answer) {
+        if (!botResponse.data.answer) {
           throw new Error("Invalid bot response data");
         }
         nextMessage = new TextMessage({
           id: (Date.now() + 1).toString(),
-          text: botResponse.data?.answer,
+          text: botResponse.data.answer,
           sender: "bot",
           timestamp: new Date(),
         });
+        break;
+      case "strategies":
+        const chains = botResponse.data.chain
+          ? [botResponse.data.chain]
+          : [arbitrum.id];
+        const riskLevel = botResponse.data.risk_level || "low";
+
+        nextMessage = new FindStrategiesMessage(
+          {
+            id: (Date.now() + 1).toString(),
+            text: "Find strategies",
+            sender: "bot",
+            timestamp: new Date(),
+          },
+          riskLevel,
+          chains
+        );
         break;
       default:
         throw new Error("Invalid bot response type");
@@ -157,6 +177,8 @@ export default function Home() {
           addBotMessage={addBotMessage}
         />
       );
+    } else if (message instanceof StrategiesCardsMessage) {
+      return <DefiStrategiesCardsChatWrapper message={message} />;
     }
   };
 

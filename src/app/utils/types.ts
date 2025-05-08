@@ -92,7 +92,7 @@ export type NextStepFn = (
 
 export type BotResponse = {
   type: BotResponseType;
-  data?: BotResponseData;
+  data: BotResponseData;
 };
 
 export type BotResponseType =
@@ -102,8 +102,8 @@ export type BotResponseType =
   | "analyze_portfolio";
 
 export type BotResponseData = {
-  risk_level: string;
-  chain: string;
+  risk_level: RiskLevel;
+  chain: number;
 } & {
   answer: string;
 };
