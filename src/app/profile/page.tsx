@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import AssetsTableComponent from "../components/Profile/AssetsTable";
-import StrategiesTableComponent from "../components/Profile/StrategiesTable";
-import TransactionsTableComponent from "../components/Profile/TransactionsTable";
+
+import AssetsTableComponent from "@/components/Profile/AssetsTable";
+import StrategiesTableComponent from "@/components/Profile/StrategiesTable";
+import TransactionsTableComponent from "@/components/Profile/TransactionsTable";
 
 const PROFILE_TABS = [
   {

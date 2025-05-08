@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import type { MorphoParams } from "@/app/utils/strategies/morpho";
-import { MorphoSupplyingStrategy } from "@/app/server/morpho";
-import { MorphoSupportedChains } from "@/app/utils/constants/protocols/morpho";
+import type { MorphoParams } from "@/classes/strategies/morpho";
+import { MorphoSupportedChains } from "@/constants/protocols/morpho";
+import { MorphoSupplyingStrategy } from "@/server/morpho";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as MorphoParams;
