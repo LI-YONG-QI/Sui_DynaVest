@@ -6,7 +6,7 @@ import {
   EditChatWrapper,
   ReviewPortfolioChatWrapper,
   BuildPortfolioChatWrapper,
-  FindDefiStrategiesChatWrapper,
+  FindStrategiesChatWrapper,
   DefiStrategiesCardsChatWrapper,
   InvestmentFormChatWrapper,
   DepositChatWrapper,
@@ -25,7 +25,7 @@ export const chatComponentMap: ComponentMap = {
   "Review Portfolio": ReviewPortfolioChatWrapper,
   "Build Portfolio": BuildPortfolioChatWrapper,
   "Deposit Funds": DepositChatWrapper,
-  "Find Defi Strategies": FindDefiStrategiesChatWrapper,
+  "Find Defi Strategies": FindStrategiesChatWrapper,
   "DeFi Strategies Cards": DefiStrategiesCardsChatWrapper,
 };
 

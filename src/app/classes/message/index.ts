@@ -207,3 +207,44 @@ export class DepositMessage extends Message {
     console.log("Deposit executed successfully");
   }
 }
+
+export class FindStrategiesMessage extends Message {
+  public risk: RiskLevel = "low";
+  public chain: number = arbitrum.id;
+
+  constructor(metadata: MessageMetadata, _risk?: RiskLevel, _chain?: number) {
+    super(metadata);
+
+    if (_risk) {
+      this.risk = _risk;
+    }
+
+    if (_chain) {
+      this.chain = _chain;
+    }
+  }
+
+  next(): Message {
+    return new StrategiesCardsMessage(
+      this.createDefaultMetadata("DeFi Strategies Cards"),
+      this.risk,
+      this.chain
+    );
+  }
+}
+
+export class StrategiesCardsMessage extends Message {
+  constructor(
+    metadata: MessageMetadata,
+    public readonly risk: RiskLevel,
+    public readonly chain: number
+  ) {
+    super(metadata);
+  }
+
+  next(): Message {
+    throw new Error(
+      "StrategiesCardsMessage does not have default next message"
+    );
+  }
+}

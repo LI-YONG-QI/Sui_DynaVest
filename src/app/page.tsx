@@ -23,9 +23,10 @@ import {
   TextMessage,
   ReviewPortfolioMessage,
   DepositMessage,
+  FindStrategiesMessage,
 } from "./classes/message";
 import { BotResponse } from "./utils/types";
-
+import FindStrategiesChatWrapper from "./components/ChatWrapper/FindStrategiesChatWrapper";
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
   const [command, setCommand] = useState("");
@@ -74,6 +75,20 @@ export default function Home() {
     await handleTypingText(message);
     setConversation((prev) => [...prev, message]);
   };
+
+  const addUserMessage = (message: string) => {
+    if (message === "") return;
+    const userMessage: Message = new TextMessage({
+      id: Date.now().toString(),
+      text: message,
+      sender: "user",
+      timestamp: new Date(),
+    });
+
+    setConversation((prev) => [...prev, userMessage]);
+    setCommand("");
+  };
+
   /// HANDLE FUNCTIONS ///
   const handleHotTopic = (topic: string) => {
     setCommand(topic);
@@ -135,23 +150,17 @@ export default function Home() {
       return (
         <DepositChatWrapper message={message} addBotMessage={addBotMessage} />
       );
+    } else if (message instanceof FindStrategiesMessage) {
+      return (
+        <FindStrategiesChatWrapper
+          message={message}
+          addBotMessage={addBotMessage}
+        />
+      );
     }
   };
 
   const handleMessage = async (userInput: string) => {
-    const addUserMessage = (message: string) => {
-      if (message === "") return;
-      const userMessage: Message = new TextMessage({
-        id: Date.now().toString(),
-        text: message,
-        sender: "user",
-        timestamp: new Date(),
-      });
-
-      setConversation((prev) => [...prev, userMessage]);
-      setCommand("");
-    };
-
     addUserMessage(userInput);
 
     try {

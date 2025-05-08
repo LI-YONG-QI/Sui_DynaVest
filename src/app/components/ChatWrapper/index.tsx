@@ -1,7 +1,7 @@
 import ReviewPortfolioChatWrapper from "./ReviewPortfolioChatWrapper";
 import BuildPortfolioChatWrapper from "./BuildPortfolioChatWrapper";
 import EditChatWrapper from "./EditChatWrapper";
-import FindDefiStrategiesChatWrapper from "./FindDefiStrategiesChatWrapper";
+import FindStrategiesChatWrapper from "./FindStrategiesChatWrapper";
 import DefiStrategiesCardsChatWrapper from "./DefiStrategiesCardsChatWrapper";
 import PortfolioChatWrapper from "./PortfolioChatWrapper";
 import DepositChatWrapper from "./DepositChatWrapper";
@@ -11,7 +11,7 @@ export {
   ReviewPortfolioChatWrapper,
   BuildPortfolioChatWrapper,
   EditChatWrapper,
-  FindDefiStrategiesChatWrapper,
+  FindStrategiesChatWrapper,
   DefiStrategiesCardsChatWrapper,
   PortfolioChatWrapper,
   DepositChatWrapper,
