@@ -68,6 +68,8 @@ export default function Home() {
   });
 
   const chainsName = chains.map((chainId) => getChainName(chainId)).join(" / ");
+  const hasEnoughBalance =
+    parseUnits(depositAmount, 6) <= (balance?.value ?? BigInt(0));
 
   // 使用消息處理器
   const { createBotMessage, createDefaultMessage } = useMessageHandler({
@@ -76,11 +78,8 @@ export default function Home() {
     chains,
     depositAmount,
     chainsName,
-    hasEnoughBalance:
-      parseUnits(depositAmount, 6) <= (balance?.value ?? BigInt(0)),
+    hasEnoughBalance,
   });
-
-  // 創建消息配置
 
   /**
    * Process response from backend & Create a bot message

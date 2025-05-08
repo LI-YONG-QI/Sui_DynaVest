@@ -11,9 +11,9 @@ export type MessagePortfolioData = {
 
 export const StaticMessageType = [
   "Text",
-  "DeFi Strategies Cards",
+  "Strategies Cards",
   "Deposit Funds",
-  "Find Defi Strategies",
+  "Find Strategies",
   "Review Portfolio",
 ] as const;
 

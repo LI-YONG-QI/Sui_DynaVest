@@ -37,8 +37,18 @@ function assertData<T>(
 export const useMessageHandler = (config: MessageHandlerConfig) => {
   // Define the logic for handling all message types
   const messageTypeHandlers: MessageTypeHandlers = {
+    Text: {
+      text: "",
+    },
     Invest: {
       text: "What's your investment size (Base by default)?",
+      data: {
+        risk: config.riskLevel,
+        strategies: config.strategies,
+      },
+    },
+    Portfolio: {
+      text: "What's your Risk/Yield and Airdrop portfolio preference?",
       data: {
         risk: config.riskLevel,
         strategies: config.strategies,
@@ -51,7 +61,7 @@ export const useMessageHandler = (config: MessageHandlerConfig) => {
         strategies: config.strategies,
       },
     },
-    "DeFi Strategies Cards": {
+    "Strategies Cards": {
       text: `Here're some ${config.riskLevel} risk DeFi yield strategies from reputable and secured platform on ${config.chainsName}`,
       data: {
         risk: config.riskLevel,
@@ -76,7 +86,10 @@ export const useMessageHandler = (config: MessageHandlerConfig) => {
       modifyType: () =>
         config.hasEnoughBalance ? "Build Portfolio" : "Deposit Funds",
     },
-    "Find Defi Strategies": {
+    "Deposit Funds": {
+      text: "Oops, you have insufficient balance in your wallet. You can deposit or change amount.",
+    },
+    "Find Strategies": {
       text: "We will diversify your token into reputable and secured yield protocols based on your preference.",
       data: {
         risk: config.riskLevel,
@@ -89,6 +102,7 @@ export const useMessageHandler = (config: MessageHandlerConfig) => {
   const createBotMessage = (botResponse: BotResponse): Message => {
     let data: MessagePortfolioData | undefined;
     const baseConfig = BOT_DEFAULT_RESPONSE_MAP[botResponse.type];
+
     let text = baseConfig.text;
     const type = baseConfig.type;
 
@@ -109,6 +123,7 @@ export const useMessageHandler = (config: MessageHandlerConfig) => {
         // Data does not need to be set for this type, riskLevel and chains are set externally
         break;
       case "build_portfolio":
+        // TODO: remove the unused data
         data = {
           risk: config.riskLevel,
           strategies: config.strategies,
