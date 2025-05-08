@@ -28,7 +28,17 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
     // Settle message attributes
     message.risk = risk;
     message.strategies = strategies;
-    await addBotMessage(message.next(action));
+
+    if (action === "build") {
+      // 判斷金額
+      if (Number(message.amount) < 100) {
+        await addBotMessage(message.next("deposit"));
+      } else {
+        await addBotMessage(message.next("build"));
+      }
+    } else {
+      await addBotMessage(message.next(action));
+    }
   };
 
   useEffect(() => {

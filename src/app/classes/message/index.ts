@@ -71,7 +71,7 @@ export class PortfolioMessage extends Message {
     super(metadata);
   }
 
-  next(action: "build" | "edit"): Message {
+  next(action: "build" | "edit" | "deposit"): Message {
     switch (action) {
       case "build":
         return new BuildPortfolioMessage(
@@ -82,6 +82,13 @@ export class PortfolioMessage extends Message {
       case "edit":
         return new EditMessage(
           this.createDefaultMetadata("Edit"),
+          this.amount,
+          this.chain,
+          this.strategies
+        );
+      case "deposit":
+        return new DepositMessage(
+          this.createDefaultMetadata("Deposit"),
           this.amount,
           this.chain,
           this.strategies
@@ -120,7 +127,7 @@ export class ReviewPortfolioMessage extends Message {
     super(metadata);
   }
 
-  next(action: "build" | "edit"): Message {
+  next(action: "build" | "edit" | "deposit"): Message {
     switch (action) {
       case "build":
         return new BuildPortfolioMessage(
@@ -131,6 +138,13 @@ export class ReviewPortfolioMessage extends Message {
       case "edit":
         return new EditMessage(
           this.createDefaultMetadata("Edit"),
+          this.amount,
+          this.chain,
+          this.strategies
+        );
+      case "deposit":
+        return new DepositMessage(
+          this.createDefaultMetadata("Deposit"),
           this.amount,
           this.chain,
           this.strategies

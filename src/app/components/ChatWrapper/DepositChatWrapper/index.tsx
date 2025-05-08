@@ -9,6 +9,8 @@ import { RiskBadge } from "../../RiskPortfolio";
 import InvestmentForm from "../../StrategyList/StrategyCard/InvestModal/InvestmentForm";
 import CopyButton from "../../CopyButton";
 import { DepositMessage, Message } from "@/app/classes/message";
+import { USDC } from "@/app/utils/constants/coins";
+import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
 
 const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 
@@ -25,7 +27,7 @@ const DepositChatWrapper = ({
   const [selectedAction, setSelectedAction] = useState<string>("Deposit");
   const [isDeposit, setIsDeposit] = useState(false); // TODO: deal deposit logic
 
-  const usdc = message.strategies[0].tokens[0].chains![message.chain];
+  const usdc = USDC.chains![message.chain];
   const { data: balance } = useBalance({
     address,
     token: usdc,
@@ -104,7 +106,7 @@ const DepositChatWrapper = ({
       ) : (
         <div className="w-[80%]">
           <InvestmentForm
-            strategy={message.strategies[0]}
+            strategy={{ ...BOT_STRATEGY, chainId: message.chain }}
             handlePortfolio={(amount: string) => {
               message.amount = amount;
               nextMessage("portfolio");

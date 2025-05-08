@@ -14,9 +14,16 @@ const ReviewPortfolioChatWrapper: React.FC<ReviewPortfolioChatWrapperProps> = ({
   addBotMessage,
 }) => {
   const nextMessage = async (action: "build" | "edit") => {
-
-    
-    await addBotMessage(message.next(action));
+    if (action === "build") {
+      // 判斷金額
+      if (Number(message.amount) < 100) {
+        await addBotMessage(message.next("deposit"));
+      } else {
+        await addBotMessage(message.next(action));
+      }
+    } else {
+      await addBotMessage(message.next(action));
+    }
   };
 
   return (
