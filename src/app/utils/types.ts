@@ -35,7 +35,7 @@ export type InvestStrategy = {
   title: string;
   apy: number;
   risk: {
-    level: "Low" | "Medium" | "High";
+    level: RiskLevel;
     color: string;
     bgColor: string;
   };
@@ -84,9 +84,20 @@ export type StrategiesSet = Record<RiskLevel, RiskPortfolioStrategies[]>;
 
 export type DepositAction = "Deposit" | "Change Amount";
 
-export type NextStepFn = (
-  userInput: string,
-  sendMsg: (message: string) => Promise<{
-    result: string;
-  }>
-) => void;
+export type BotResponse = {
+  type: BotResponseType;
+  data: BotResponseData;
+};
+
+export type BotResponseType =
+  | "strategies"
+  | "question"
+  | "build_portfolio"
+  | "analyze_portfolio";
+
+export type BotResponseData = {
+  risk_level: RiskLevel;
+  chain: number;
+} & {
+  answer: string;
+};

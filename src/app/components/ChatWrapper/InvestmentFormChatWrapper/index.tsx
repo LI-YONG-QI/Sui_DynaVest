@@ -1,51 +1,55 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
-import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
+import type { StrategyMetadata } from "@/app/utils/types";
 import ChainFilter from "@/app/components/StrategyList/ChainFilter";
 import InvestmentForm from "@/app/components/StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import { sendMockPortfolioMessage } from "@/test/sendMock";
+import { InvestMessage } from "@/app/classes/message";
 
+import type { Message } from "@/app/classes/message";
 interface InvestmentFormChatWrapperProps {
-  nextStep: NextStepFn;
-  setDepositAmount: (amount: string) => void;
-  selectedChains: number[];
-  setSelectedChains: Dispatch<SetStateAction<number[]>>;
+  message: InvestMessage;
+  addBotMessage: (message: Message) => Promise<void>;
 }
 
-export const InvestmentFormChatWrapper = ({
-  nextStep,
-  setDepositAmount,
-  selectedChains,
-  setSelectedChains,
+const InvestmentFormChatWrapper = ({
+  message,
+  addBotMessage,
 }: InvestmentFormChatWrapperProps) => {
   const [botStrategy, setBotStrategy] =
     useState<StrategyMetadata>(BOT_STRATEGY);
 
+  const [chain, setChain] = useState<number>(message.chain);
+
   useEffect(() => {
     setBotStrategy({
       ...BOT_STRATEGY,
-      chainId: selectedChains[0],
+      chainId: chain,
     });
-  }, [selectedChains]);
+  }, [chain]);
+
+  const handlePortfolio = async (amount: string) => {
+    message.amount = amount;
+    message.chain = chain;
+    await addBotMessage(message.next());
+  };
 
   return (
     <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-gray-300 w-[80%]">
       <div className="flex items-center gap-2">
         <p className="font-[Manrope] font-medium text-sm"> Select Chains </p>
         <ChainFilter
-          selectedChains={selectedChains}
-          setSelectedChains={setSelectedChains}
+          selectedChains={[chain]}
+          setSelectedChain={setChain}
           selectionMode="single"
         />
       </div>
       <InvestmentForm
         strategy={botStrategy}
-        handlePortfolio={(amount: string) => {
-          setDepositAmount(amount);
-          nextStep(amount + " USDT", sendMockPortfolioMessage);
-        }}
+        handlePortfolio={handlePortfolio}
       />
     </div>
   );
 };
+
+export default InvestmentFormChatWrapper;

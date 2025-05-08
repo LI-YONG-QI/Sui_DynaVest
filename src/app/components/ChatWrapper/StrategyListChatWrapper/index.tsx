@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 
-import StrategyCard from "../StrategyList/StrategyCard";
 import { StrategyMetadata } from "@/app/utils/types";
 import { RiskLevel } from "@/app/utils/types";
 import { STRATEGIES_METADATA } from "@/app/utils/constants/strategies";
+import StrategyCard from "../../StrategyList/StrategyCard";
 
 interface StrategyListChatWrapperProps {
   selectedRiskLevel: RiskLevel;

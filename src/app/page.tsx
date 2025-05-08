@@ -1,38 +1,35 @@
 "use client";
 
 import { useState, KeyboardEvent, useRef, useEffect } from "react";
-import { Undo2, FileCheck, MoveUpRight } from "lucide-react";
+import { Undo2 } from "lucide-react";
 import { format } from "date-fns";
 
-import type { Message, MessagePortfolioData, MessageType } from "./types";
+import type { Message } from "@/app/classes/message";
 import useChatbot from "@/app/hooks/useChatbotResponse";
-import RiskPortfolio, {
-  getRiskDescription,
-} from "@/app/components/RiskPortfolio";
-import ChangePercentList from "@/app/components/ChangePercentList";
-import { InvestmentFormChatWrapper } from "@/app/components/InvestmentFormChatWrapper";
+import { useChat } from "@/app/contexts/ChatContext";
 import {
-  sendMockChangePercentageMessage,
-  sendMockReviewMessage,
-  sendMockInvestMessage,
-  sendMockBuildPortfolioMessage,
-  sendMockFindDeFiStrategiesMessage,
-  sendMockDeFiStrategiesCardMessage,
-} from "@/test/sendMock";
-import { MOCK_STRATEGIES_SET } from "@/test/constants/strategiesSet";
-import { useStrategiesSet } from "@/app/hooks/useStrategiesSet";
-import { RiskBadgeList } from "./components/RiskBadgeList";
-import DepositChatWrapper from "./components/DepositChatWrapper";
-import { BOT_STRATEGY } from "./utils/constants/strategies";
-import { useChat } from "./contexts/ChatContext";
-import { useAccount, useBalance } from "wagmi";
-import { parseUnits } from "viem";
-import ChainFilter from "./components/StrategyList/ChainFilter";
-import { RISK_OPTIONS } from "./utils/constants/risk";
-import Button from "./components/Button";
-import StrategyListChatWrapper from "./components/StrategyListChatWrapper";
-import { getChainName } from "./utils/constants/chains";
-
+  PortfolioChatWrapper,
+  EditChatWrapper,
+  ReviewPortfolioChatWrapper,
+  BuildPortfolioChatWrapper,
+  InvestmentFormChatWrapper,
+  DepositChatWrapper,
+  DefiStrategiesCardsChatWrapper,
+} from "@/app/components/ChatWrapper";
+import {
+  EditMessage,
+  PortfolioMessage,
+  BuildPortfolioMessage,
+  InvestMessage,
+  TextMessage,
+  ReviewPortfolioMessage,
+  DepositMessage,
+  FindStrategiesMessage,
+  StrategiesCardsMessage,
+} from "./classes/message";
+import { BotResponse } from "./utils/types";
+import FindStrategiesChatWrapper from "./components/ChatWrapper/FindStrategiesChatWrapper";
+import { arbitrum } from "viem/chains";
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
   const [command, setCommand] = useState("");
@@ -40,182 +37,76 @@ export default function Home() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [depositAmount, setDepositAmount] = useState<string>("");
-  const {
-    selectedChains,
-    setSelectedChains,
-    selectedRiskLevel,
-    setSelectedRiskLevel,
-    selectedStrategies,
-    setSelectedStrategies,
-  } = useStrategiesSet(MOCK_STRATEGIES_SET); // TODO: remove mock data
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const { mutateAsync: sendMessage, isPending: loadingBotResponse } =
     useChatbot();
+
   const { closeChat } = useChat();
 
-  const { address } = useAccount();
-  const { data: balance } = useBalance({
-    address,
-    token: BOT_STRATEGY.tokens[0].chains![selectedChains[0]],
-    chainId: selectedChains[0],
-  });
+  const parseBotResponse = (botResponse: BotResponse) => {
+    let nextMessage: Message;
 
-  const chainsName = selectedChains
-    .map((chainId) => getChainName(chainId))
-    .join(" / ");
-
-  // Create a mapping between bot response results and message types
-
-  const BOT_RESPONSE_MAP: Record<
-    string,
-    {
-      type: MessageType;
-      text: string;
-      isEdit: boolean;
-      shouldIncludeData?: boolean;
-    }
-  > = {
-    build_portfolio: {
-      type: "Invest",
-      text: "We will diversify your token into reputable and secured yield protocols based on your preference.\nWhat's your investment size (Base by default)? ",
-      isEdit: false,
-    },
-    pie_chart: {
-      type: "Portfolio",
-      text: "What's your Risk/Yield and Airdrop portfolio preference?",
-      isEdit: true,
-    },
-    edit_portfolio: {
-      type: "Edit",
-      text: "",
-      isEdit: true,
-    },
-    review_portfolio: {
-      type: "Review Portfolio",
-      text: "",
-      isEdit: false,
-      shouldIncludeData: true,
-    },
-    middle_risk_strategy: {
-      type: "Find Defi Strategies",
-      text: "No problem. What's your Chain and Risk preference? I'll find DeFi strategies meet your preference. ",
-      isEdit: true,
-    },
-    defi_strategies_card: {
-      type: "DeFi Strategies Cards",
-      text: `Here're some ${selectedRiskLevel} risk DeFi yield strategies from reputable and secured platform on ${chainsName}`,
-      isEdit: false,
-    },
-  };
-
-  const createBotMessage = (botResponse: { result: string }): Message => {
-    let type: MessageType = "Text";
-    let text = "";
-    let data: MessagePortfolioData | undefined;
-
-    // Handle the special case for insufficient balance first
-    if (botResponse.result === "build_portfolio_completed") {
-      if (parseUnits(depositAmount, 6) > (balance?.value ?? BigInt(0))) {
-        type = "Deposit Funds";
-        text =
-          "Oops, you have insufficient balance in your wallet. You can deposit or change amount.";
-
-        setIsEditing(true);
-      } else {
-        type = "Build Portfolio";
-        text = "Start building portfolio...";
-      }
-    } else {
-      // Use the mapping for other cases
-      const config = BOT_RESPONSE_MAP[botResponse.result];
-
-      if (config) {
-        type = config.type;
-        text = config.text;
-
-        setIsEditing(config.isEdit);
-      } else {
-        // Default case
-        text = botResponse.result;
-      }
-    }
-
-    // Include portfolio data when needed for rendering
-    if (
-      type === "Review Portfolio" ||
-      type === "Deposit Funds" ||
-      type === "Find Defi Strategies" ||
-      type === "DeFi Strategies Cards"
-    ) {
-      data = {
-        risk: selectedRiskLevel,
-        strategies: selectedStrategies,
-      };
-    }
-
-    // Create the message object
-    const botMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      text,
-      sender: "bot",
-      timestamp: new Date(),
-      type,
-      data,
-    };
-
-    return botMessage;
-  };
-
-  const getMessageData = (message: Message) => {
-    const validateEditable = (message: Message) => {
-      return (
-        message.id === conversation[conversation.length - 1].id && // The latest message conversation
-        isEditing === true
-      );
-    };
-
-    const { data } = message;
-    const isEditable = validateEditable(message);
-
-    if (!isEditable && !data) {
-      throw new Error("Portfolio data is required");
-    }
-
-    const risk = isEditable ? selectedRiskLevel : data!.risk;
-    const strategies = isEditable ? selectedStrategies : data!.strategies;
-
-    return { isEditable, risk, strategies };
-  };
-
-  const nextStep = (
-    userInput: string,
-    sendMsg: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => {
-    const settleMessage = (message: Message) => {
-      // Update the message with the current data
-      const updatedConversation = conversation.map((convMsg) => {
-        if (convMsg.id === message.id) {
-          return {
-            ...convMsg,
-            data: {
-              risk: selectedRiskLevel,
-              strategies: selectedStrategies,
-            },
-          };
+    switch (botResponse.type) {
+      case "build_portfolio":
+        nextMessage = new InvestMessage({
+          id: (Date.now() + 1).toString(),
+          text: "Invest start",
+          sender: "bot",
+          timestamp: new Date(),
+        });
+        break;
+      case "question":
+        if (!botResponse.data.answer) {
+          throw new Error("Invalid bot response data");
         }
-        return convMsg;
-      });
+        nextMessage = new TextMessage({
+          id: (Date.now() + 1).toString(),
+          text: botResponse.data.answer,
+          sender: "bot",
+          timestamp: new Date(),
+        });
+        break;
+      case "strategies":
+        const chains = botResponse.data.chain
+          ? [botResponse.data.chain]
+          : [arbitrum.id];
+        const riskLevel = botResponse.data.risk_level || "low";
 
-      setConversation(updatedConversation);
-      setIsEditing(false);
-    };
+        nextMessage = new FindStrategiesMessage(
+          {
+            id: (Date.now() + 1).toString(),
+            text: "Find strategies",
+            sender: "bot",
+            timestamp: new Date(),
+          },
+          riskLevel,
+          chains
+        );
+        break;
+      default:
+        throw new Error("Invalid bot response type");
+    }
 
-    settleMessage(conversation[conversation.length - 1]);
-    handleMessage(userInput, sendMsg);
+    return nextMessage;
+  };
+
+  const addBotMessage = async (message: Message) => {
+    await handleTypingText(message);
+    setConversation((prev) => [...prev, message]);
+  };
+
+  const addUserMessage = (message: string) => {
+    if (message === "") return;
+    const userMessage: Message = new TextMessage({
+      id: Date.now().toString(),
+      text: message,
+      sender: "user",
+      timestamp: new Date(),
+    });
+
+    setConversation((prev) => [...prev, userMessage]);
+    setCommand("");
   };
 
   /// HANDLE FUNCTIONS ///
@@ -227,58 +118,10 @@ export default function Home() {
     }, 0);
   };
 
-  const handleMessage = async (
-    userInput: string,
-    sendMsg: (message: string) => Promise<{
-      result: string;
-    }>
-  ) => {
-    const addUserMessage = (message: string) => {
-      if (message === "") return;
-      // Add user message to conversation
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        text: message,
-        sender: "user",
-        timestamp: new Date(),
-        type: "Text",
-      };
-
-      setConversation((prev) => [...prev, userMessage]);
-      setCommand("");
-    };
-
-    addUserMessage(userInput);
-
-    try {
-      const botResponse = await sendMsg(userInput);
-      if (!botResponse || !botResponse.result) return;
-
-      // Replace "build_portfolio_2" with "build_portfolio_completed"
-      if (botResponse.result === "build_portfolio_2") {
-        botResponse.result = "build_portfolio_completed";
-      }
-
-      const botMessage = createBotMessage(botResponse);
-
-      await handleTypingText(botMessage);
-    } catch {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Sorry, I couldn't process your request. Please try again.",
-        sender: "bot",
-        timestamp: new Date(),
-        type: "Text",
-      };
-
-      setConversation((prev) => [...prev, errorMessage]);
-    }
-  };
-
   const handleTypingText = async (botMessage: Message) => {
     setIsTyping(true);
     let currentText = "";
-    const textToType = botMessage.text;
+    const textToType = botMessage.metadata.text;
 
     for (let i = 0; i < textToType.length; i++) {
       currentText += textToType[i];
@@ -289,203 +132,76 @@ export default function Home() {
 
     setIsTyping(false);
     setTypingText("");
-    setConversation((prev) => [...prev, botMessage]);
   };
-
   // Handle key press in input field
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && command.trim() !== "") {
       e.preventDefault();
-      handleMessage(command, sendMessage);
+      handleMessage(command);
     }
   };
 
   const renderBotMessageContent = (message: Message) => {
-    if (message.sender !== "bot") return null;
+    if (message instanceof InvestMessage) {
+      return (
+        <InvestmentFormChatWrapper
+          message={message}
+          addBotMessage={addBotMessage}
+        />
+      );
+    } else if (message instanceof PortfolioMessage) {
+      return (
+        <PortfolioChatWrapper message={message} addBotMessage={addBotMessage} />
+      );
+    } else if (message instanceof BuildPortfolioMessage) {
+      return <BuildPortfolioChatWrapper message={message} />;
+    } else if (message instanceof EditMessage) {
+      return (
+        <EditChatWrapper message={message} addBotMessage={addBotMessage} />
+      );
+    } else if (message instanceof ReviewPortfolioMessage) {
+      return (
+        <ReviewPortfolioChatWrapper
+          message={message}
+          addBotMessage={addBotMessage}
+        />
+      );
+    } else if (message instanceof DepositMessage) {
+      return (
+        <DepositChatWrapper message={message} addBotMessage={addBotMessage} />
+      );
+    } else if (message instanceof FindStrategiesMessage) {
+      return (
+        <FindStrategiesChatWrapper
+          message={message}
+          addBotMessage={addBotMessage}
+        />
+      );
+    } else if (message instanceof StrategiesCardsMessage) {
+      return <DefiStrategiesCardsChatWrapper message={message} />;
+    }
+  };
 
-    // Use a mapping between message types and their render functions
-    switch (message.type) {
-      case "Invest":
-        return (
-          <InvestmentFormChatWrapper
-            selectedChains={selectedChains}
-            setSelectedChains={setSelectedChains}
-            nextStep={nextStep}
-            setDepositAmount={setDepositAmount}
-          />
-        );
-      case "Portfolio": {
-        const {
-          isEditable,
-          risk: messageRisk,
-          strategies,
-        } = getMessageData(message);
+  const handleMessage = async (userInput: string) => {
+    addUserMessage(userInput);
 
-        return (
-          <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
-            <div className="w-full max-w-[320px] md:max-w-none">
-              <div className="flex flex-col gap-3">
-                <div className="rounded-[0px_10px_10px_10px] p-4 flex flex-col gap-6">
-                  {/* Risk preference selection */}
-                  <RiskBadgeList
-                    selectedRisk={messageRisk}
-                    isEditable={isEditable}
-                    setSelectedRiskLevel={setSelectedRiskLevel}
-                    options={RISK_OPTIONS}
-                  />
+    try {
+      const botResponse = await sendMessage(userInput);
+      const nextMessage = parseBotResponse(botResponse);
 
-                  <div className="flex items-center">
-                    <p className="text-gray text-xs md:text-sm font-normal px-1">
-                      {getRiskDescription(messageRisk)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <RiskPortfolio
-                buildPortfolio={() =>
-                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
-                }
-                changePercent={() =>
-                  nextStep("Change percentage", sendMockChangePercentageMessage)
-                }
-                riskPortfolioStrategies={strategies}
-              />
-            </div>
-          </div>
-        );
-      }
-      case "Edit": {
-        const { isEditable, strategies } = getMessageData(message);
-
-        return (
-          <div className="overflow-x-auto max-w-full">
-            <ChangePercentList
-              riskPortfolioStrategies={strategies}
-              setRiskPortfolioStrategies={setSelectedStrategies}
-              isEditable={isEditable}
-              nextStep={() => nextStep("", sendMockReviewMessage)}
-            />
-          </div>
-        );
-      }
-      case "Review Portfolio": {
-        const { strategies } = getMessageData(message);
-
-        return (
-          <div className="mt-4 overflow-x-auto max-w-full w-full flex justify-center">
-            <div className="w-full min-w-[600px] md:max-w-none">
-              <RiskPortfolio
-                buildPortfolio={() =>
-                  nextStep("Build portfolio", sendMockBuildPortfolioMessage)
-                }
-                changePercent={() =>
-                  nextStep("Change percentage", sendMockChangePercentageMessage)
-                }
-                riskPortfolioStrategies={strategies}
-              />
-            </div>
-          </div>
-        );
-      }
-      case "Build Portfolio": {
-        return (
-          <div className="flex flex-col gap-4">
-            <p className="mt-4 text-lg font-bold">
-              ${depositAmount} USDC Portfolio complete!
-            </p>
-            <div className="flex flex-col gap-2">
-              {selectedStrategies.map((strategy, index) => (
-                <p className="text-sm text-gray-400" key={index}>
-                  {strategy.title} {strategy.allocation}% $
-                  {(strategy.allocation * Number(depositAmount)) / 100}
-                </p>
-              ))}
-            </div>
-            <div className="flex gap-5">
-              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
-                <FileCheck />
-                <span className="text-sm font-semibold">
-                  Check my portfolio
-                </span>
-              </button>
-              <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
-                <MoveUpRight />
-                <span className="text-sm font-semibold">
-                  Explore more DeFi Investment
-                </span>
-              </button>
-            </div>
-          </div>
-        );
-      }
-      case "Deposit Funds": {
-        const { isEditable } = getMessageData(message);
-
-        return (
-          <DepositChatWrapper
-            setDepositAmount={setDepositAmount}
-            depositAmount={depositAmount}
-            isEditable={isEditable}
-            nextStep={nextStep}
-            strategy={{
-              ...BOT_STRATEGY,
-              chainId: selectedChains[0],
-            }}
-          />
-        );
-      }
-      case "Find Defi Strategies": {
-        const { isEditable } = getMessageData(message);
-
-        return (
-          <div className="mt-4 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <p className="font-[Manrope] font-medium text-sm">
-                Select Chains
-              </p>
-              <ChainFilter
-                selectedChains={selectedChains}
-                setSelectedChains={setSelectedChains}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <p className="font-[Manrope] font-medium text-sm">Select Risk</p>
-              <RiskBadgeList
-                selectedRisk={selectedRiskLevel}
-                setSelectedRiskLevel={setSelectedRiskLevel}
-                options={RISK_OPTIONS.filter(
-                  (option) =>
-                    option !== "Balanced" && option !== "High Airdrop Potential"
-                )}
-                isEditable={isEditable}
-              />
-            </div>
-            <Button
-              onClick={() =>
-                nextStep(
-                  `Find ${selectedRiskLevel} risk DeFi strategies on ${chainsName}`,
-                  sendMockDeFiStrategiesCardMessage
-                )
-              }
-              text="Find DeFi Strategies"
-              icon={<MoveUpRight />}
-            />
-          </div>
-        );
-      }
-
-      case "DeFi Strategies Cards": {
-        return (
-          <StrategyListChatWrapper
-            selectedChains={selectedChains}
-            selectedRiskLevel={selectedRiskLevel}
-          />
-        );
-      }
-
-      default:
-        return null;
+      await handleTypingText(nextMessage);
+      setConversation((prev) => [...prev, nextMessage]);
+    } catch (error) {
+      console.error(error);
+      setConversation((prev) => [
+        ...prev,
+        new TextMessage({
+          id: (Date.now() + 1).toString(),
+          text: "Sorry, I couldn't process your request. Please try again.",
+          sender: "bot",
+          timestamp: new Date(),
+        }),
+      ]);
     }
   };
 
@@ -496,15 +212,11 @@ export default function Home() {
 
   useEffect(() => {
     const latestBotMessages = conversation.filter(
-      (message) => message.sender === "bot"
+      (message) => message.metadata.sender === "bot"
     );
     const latestBotMessage = latestBotMessages[latestBotMessages.length - 1];
 
-    setIsInput(
-      latestBotMessage?.type === "Text" ||
-        latestBotMessage?.type === "Find Defi Strategies" ||
-        latestBotMessage?.type === "DeFi Strategies Cards"
-    );
+    setIsInput(latestBotMessage instanceof TextMessage);
   }, [conversation]);
 
   useEffect(() => {
@@ -545,10 +257,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
                     onClick={() =>
-                      handleMessage(
-                        "Build a diversified DeFi Portfolio",
-                        sendMockInvestMessage
-                      )
+                      handleMessage("Build a diversified DeFi Portfolio")
                     }
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
@@ -558,10 +267,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
                     onClick={() =>
-                      handleMessage(
-                        "Analyze and adjust my DeFi Portfolio",
-                        sendMessage
-                      )
+                      handleMessage("Analyze and adjust my DeFi Portfolio")
                     }
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
@@ -570,9 +276,7 @@ export default function Home() {
                   </button>
                   <button
                     className="w-full bg-[#5F79F1] text-white rounded-[11px] py-3 px-4 flex justify-center items-center"
-                    onClick={() =>
-                      handleMessage("Deposit into my wallet", sendMessage)
-                    }
+                    onClick={() => handleMessage("Deposit into my wallet")}
                   >
                     <span className="font-[Manrope] font-semibold text-base text-center">
                       Deposit into my wallet
@@ -590,10 +294,7 @@ export default function Home() {
                   <button
                     className="w-full bg-[rgba(255,255,255,0.7)] text-black rounded-[14px] py-1.5 px-5 flex items-center gap-1.5"
                     onClick={() =>
-                      handleMessage(
-                        "Help me find the best DeFi strategies",
-                        sendMockFindDeFiStrategiesMessage
-                      )
+                      handleMessage("Help me find the best DeFi strategies")
                     }
                   >
                     <span className="font-[Manrope] font-bold text-sm">
@@ -649,7 +350,7 @@ export default function Home() {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  handleMessage(command, sendMessage);
+                  handleMessage(command);
                 }}
                 disabled={command.trim() === ""}
                 className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"
@@ -692,20 +393,22 @@ export default function Home() {
                   {/* Conversion */}
                   {conversation.map((message) => (
                     <div
-                      key={message.id}
+                      key={message.metadata.id}
                       className={`flex flex-col ${
-                        message.sender === "user" ? "items-end" : "items-start"
+                        message.metadata.sender === "user"
+                          ? "items-end"
+                          : "items-start"
                       }`}
                     >
                       <div
                         className={`max-w-[90%] md:max-w-[80%] rounded-2xl py-3 ${
-                          message.sender === "user"
+                          message.metadata.sender === "user"
                             ? "bg-white text-black px-4"
                             : "bg-transparent text-gray-800"
                         }`}
                       >
                         <div className="whitespace-pre-wrap break-words">
-                          {message.text}
+                          {message.metadata.text}
                         </div>
 
                         {/* Render bot message content by response type */}
@@ -713,12 +416,12 @@ export default function Home() {
 
                         <div
                           className={`text-xs mt-3 ${
-                            message.sender === "user"
+                            message.metadata.sender === "user"
                               ? "text-gray-500"
                               : "text-black"
                           }`}
                         >
-                          {format(message.timestamp, "HH:mm")}
+                          {format(message.metadata.timestamp, "HH:mm")}
                         </div>
                       </div>
                     </div>
@@ -773,7 +476,7 @@ export default function Home() {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    handleMessage(command, sendMessage);
+                    handleMessage(command);
                   }}
                   disabled={command.trim() === ""}
                   className="flex justify-center items-center min-w-[50px] h-[50px] bg-gradient-to-r from-[#AF95E3] to-[#7BA9E9] p-2 rounded-lg disabled:opacity-50 shrink-0"

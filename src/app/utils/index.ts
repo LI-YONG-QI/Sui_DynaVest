@@ -1,17 +1,19 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import type { RiskLevel } from "./types";
+
 export const getRiskColor = (risk: {
-  level: "Low" | "Medium" | "High";
+  level: RiskLevel;
   color: string;
   bgColor: string;
 }) => {
   switch (risk.level) {
-    case "Low":
+    case "low":
       return { text: "#10B981", bg: "rgba(16, 185, 129, 0.3)" };
-    case "Medium":
+    case "medium":
       return { text: "#B9AB15", bg: "rgba(230, 212, 9, 0.3)" };
-    case "High":
+    case "high":
       return { text: "#E83033", bg: "rgba(232, 48, 51, 0.3)" };
   }
 };

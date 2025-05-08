@@ -1,45 +1,37 @@
-import React, { SetStateAction, Dispatch, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { MoveUpRight } from "lucide-react";
 import { MoonLoader } from "react-spinners";
 import { QRCodeSVG } from "qrcode.react";
 import { parseUnits } from "viem";
-import {
-  sendMockBuildPortfolioMessage,
-  sendMockPortfolioMessage,
-} from "@/test/sendMock";
-import { RiskBadge } from "../RiskPortfolio";
-import type { NextStepFn, StrategyMetadata } from "@/app/utils/types";
-import InvestmentForm from "../StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import CopyButton from "../CopyButton";
+
+import { RiskBadge } from "../../RiskPortfolio";
+import InvestmentForm from "../../StrategyList/StrategyCard/InvestModal/InvestmentForm";
+import CopyButton from "../../CopyButton";
+import { DepositMessage, Message } from "@/app/classes/message";
+import { USDC } from "@/app/utils/constants/coins";
+import { BOT_STRATEGY } from "@/app/utils/constants/strategies";
 
 const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 
-type DepositChatWrapperProps = {
-  isEditable: boolean;
-  nextStep: NextStepFn;
-  depositAmount: string;
-  setDepositAmount: Dispatch<SetStateAction<string>>;
-  strategy: StrategyMetadata;
-};
+interface DepositChatWrapperProps {
+  message: DepositMessage;
+  addBotMessage: (message: Message) => Promise<void>;
+}
 
 const DepositChatWrapper = ({
-  isEditable,
-  nextStep,
-  depositAmount,
-  setDepositAmount,
-  strategy,
+  message,
+  addBotMessage,
 }: DepositChatWrapperProps) => {
   const { address } = useAccount();
   const [selectedAction, setSelectedAction] = useState<string>("Deposit");
   const [isDeposit, setIsDeposit] = useState(false); // TODO: deal deposit logic
 
-  const chainId = strategy.chainId;
-  const usdc = strategy.tokens[0].chains![chainId];
-  const { data: balance, dataUpdatedAt } = useBalance({
+  const usdc = USDC.chains![message.chain];
+  const { data: balance } = useBalance({
     address,
     token: usdc,
-    chainId,
+    chainId: message.chain,
     query: {
       enabled: !isDeposit,
       refetchInterval: 3 * 1000,
@@ -48,14 +40,15 @@ const DepositChatWrapper = ({
 
   const uri = `ethereum:${address}`;
 
-  console.log(balance);
-  console.log(dataUpdatedAt);
-
   useEffect(() => {
     if (balance?.value) {
-      setIsDeposit(balance.value > BigInt(parseUnits(depositAmount, 6)));
+      setIsDeposit(balance.value > BigInt(parseUnits(message.amount, 6)));
     }
-  }, [balance, depositAmount]);
+  }, [balance, message.amount]);
+
+  const nextMessage = async (action: "build" | "portfolio") => {
+    await addBotMessage(message.next(action));
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -67,7 +60,7 @@ const DepositChatWrapper = ({
             key={action}
             label={action}
             isSelected={action === selectedAction}
-            isEditable={isEditable}
+            isEditable={true} // TODO: mock true
             setSelectedRiskLevel={setSelectedAction}
           />
         ))}
@@ -93,9 +86,7 @@ const DepositChatWrapper = ({
               <>
                 <p>Deposit successfully</p>
                 <button
-                  onClick={() =>
-                    nextStep("Build portfolio", sendMockBuildPortfolioMessage)
-                  }
+                  onClick={() => nextMessage("build")}
                   className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
                 >
                   <MoveUpRight />
@@ -115,10 +106,10 @@ const DepositChatWrapper = ({
       ) : (
         <div className="w-[80%]">
           <InvestmentForm
-            strategy={strategy}
+            strategy={{ ...BOT_STRATEGY, chainId: message.chain }}
             handlePortfolio={(amount: string) => {
-              setDepositAmount(amount);
-              nextStep(amount + " USDT", sendMockPortfolioMessage);
+              message.amount = amount;
+              nextMessage("portfolio");
             }}
           />
         </div>

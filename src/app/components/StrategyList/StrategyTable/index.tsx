@@ -1,15 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+
 import { getRiskColor } from "@/app/utils";
 import { useChat } from "@/app/contexts/ChatContext";
-
+import type { RiskLevel } from "@/app/utils/types";
 interface StrategyTableProps {
   strategies: Array<{
     title: string;
     apy: number;
     risk: {
-      level: "Low" | "Medium" | "High";
+      level: RiskLevel;
       color: string;
       bgColor: string;
     };
