@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { FileCheck, MoveUpRight } from "lucide-react";
 
 import { BuildPortfolioMessage } from "@/classes/message";
+import Button from "@/components/Button";
 
 interface BuildPortfolioChatWrapperProps {
   message: BuildPortfolioMessage;
@@ -10,6 +11,8 @@ interface BuildPortfolioChatWrapperProps {
 const BuildPortfolioChatWrapper: React.FC<BuildPortfolioChatWrapperProps> = ({
   message,
 }) => {
+  const [isEdit, setIsEdit] = useState(true);
+
   return (
     <div className="flex flex-col gap-4">
       <p className="mt-4 text-lg font-bold">
@@ -24,16 +27,18 @@ const BuildPortfolioChatWrapper: React.FC<BuildPortfolioChatWrapperProps> = ({
         ))}
       </div>
       <div className="flex gap-5">
-        <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
-          <FileCheck />
-          <span className="text-sm font-semibold">Check my portfolio</span>
-        </button>
-        <button className="flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5">
-          <MoveUpRight />
-          <span className="text-sm font-semibold">
-            Explore more DeFi Investment
-          </span>
-        </button>
+        <Button
+          onClick={() => setIsEdit(false)}
+          text="Check my portfolio"
+          disabled={!isEdit}
+          icon={<FileCheck />}
+        />
+        <Button
+          onClick={() => setIsEdit(false)}
+          text="Explore more DeFi Investment"
+          disabled={!isEdit}
+          icon={<MoveUpRight />}
+        />
       </div>
     </div>
   );

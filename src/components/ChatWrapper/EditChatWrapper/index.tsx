@@ -18,10 +18,14 @@ const EditChatWrapper: React.FC<EditChatWrapperProps> = ({
   const [strategies, setStrategies] = useState<RiskPortfolioStrategies[]>(
     message.strategies
   );
+  const [isEdit, setIsEdit] = useState(true);
 
   const nextMessage = async () => {
     // Settle message attributes
     message.strategies = strategies;
+
+    setIsEdit(false);
+
     await addBotMessage(message.next());
   };
 
@@ -30,7 +34,7 @@ const EditChatWrapper: React.FC<EditChatWrapperProps> = ({
       <ChangePercentList
         riskPortfolioStrategies={strategies}
         setRiskPortfolioStrategies={setStrategies}
-        isEditable={true} // TODO: mock true
+        isEditable={isEdit}
         nextStep={nextMessage}
       />
     </div>

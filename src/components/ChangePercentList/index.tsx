@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { Percent } from "lucide-react";
+
 import type { RiskPortfolioStrategies } from "@/types";
 import { toast } from "react-toastify";
+import Button from "../Button";
 
 export type ChangePercentStrategy = {
   name: string;
@@ -98,27 +101,12 @@ const ChangePercentList = ({
           </React.Fragment>
         ))}
       </div>
-      <button
+      <Button
         onClick={reviewChange}
-        className="bg-[#5F79F1] text-white font-[Manrope] font-semibold text-sm rounded-lg py-3.5 px-5 flex gap-2.5"
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M12 5V19M5 12H19"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        Review Percentage
-      </button>
+        text="Review Percentage"
+        disabled={!isEditable}
+        icon={<Percent />}
+      />
     </div>
   );
 };

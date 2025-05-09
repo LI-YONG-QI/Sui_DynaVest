@@ -19,10 +19,13 @@ const FindStrategiesChatWrapper: FC<FindStrategiesChatWrapperProps> = ({
 }) => {
   const [chains, setChains] = useState<number[]>(message.chains);
   const [risk, setRisk] = useState<RiskLevel>(message.risk);
+  const [isEdit, setIsEdit] = useState(true);
 
   const nextMessage = async () => {
     message.chains = chains;
     message.risk = risk;
+
+    setIsEdit(false);
 
     await addBotMessage(message.next());
   };
@@ -39,12 +42,13 @@ const FindStrategiesChatWrapper: FC<FindStrategiesChatWrapperProps> = ({
           selectedRisk={risk}
           setSelectedRiskLevel={setRisk}
           options={RISK_OPTIONS}
-          isEditable={true}
+          isEditable={isEdit}
         />
       </div>
       <Button
         onClick={nextMessage}
         text="Find DeFi Strategies"
+        disabled={!isEdit}
         icon={<MoveUpRight />}
       />
     </div>

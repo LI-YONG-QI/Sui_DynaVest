@@ -11,6 +11,7 @@ import CopyButton from "../../CopyButton";
 import { DepositMessage, Message } from "@/classes/message";
 import { USDC } from "@/constants/coins";
 import { BOT_STRATEGY } from "@/constants/strategies";
+import Button from "@/components/Button";
 
 const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 
@@ -25,7 +26,8 @@ const DepositChatWrapper = ({
 }: DepositChatWrapperProps) => {
   const { address } = useAccount();
   const [selectedAction, setSelectedAction] = useState<string>("Deposit");
-  const [isDeposit, setIsDeposit] = useState(false); // TODO: deal deposit logic
+  const [isDeposit, setIsDeposit] = useState(false);
+  const [isEdit, setIsEdit] = useState(true);
 
   const usdc = USDC.chains![message.chain];
   const { data: balance } = useBalance({
@@ -47,6 +49,7 @@ const DepositChatWrapper = ({
   }, [balance, message.amount]);
 
   const nextMessage = async (action: "build" | "portfolio") => {
+    setIsEdit(false);
     await addBotMessage(message.next(action));
   };
 
@@ -60,7 +63,7 @@ const DepositChatWrapper = ({
             key={action}
             label={action}
             isSelected={action === selectedAction}
-            isEditable={true} // TODO: mock true
+            isEditable={isEdit}
             setSelectedRiskLevel={setSelectedAction}
           />
         ))}
@@ -85,15 +88,12 @@ const DepositChatWrapper = ({
             {isDeposit ? (
               <>
                 <p>Deposit successfully</p>
-                <button
+                <Button
                   onClick={() => nextMessage("build")}
-                  className="max-w-[250px] flex items-center justify-center gap-2.5 rounded-lg bg-[#5F79F1] text-white py-3.5 px-5"
-                >
-                  <MoveUpRight />
-                  <span className="text-sm font-semibold">
-                    Start Building Portfolio
-                  </span>
-                </button>
+                  text="Start Building Portfolio"
+                  icon={<MoveUpRight />}
+                  disabled={!isEdit}
+                />
               </>
             ) : (
               <div className="flex gap-4 self-start">

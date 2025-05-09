@@ -33,6 +33,7 @@ export default function InvestModalButton({
   );
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const { address: user } = useAccount();
   const chainId = useChainId();
   const {
@@ -57,7 +58,6 @@ export default function InvestModalButton({
   }, [isWalletReady, isLoading, isSupportedChain]);
 
   const invest = async () => {
-    // TODO: custom logic for each strategy
     if (Number(amount) < AMOUNT_LIMIT) {
       toast.error("Investment amount must be greater than 0.01");
       return;
@@ -65,6 +65,7 @@ export default function InvestModalButton({
 
     if (handlePortfolio) {
       handlePortfolio(amount);
+      setIsDisabled(false);
     } else {
       executeStrategy();
     }
