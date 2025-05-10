@@ -1,5 +1,12 @@
+import { Address } from "viem";
+
 import { RISK_OPTIONS } from "@/constants/risk";
 import { Token } from "./blockchain";
+
+export type ProtocolAddresses<
+  ChainId extends number,
+  Addresses extends Record<string, Address>
+> = Record<ChainId, Addresses>;
 
 export type Protocol =
   | "1inch"
@@ -16,7 +23,7 @@ export type Protocol =
   | "Camelot"
   | "GMX"
   | "Bot Strategy"
-  | "MorphoAA";
+  | "MorphoSupply";
 
 export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;

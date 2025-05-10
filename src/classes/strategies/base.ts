@@ -1,36 +1,61 @@
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { Address } from "viem";
+import { KernelAccountClient } from "@zerodev/sdk";
+import type { Address } from "viem";
 
-import { wagmiConfig as config } from "@/providers/config";
-export abstract class BaseStrategy<T extends number> {
-  public readonly chainId: T;
+import type { ProtocolAddresses } from "@/types/strategies";
 
-  constructor(chainId: number) {
-    if (!this.isSupported(chainId)) {
-      throw new Error("Chain not supported");
+export abstract class BaseStrategy<
+  SupportedChainId extends number,
+  Addresses extends Record<string, Address>
+> {
+  public readonly chainId: SupportedChainId;
+  public readonly user: Address;
+
+  constructor(
+    chainId: number,
+    public readonly kernelAccountClient: KernelAccountClient,
+    public readonly protocolAddresses: ProtocolAddresses<
+      SupportedChainId,
+      Addresses
+    >
+  ) {
+    if (this.isSupported(chainId)) {
+      this.chainId = chainId as SupportedChainId;
     } else {
-      this.chainId = chainId as T;
+      throw new Error("Chain not supported");
+    }
+
+    if (this.kernelAccountClient.account?.address) {
+      this.user = this.kernelAccountClient.account.address;
+    } else {
+      throw new Error("Kernel account not found");
     }
   }
 
   /**
-   * @param asset - The asset to invest in. If the strategy is for native tokens, set to null.
+   * @param asset - (optional) The asset to invest in. If asset is undefined, the strategy is for native tokens.
    */
-  // TODO: asset should be optional (update all strategies class)
-  abstract execute(
-    user: Address,
-    asset: Address | null,
-    amount: bigint
-  ): Promise<string>;
+  abstract execute(amount: bigint, asset?: Address): Promise<string>;
 
-  abstract isSupported(chainId: number): boolean;
+  isSupported(chainId: number) {
+    return Object.keys(this.protocolAddresses).map(Number).includes(chainId);
+  }
 
-  protected async executeWaitTx(
-    writeContract: () => Promise<`0x${string}`>
-  ): Promise<string> {
-    const hash = await writeContract();
-    await waitForTransactionReceipt(config, { hash });
+  getAddress(key: keyof Addresses) {
+    return this.protocolAddresses[this.chainId][key];
+  }
 
-    return hash;
+  protected async waitForUserOp(userOp: `0x${string}`): Promise<string> {
+    const { success, receipt, reason, userOpHash } =
+      await this.kernelAccountClient.waitForUserOperationReceipt({
+        hash: userOp,
+      });
+
+    if (success === true) {
+      return receipt.transactionHash;
+    } else {
+      throw new Error(
+        `MorphoAA: Reverted with reason: ${reason} / userOpHash: ${userOpHash} / txHash: ${receipt.transactionHash}  `
+      );
+    }
   }
 }

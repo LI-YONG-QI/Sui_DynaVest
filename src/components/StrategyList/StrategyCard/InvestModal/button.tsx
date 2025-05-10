@@ -4,8 +4,9 @@ import { useAccount, useChainId } from "wagmi";
 import { parseUnits } from "viem";
 
 import { Token, InvestStrategy } from "@/types";
-import { getStrategy } from "@/classes/strategies/utils";
+import { getStrategy } from "@/utils/strategies";
 import useSwitchChain from "@/hooks/useSwitchChain";
+import { useAccountProviderContext } from "@/contexts/AccountContext";
 
 enum ButtonState {
   Pending = "Processing...",
@@ -33,6 +34,7 @@ export default function InvestModalButton({
   );
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { kernelAccountClient } = useAccountProviderContext();
 
   const { address: user } = useAccount();
   const chainId = useChainId();
@@ -74,33 +76,38 @@ export default function InvestModalButton({
   const executeStrategy = async () => {
     setIsLoading(true);
 
-    if (user) {
-      const strategyHandler = getStrategy(strategy.protocol, chainId);
-      const parsedAmount = parseUnits(amount, currency.decimals);
-
-      try {
-        let result;
-        if (currency.isNativeToken) {
-          console.log("native token");
-          result = await strategyHandler.execute(user, null, parsedAmount);
-        } else {
-          console.log("token");
-          result = await strategyHandler.execute(
-            user,
-            currency.chains![chainId],
-            parsedAmount
-          );
-        }
-
-        toast.success(`Investment successful! ${result}`);
-
-        if (handleClose) handleClose();
-      } catch (error) {
-        console.error(error);
-        toast.error(`Investment failed! ${error}`);
-      }
+    if (!user || !kernelAccountClient) {
+      console.error("no user or kernel account client");
+      toast.error("Something went wrong");
+      setIsLoading(false);
+      return;
     }
 
+    const strategyHandler = getStrategy(
+      strategy.protocol,
+      chainId,
+      kernelAccountClient
+    );
+    const parsedAmount = parseUnits(amount, currency.decimals);
+
+    try {
+      let result;
+      if (currency.isNativeToken) {
+        result = await strategyHandler.execute(parsedAmount);
+      } else {
+        result = await strategyHandler.execute(
+          parsedAmount,
+          currency.chains![chainId]
+        );
+      }
+
+      toast.success(`Investment successful! ${result}`);
+
+      if (handleClose) handleClose();
+    } catch (error) {
+      console.error(error);
+      toast.error(`Investment failed! ${error}`);
+    }
     setIsLoading(false);
   };
 

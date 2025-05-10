@@ -1,87 +1,41 @@
-import { signTypedData } from "@wagmi/core";
-import type { Address, Hex } from "viem";
-import { readContract } from "@wagmi/core";
+import type { Address } from "viem";
+import { encodeFunctionData } from "viem";
+import { KernelAccountClient } from "@zerodev/sdk";
 
-import { wagmiConfig as config } from "@/providers/config";
-import { ERC20_PERMIT_ABI } from "@/constants/abis";
-import { PERMIT_TYPES } from "@/types";
-import { PERMIT_EXPIRY } from "@/constants";
+import { AAVE_V3_ABI, ERC20_ABI } from "@/constants/abis";
 import { BaseStrategy } from "./base";
-import {
-  AAVE_CONTRACTS,
-  AaveSupportedChains,
-  DYNAVEST_CONTRACTS,
-} from "@/constants/protocols/";
+import { AAVE_CONTRACTS } from "@/constants/protocols/aave";
+import type { AaveChains, AaveAddresses } from "@/constants/protocols/aave";
 
-export interface AaveParams {
-  chainId: AaveSupportedChains;
-  user: Address;
-  asset: Address;
-  amount: string;
-  deadline: string;
-  signature: Hex;
-}
-
-export class AaveV3Strategy extends BaseStrategy<AaveSupportedChains> {
-  public executor: Address;
-  public permitExpiry: number;
-
-  constructor(chainId: number) {
-    super(chainId);
-
-    this.executor = DYNAVEST_CONTRACTS[this.chainId].executor;
-    this.permitExpiry = PERMIT_EXPIRY;
+export class AaveV3Strategy extends BaseStrategy<AaveChains, AaveAddresses> {
+  constructor(chainId: number, kernelAccountClient: KernelAccountClient) {
+    super(chainId, kernelAccountClient, AAVE_CONTRACTS);
   }
 
-  async execute(user: Address, asset: Address, amount: bigint) {
-    const timestampInSeconds = Math.floor(Date.now() / 1000);
-    const deadline = BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
+  async execute(amount: bigint, asset: Address) {
+    const pool = this.getAddress("pool");
 
-    const nonce = await readContract(config, {
-      abi: ERC20_PERMIT_ABI,
-      address: asset,
-      functionName: "nonces",
-      args: [user!],
+    const userOp = await this.kernelAccountClient.sendUserOperation({
+      calls: [
+        {
+          to: asset,
+          data: encodeFunctionData({
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [pool, amount],
+          }),
+        },
+        {
+          to: pool,
+          data: encodeFunctionData({
+            abi: AAVE_V3_ABI,
+            functionName: "supply",
+            args: [asset, amount, this.user, 0],
+          }),
+        },
+      ],
     });
 
-    // TODO: only USDC is supported (solution: Permit2)
-    const signature = await signTypedData(config, {
-      domain: {
-        name: "USD Coin",
-        chainId: this.chainId,
-        verifyingContract: asset,
-        version: "2",
-      },
-      types: PERMIT_TYPES,
-      primaryType: "Permit",
-      message: {
-        owner: user,
-        spender: this.executor,
-        value: amount,
-        nonce: nonce,
-        deadline,
-      },
-    });
-
-    const body: AaveParams = {
-      chainId: this.chainId,
-      user,
-      asset,
-      amount: amount.toString(),
-      deadline: deadline.toString(),
-      signature,
-    };
-
-    const response = await fetch("/api/aave", {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-
-    const res = await response.json();
-    return res.message;
-  }
-
-  isSupported(chainId: number): boolean {
-    return Object.keys(AAVE_CONTRACTS).map(Number).includes(chainId);
+    return this.waitForUserOp(userOp);
   }
 }

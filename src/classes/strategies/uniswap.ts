@@ -11,7 +11,7 @@ import {
 import { wagmiConfig as config } from "@/providers/config";
 import { ERC20_ABI, NFT_MANAGER_ABI } from "@/constants/abis";
 import { USDT } from "@/constants/coins";
-import { getDeadline } from "./utils";
+import { getDeadline } from "@/utils/strategies";
 
 /**
  * Compares two addresses lexicographically
