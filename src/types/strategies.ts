@@ -3,10 +3,10 @@ import { Address } from "viem";
 import { RISK_OPTIONS } from "@/constants/risk";
 import { Token } from "./blockchain";
 
-export type ProtocolAddresses<
-  ChainId extends number,
-  Addresses extends Record<string, Address>
-> = Record<ChainId, Addresses>;
+// TODO: need rename it
+export type Protocols = Record<number, Record<string, Address>>;
+export type ProtocolChains<T extends Protocols> = keyof T;
+export type ProtocolContracts<T extends Protocols> = keyof T[keyof T];
 
 export type Protocol =
   | "1inch"

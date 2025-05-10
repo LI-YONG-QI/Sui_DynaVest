@@ -5,12 +5,8 @@ import { readContract } from "@wagmi/core";
 import { MORPHO_CONTRACTS, ERC20_ABI, MORPHO_ABI } from "@/constants";
 import { BaseStrategy } from "../base";
 import { wagmiConfig as config } from "@/providers/config";
-import type {
-  MorphoChains,
-  MorphoAddresses,
-} from "@/constants/protocols/morpho";
 
-export class MorphoSupply extends BaseStrategy<MorphoChains, MorphoAddresses> {
+export class MorphoSupply extends BaseStrategy<typeof MORPHO_CONTRACTS> {
   constructor(chainId: number, kernelAccountClient: KernelAccountClient) {
     super(chainId, kernelAccountClient, MORPHO_CONTRACTS);
   }

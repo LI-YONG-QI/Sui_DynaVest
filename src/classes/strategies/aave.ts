@@ -5,9 +5,8 @@ import { KernelAccountClient } from "@zerodev/sdk";
 import { AAVE_V3_ABI, ERC20_ABI } from "@/constants/abis";
 import { BaseStrategy } from "./base";
 import { AAVE_CONTRACTS } from "@/constants/protocols/aave";
-import type { AaveChains, AaveAddresses } from "@/constants/protocols/aave";
 
-export class AaveV3Strategy extends BaseStrategy<AaveChains, AaveAddresses> {
+export class AaveV3Strategy extends BaseStrategy<typeof AAVE_CONTRACTS> {
   constructor(chainId: number, kernelAccountClient: KernelAccountClient) {
     super(chainId, kernelAccountClient, AAVE_CONTRACTS);
   }

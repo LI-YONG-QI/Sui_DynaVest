@@ -1,19 +1,6 @@
-import { ProtocolAddresses } from "@/types/strategies";
-import { Address } from "viem";
 import { arbitrum, base, bsc, celo, polygon } from "viem/chains";
 
-export type AaveChains =
-  | typeof celo.id
-  | typeof bsc.id
-  | typeof arbitrum.id
-  | typeof base.id
-  | typeof polygon.id;
-
-export type AaveAddresses = {
-  pool: Address;
-};
-
-export const AAVE_CONTRACTS: ProtocolAddresses<AaveChains, AaveAddresses> = {
+export const AAVE_CONTRACTS = {
   [celo.id]: {
     pool: "0x3E59A31363E2ad014dcbc521c4a0d5757d9f3402",
   },
@@ -29,4 +16,4 @@ export const AAVE_CONTRACTS: ProtocolAddresses<AaveChains, AaveAddresses> = {
   [polygon.id]: {
     pool: "0x794a61358D6845594F94dc1DB02A252b5b4814aD",
   },
-};
+} as const;

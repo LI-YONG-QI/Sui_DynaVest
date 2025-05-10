@@ -1,7 +1,7 @@
 import { KernelAccountClient } from "@zerodev/sdk";
 import { Address } from "viem";
 
-import { Protocol } from "@/types";
+import { Protocol, Protocols } from "@/types";
 import { PERMIT_EXPIRY } from "@/constants";
 import {
   AaveV3Strategy,
@@ -29,7 +29,7 @@ export function getStrategy(
   protocol: Protocol,
   chainId: number,
   kernelAccountClient: KernelAccountClient
-): BaseStrategy<number, Record<string, Address>> {
+): BaseStrategy<Protocols> {
   // The type casting here is safe because we've already verified the chainId is supported
   // for the specific protocol with isChainIdSupported
   switch (protocol) {

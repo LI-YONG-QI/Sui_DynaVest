@@ -1,25 +1,23 @@
 import { KernelAccountClient } from "@zerodev/sdk";
 import type { Address } from "viem";
 
-import type { ProtocolAddresses } from "@/types/strategies";
+import type {
+  Protocols,
+  ProtocolChains,
+  ProtocolContracts,
+} from "@/types/strategies";
 
-export abstract class BaseStrategy<
-  SupportedChainId extends number,
-  Addresses extends Record<string, Address>
-> {
-  public readonly chainId: SupportedChainId;
+export abstract class BaseStrategy<T extends Protocols> {
+  public readonly chainId: ProtocolChains<T>;
   public readonly user: Address;
 
   constructor(
     chainId: number,
     public readonly kernelAccountClient: KernelAccountClient,
-    public readonly protocolAddresses: ProtocolAddresses<
-      SupportedChainId,
-      Addresses
-    >
+    public readonly protocolAddresses: T 
   ) {
     if (this.isSupported(chainId)) {
-      this.chainId = chainId as SupportedChainId;
+      this.chainId = chainId as ProtocolChains<T>;
     } else {
       throw new Error("Chain not supported");
     }
@@ -36,12 +34,12 @@ export abstract class BaseStrategy<
    */
   abstract execute(amount: bigint, asset?: Address): Promise<string>;
 
-  isSupported(chainId: number) {
+  isSupported(chainId: number): boolean {
     return Object.keys(this.protocolAddresses).map(Number).includes(chainId);
   }
 
-  getAddress(key: keyof Addresses) {
-    return this.protocolAddresses[this.chainId][key];
+  getAddress(contract: ProtocolContracts<T>) {
+    return this.protocolAddresses[this.chainId][contract];
   }
 
   protected async waitForUserOp(userOp: `0x${string}`): Promise<string> {
