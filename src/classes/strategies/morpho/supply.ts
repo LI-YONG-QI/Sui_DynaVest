@@ -3,7 +3,7 @@ import { Address, encodeFunctionData, Hex, toHex } from "viem";
 import { readContract } from "@wagmi/core";
 
 import { MORPHO_CONTRACTS, ERC20_ABI, MORPHO_ABI } from "@/constants";
-import { BaseStrategy } from "../base";
+import { BaseStrategy } from "../baseStrategy";
 import { wagmiConfig as config } from "@/providers/config";
 
 export class MorphoSupply extends BaseStrategy<typeof MORPHO_CONTRACTS> {

@@ -1,15 +1,10 @@
-import { Address } from "viem";
 import { arbitrum, base, bsc, celo, flowMainnet, polygon } from "viem/chains";
-import { wagmiConfig } from "@/providers/config";
 
-export type DynaVestSupportedChains = (typeof wagmiConfig.chains)[number]["id"];
+/**
+ * @deprecated
+ */
 
-export const DYNAVEST_CONTRACTS: Record<
-  DynaVestSupportedChains,
-  {
-    executor: Address;
-  }
-> = {
+export const DYNAVEST_CONTRACTS = {
   [base.id]: {
     executor: "0xbB6Aed42b49e427FeA6048715e0a1E4F9cFfacA6",
   },
@@ -28,4 +23,4 @@ export const DYNAVEST_CONTRACTS: Record<
   [polygon.id]: {
     executor: "0x2F3164c983EF3172472BEb98DbA6cE9B4343B102",
   },
-};
+} as const;

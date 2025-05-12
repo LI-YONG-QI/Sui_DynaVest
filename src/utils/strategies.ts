@@ -1,23 +1,16 @@
 import { KernelAccountClient } from "@zerodev/sdk";
-import { Address } from "viem";
+import { bsc } from "viem/chains";
 
 import { Protocol, Protocols } from "@/types";
-import { PERMIT_EXPIRY } from "@/constants";
+import { BNB, ETH, PERMIT_EXPIRY, wbETH, wstETH } from "@/constants";
 import {
-  AaveV3Strategy,
   BaseStrategy,
-  AnkrFlowStrategy,
-  FlowStrategy,
-  KittyStrategy,
-  StCeloStrategy,
-  MorphoSupplyingStrategy,
-  UniswapV3Strategy,
-  BscAaveV3Strategy,
-  LSTStrategy,
-  BscLstStrategy,
-  CamelotStrategy,
-  GMXStrategy,
   MorphoSupply,
+  UniswapV3SwapLST,
+  CamelotStaking,
+  GMXDeposit,
+  StCeloStaking,
+  AaveV3Supply,
 } from "@/classes/strategies";
 
 export function getDeadline(): bigint {
@@ -35,6 +28,21 @@ export function getStrategy(
   switch (protocol) {
     case "MorphoSupply":
       return new MorphoSupply(chainId, kernelAccountClient);
+    case "AaveV3Supply":
+      return new AaveV3Supply(chainId, kernelAccountClient);
+    case "StCeloStaking":
+      return new StCeloStaking(chainId, kernelAccountClient);
+    case "UniswapV3SwapLST": {
+      if (chainId === bsc.id) {
+        return new UniswapV3SwapLST(chainId, kernelAccountClient, BNB, wbETH);
+      } else {
+        return new UniswapV3SwapLST(chainId, kernelAccountClient, ETH, wstETH);
+      }
+    }
+    case "CamelotStaking":
+      return new CamelotStaking(chainId, kernelAccountClient);
+    case "GMXDeposit":
+      return new GMXDeposit(chainId, kernelAccountClient);
     default:
       throw new Error("Unsupported protocol");
   }

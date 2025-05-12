@@ -2,11 +2,15 @@ import { Address } from "viem";
 import { flowMainnet } from "viem/chains";
 import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 
-import { BaseStrategy } from ".//base";
+import { BaseStrategy } from "../baseStrategy";
 import { FLOW_STRATEGY_ABI } from "@/constants/abis";
 import { wagmiConfig as config } from "@/providers/config";
 
 type FlowSupportedChains = typeof flowMainnet.id;
+
+/**
+ * @deprecated
+ */
 
 export class FlowStrategy extends BaseStrategy<FlowSupportedChains> {
   public readonly strategy: Address =

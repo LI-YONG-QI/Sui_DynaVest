@@ -1,8 +1,12 @@
-import { BaseStrategy } from "./base";
+import { BaseStrategy } from "../baseStrategy";
 import type { Address, Hex } from "viem";
 import { sendTransaction } from "@wagmi/core";
 import { ANKR_CONTRACTS, AnkrSupportedChains } from "@/constants/protocols";
 import { wagmiConfig as config } from "@/providers/config";
+
+/**
+ * @deprecated
+ */
 
 export class AnkrFlowStrategy extends BaseStrategy<AnkrSupportedChains> {
   public readonly ANKR_CORE: Address;
@@ -17,7 +21,7 @@ export class AnkrFlowStrategy extends BaseStrategy<AnkrSupportedChains> {
     user: Address,
     _asset: Address,
     amount: bigint
-  ): Promise<string> {
+  ): Promise<strinag> {
     const result = await sendTransaction(config, {
       to: this.ANKR_CORE,
       value: amount,

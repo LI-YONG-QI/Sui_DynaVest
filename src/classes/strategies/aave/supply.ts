@@ -3,10 +3,10 @@ import { encodeFunctionData } from "viem";
 import { KernelAccountClient } from "@zerodev/sdk";
 
 import { AAVE_V3_ABI, ERC20_ABI } from "@/constants/abis";
-import { BaseStrategy } from "./base";
+import { BaseStrategy } from "../baseStrategy";
 import { AAVE_CONTRACTS } from "@/constants/protocols/aave";
 
-export class AaveV3Strategy extends BaseStrategy<typeof AAVE_CONTRACTS> {
+export class AaveV3Supply extends BaseStrategy<typeof AAVE_CONTRACTS> {
   constructor(chainId: number, kernelAccountClient: KernelAccountClient) {
     super(chainId, kernelAccountClient, AAVE_CONTRACTS);
   }

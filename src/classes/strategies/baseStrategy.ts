@@ -14,7 +14,7 @@ export abstract class BaseStrategy<T extends Protocols> {
   constructor(
     chainId: number,
     public readonly kernelAccountClient: KernelAccountClient,
-    public readonly protocolAddresses: T 
+    public readonly protocolAddresses: T
   ) {
     if (this.isSupported(chainId)) {
       this.chainId = chainId as ProtocolChains<T>;
@@ -52,7 +52,7 @@ export abstract class BaseStrategy<T extends Protocols> {
       return receipt.transactionHash;
     } else {
       throw new Error(
-        `MorphoAA: Reverted with reason: ${reason} / userOpHash: ${userOpHash} / txHash: ${receipt.transactionHash}  `
+        `BaseStrategy: Reverted with reason: ${reason} / userOpHash: ${userOpHash} / txHash: ${receipt.transactionHash}  `
       );
     }
   }

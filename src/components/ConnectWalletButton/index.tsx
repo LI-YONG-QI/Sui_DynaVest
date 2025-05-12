@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function ConnectWalletButton() {
   const { ready: privyReady, authenticated, logout, linkWallet } = usePrivy();
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
   const { login } = useLogin();
   const { disconnect } = useDisconnect();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,7 +27,7 @@ export default function ConnectWalletButton() {
       } else {
         // User is not authenticated, use regular login
         login({
-          loginMethods: ["wallet"],
+          loginMethods: ["wallet", "google"],
           walletChainType: "ethereum-only",
           disableSignup: false,
         });
@@ -79,6 +79,7 @@ export default function ConnectWalletButton() {
       style={backgroundStyle}
       ref={dropdownRef}
     >
+      <div> {chainId} </div>
       <button
         disabled={!buttonReady}
         onClick={handleButtonOnClick}

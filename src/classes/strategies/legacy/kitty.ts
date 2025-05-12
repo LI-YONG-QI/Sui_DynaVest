@@ -2,12 +2,15 @@ import { writeContract } from "@wagmi/core";
 import type { Address } from "viem";
 
 import { wagmiConfig as config } from "@/providers/config";
-import { BaseStrategy } from ".//base";
+import { BaseStrategy } from "./baseStrategy";
 import { ERC20_ABI, KITTY_ABI } from "@/constants/abis";
 import {
   KITTY_CONTRACTS,
   KittySupportedChains,
 } from "@/constants/protocols/kitty";
+/**
+ * @deprecated
+ */
 
 export class KittyStrategy extends BaseStrategy<KittySupportedChains> {
   public readonly kitty: Address;
