@@ -2,6 +2,7 @@
 import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "@privy-io/wagmi";
+import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
 
 import { wagmiConfig } from "./config";
 import PrivyAccountProvider from "@/contexts/PrivyAccountProvider";
@@ -22,10 +23,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         appearance: {
           theme: "light",
           accentColor: "#676FFF",
-          //   walletList: ["metamask"],
           walletChainType: "ethereum-only",
         },
-        // Create embedded wallets for users who don't have a wallet
         embeddedWallets: {
           showWalletUIs: false,
           createOnLogin: "users-without-wallets",
@@ -33,11 +32,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         supportedChains: [...wagmiConfig.chains],
       }}
     >
-      <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={wagmiConfig}>
-          <PrivyAccountProvider>{children}</PrivyAccountProvider>
-        </WagmiProvider>
-      </QueryClientProvider>
+      <SmartWalletsProvider>
+        <QueryClientProvider client={queryClient}>
+          <WagmiProvider config={wagmiConfig}>
+            <PrivyAccountProvider>{children}</PrivyAccountProvider>
+          </WagmiProvider>
+        </QueryClientProvider>
+      </SmartWalletsProvider>
     </PrivyProvider>
   );
 }
