@@ -11,6 +11,7 @@ import {
   GMXDeposit,
   StCeloStaking,
   AaveV3Supply,
+  UniswapV3AddLiquidity,
 } from "@/classes/strategies";
 
 export function getDeadline(): bigint {
@@ -39,6 +40,8 @@ export function getStrategy(
         return new UniswapV3SwapLST(chainId, kernelAccountClient, ETH, wstETH);
       }
     }
+    case "UniswapV3AddLiquidity":
+      return new UniswapV3AddLiquidity(chainId, kernelAccountClient);
     case "CamelotStaking":
       return new CamelotStaking(chainId, kernelAccountClient);
     case "GMXDeposit":
