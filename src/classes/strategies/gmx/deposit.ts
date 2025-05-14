@@ -1,37 +1,36 @@
 import { Address, encodeFunctionData } from "viem";
 import { readContract } from "@wagmi/core";
-import { KernelAccountClient } from "@zerodev/sdk";
 
-import { BaseStrategy } from "../baseStrategy";
+import { BaseStrategy, StrategyCall } from "../baseStrategy";
 import { GMX_CONTRACTS } from "@/constants/protocols/gmx";
 import { wagmiConfig } from "@/providers/config";
 import { GMX_STRATEGY_ABI, ERC20_ABI } from "@/constants/abis";
 
 export class GMXDeposit extends BaseStrategy<typeof GMX_CONTRACTS> {
-  constructor(chainId: number, kernelAccountClient: KernelAccountClient) {
-    super(chainId, kernelAccountClient, GMX_CONTRACTS);
+  constructor(chainId: number) {
+    super(chainId, GMX_CONTRACTS);
   }
 
-  async execute(amount: bigint, asset?: Address): Promise<string> {
+  async buildCalls(
+    amount: bigint,
+    user: Address,
+    asset?: Address
+  ): Promise<StrategyCall[]> {
     if (!asset) {
       // For native ETH deposits to Beefy vault via GMX strategy
       const gmxStrategy = this.getAddress("gmxStrategy");
 
-      const userOp = await this.kernelAccountClient.sendUserOperation({
-        calls: [
-          {
-            to: gmxStrategy,
-            value: amount,
-            data: encodeFunctionData({
-              abi: GMX_STRATEGY_ABI,
-              functionName: "depositToBeefyVaultWithETH",
-              args: [],
-            }),
-          },
-        ],
-      });
-
-      return this.waitForUserOp(userOp);
+      return [
+        {
+          to: gmxStrategy,
+          value: amount,
+          data: encodeFunctionData({
+            abi: GMX_STRATEGY_ABI,
+            functionName: "depositToBeefyVaultWithETH",
+            args: [],
+          }),
+        },
+      ];
     } else {
       throw new Error(
         "GMXDeposit: Only native ETH is supported for GMX strategy"

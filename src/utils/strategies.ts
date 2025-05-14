@@ -1,4 +1,3 @@
-import { KernelAccountClient } from "@zerodev/sdk";
 import { bsc } from "viem/chains";
 
 import { Protocol, Protocols } from "@/types";
@@ -30,21 +29,21 @@ export function getStrategy(
       return new MorphoSupply(chainId);
     case "AaveV3Supply":
       return new AaveV3Supply(chainId);
-    // case "StCeloStaking":
-    //   return new StCeloStaking(chainId, kernelAccountClient);
-    // case "UniswapV3SwapLST": {
-    //   if (chainId === bsc.id) {
-    //     return new UniswapV3SwapLST(chainId, kernelAccountClient, BNB, wbETH);
-    //   } else {
-    //     return new UniswapV3SwapLST(chainId, kernelAccountClient, ETH, wstETH);
-    //   }
-    // }
-    // case "UniswapV3AddLiquidity":
-    //   return new UniswapV3AddLiquidity(chainId, kernelAccountClient);
-    // case "CamelotStaking":
-    //   return new CamelotStaking(chainId, kernelAccountClient);
-    // case "GMXDeposit":
-    //   return new GMXDeposit(chainId, kernelAccountClient);
+    case "StCeloStaking":
+      return new StCeloStaking(chainId);
+    case "UniswapV3SwapLST": {
+      if (chainId === bsc.id) {
+        return new UniswapV3SwapLST(chainId, BNB, wbETH);
+      } else {
+        return new UniswapV3SwapLST(chainId, ETH, wstETH);
+      }
+    }
+    case "UniswapV3AddLiquidity":
+      return new UniswapV3AddLiquidity(chainId);
+    case "CamelotStaking":
+      return new CamelotStaking(chainId);
+    case "GMXDeposit":
+      return new GMXDeposit(chainId);
     default:
       throw new Error("Unsupported protocol");
   }
