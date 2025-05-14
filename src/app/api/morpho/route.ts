@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import type { MorphoParams } from "@/classes/strategies/morpho";
+import type { MorphoParams } from "@/classes/strategies/legacy/morpho";
 import { MorphoSupportedChains } from "@/constants/protocols/morpho";
 import { MorphoSupplyingStrategy } from "@/server/morpho";
 

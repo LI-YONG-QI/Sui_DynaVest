@@ -1,12 +1,20 @@
 import Image from "next/image";
 import { useLogin, usePrivy } from "@privy-io/react-auth";
-import { useDisconnect, useAccount } from "wagmi";
+import { useChainId, useDisconnect } from "wagmi";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ConnectWalletButton() {
-  const { ready: privyReady, authenticated, logout, linkWallet } = usePrivy();
-  const { address } = useAccount();
+  const {
+    ready: privyReady,
+    authenticated,
+    logout,
+    linkWallet,
+    user,
+  } = usePrivy();
+
+  const [address, setAddress] = useState<string | null>(null);
+  const chainId = useChainId();
   const { login } = useLogin();
   const { disconnect } = useDisconnect();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,7 +35,7 @@ export default function ConnectWalletButton() {
       } else {
         // User is not authenticated, use regular login
         login({
-          loginMethods: ["wallet"],
+          loginMethods: ["wallet", "google"],
           walletChainType: "ethereum-only",
           disableSignup: false,
         });
@@ -65,7 +73,11 @@ export default function ConnectWalletButton() {
     };
   }, []);
 
-  // 创建一个共享的背景样式
+  useEffect(() => {
+    if (!user) return;
+    setAddress(user.smartWallet?.address || null); // TODO: assertion
+  }, [user]);
+
   const backgroundStyle = {
     background:
       "linear-gradient(-86.667deg, rgba(95, 121, 241, 30%) 18%, rgba(253, 164, 175, 30%) 100%)",
@@ -79,6 +91,7 @@ export default function ConnectWalletButton() {
       style={backgroundStyle}
       ref={dropdownRef}
     >
+      <div> {chainId} </div>
       <button
         disabled={!buttonReady}
         onClick={handleButtonOnClick}

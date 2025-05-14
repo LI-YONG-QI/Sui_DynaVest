@@ -4,7 +4,7 @@ import { readContract } from "@wagmi/core";
 
 import { ERC20_PERMIT_ABI } from "@/constants/abis";
 import { PERMIT_TYPES } from "@/types/blockchain";
-import { BaseStrategy } from ".//base";
+import { BaseStrategy } from "../baseStrategy";
 import { PERMIT_EXPIRY } from "@/constants";
 import {
   MORPHO_CONTRACTS,
@@ -21,6 +21,10 @@ export interface MorphoParams {
   deadline: string;
   signature: Hex;
 }
+
+/**
+ * @deprecated
+ */
 
 export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains> {
   public readonly morpho: Address;

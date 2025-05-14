@@ -1,22 +1,15 @@
+import { Address } from "viem";
+
+import type { PROTOCOLS } from "@/constants";
 import { RISK_OPTIONS } from "@/constants/risk";
 import { Token } from "./blockchain";
 
-export type Protocol =
-  | "1inch"
-  | "AAVE"
-  | "stCelo"
-  | "ankrFlow"
-  | "Kitty"
-  | "Flow"
-  | "Morpho"
-  | "Uniswap"
-  | "BSC Aave"
-  | "LST"
-  | "BSC LST"
-  | "Camelot"
-  | "GMX"
-  | "Bot Strategy"
-  | "MorphoAA";
+// TODO: need rename it
+export type Protocols = Record<number, Record<string, Address>>;
+export type ProtocolChains<T extends Protocols> = keyof T;
+export type ProtocolContracts<T extends Protocols> = keyof T[keyof T];
+
+export type Protocol = (typeof PROTOCOLS)[number];
 
 export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;

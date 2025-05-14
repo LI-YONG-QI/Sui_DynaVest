@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useAccount, useChainId } from "wagmi";
+import {
+  useAccount,
+  useChainId,
+  useSwitchChain as useWagmiSwitchChain,
+} from "wagmi";
 import { parseUnits } from "viem";
 
 import { Token, InvestStrategy } from "@/types";
-import { getStrategy } from "@/classes/strategies/utils";
+import { getStrategy } from "@/utils/strategies";
 import useSwitchChain from "@/hooks/useSwitchChain";
+
+import { useAccountProviderContext } from "@/contexts/AccountContext";
+import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
 
 enum ButtonState {
   Pending = "Processing...",
@@ -33,14 +40,16 @@ export default function InvestModalButton({
   );
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { kernelAccountClient } = useAccountProviderContext();
 
   const { address: user } = useAccount();
   const chainId = useChainId();
-  const {
-    handleSwitchChain,
-    isSupportedChain,
-    ready: isWalletReady,
-  } = useSwitchChain(strategy.chainId);
+  const { isSupportedChain, ready: isWalletReady } = useSwitchChain(
+    strategy.chainId
+  );
+
+  const { execute } = useStrategyExecutor();
+  const { switchChainAsync } = useWagmiSwitchChain();
 
   const AMOUNT_LIMIT = 0.01;
 
@@ -74,33 +83,35 @@ export default function InvestModalButton({
   const executeStrategy = async () => {
     setIsLoading(true);
 
-    if (user) {
-      const strategyHandler = getStrategy(strategy.protocol, chainId);
-      const parsedAmount = parseUnits(amount, currency.decimals);
-
-      try {
-        let result;
-        if (currency.isNativeToken) {
-          console.log("native token");
-          result = await strategyHandler.execute(user, null, parsedAmount);
-        } else {
-          console.log("token");
-          result = await strategyHandler.execute(
-            user,
-            currency.chains![chainId],
-            parsedAmount
-          );
-        }
-
-        toast.success(`Investment successful! ${result}`);
-
-        if (handleClose) handleClose();
-      } catch (error) {
-        console.error(error);
-        toast.error(`Investment failed! ${error}`);
-      }
+    if (!user || !kernelAccountClient) {
+      console.error("no user or kernel account client");
+      toast.error("Something went wrong");
+      setIsLoading(false);
+      return;
     }
 
+    const strategyHandler = getStrategy(strategy.protocol, chainId);
+    const parsedAmount = parseUnits(amount, currency.decimals);
+
+    try {
+      let result;
+      if (currency.isNativeToken) {
+        result = await execute(strategyHandler, parsedAmount);
+      } else {
+        result = await execute(
+          strategyHandler,
+          parsedAmount,
+          currency.chains![chainId]
+        );
+      }
+
+      toast.success(`Investment successful! ${result}`);
+
+      if (handleClose) handleClose();
+    } catch (error) {
+      console.error(error);
+      toast.error(`Investment failed! ${error}`);
+    }
     setIsLoading(false);
   };
 
@@ -110,7 +121,7 @@ export default function InvestModalButton({
         invest();
         break;
       case ButtonState.SwitchChain:
-        handleSwitchChain();
+        switchChainAsync({ chainId: strategy.chainId });
         break;
       default:
         break;

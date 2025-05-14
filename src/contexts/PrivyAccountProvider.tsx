@@ -12,27 +12,33 @@ import {
   signerToEcdsaValidator,
 } from "@zerodev/ecdsa-validator";
 import { createZeroDevPaymasterClient } from "@zerodev/sdk";
+import { getUserOperationGasPrice } from "@zerodev/sdk/actions";
 import React, { useEffect, useMemo } from "react";
-import { createWalletClient, custom, Hex, http } from "viem";
-import { base } from "viem/chains";
-import { usePublicClient } from "wagmi";
+import {
+  createPublicClient,
+  createWalletClient,
+  custom,
+  Hex,
+  http,
+} from "viem";
+import { useAccount } from "wagmi";
 import { AccountProviderContext, EmbeddedWallet } from "./AccountContext";
-import { KERNEL_V3_3, getEntryPoint } from "@zerodev/sdk/constants";
+import {
+  KERNEL_V3_3,
+  getEntryPoint,
+  KernelVersionToAddressesMap,
+} from "@zerodev/sdk/constants";
+
 /**
  * Constants for the Privy account provider
  */
 
 const PROVIDER = "privy";
 export const PROJECT_ID = process.env.NEXT_PUBLIC_ZERODEV_PROJECT_ID;
-import { KernelVersionToAddressesMap } from "@zerodev/sdk/constants";
 export const kernelVersion = KERNEL_V3_3;
 export const kernelAddresses = KernelVersionToAddressesMap[kernelVersion];
-// export const sepoliaBundlerRpc = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/11155111`;
-// export const sepoliaPaymasterRpc = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/11155111`;
-export const baseBundlerRpc = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/8453`;
-export const basePaymasterRpc = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/8453 `;
 export const entryPoint = getEntryPoint("0.7");
-export const EXPLORER_URL = base.blockExplorers.default.url;
+// export const EXPLORER_URL = chain.blockExplorers.default.url;
 
 /**
  * PrivyAccountProvider is a React component that manages authentication and wallet functionality
@@ -48,11 +54,15 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = usePrivy();
   const { createWallet } = useCreateWallet();
   const { signAuthorization } = useSignAuthorization();
+  const { chainId, chain } = useAccount();
+
+  const bundlerRpc = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/${chainId}`;
+  const paymasterRpc = `https://rpc.zerodev.app/api/v3/${PROJECT_ID}/chain/${chainId}`;
 
   const { login } = useLogin();
 
   const privyEmbeddedWallet = useMemo(() => {
-    return wallets.find((wallet) => wallet.walletClientType === "privy");
+    return wallets.find((wallet) => wallet.walletClientType === PROVIDER);
   }, [wallets]);
 
   /**
@@ -60,14 +70,14 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
    * The configured wallet client or null if not available
    */
   const { data: privyAccount } = useQuery({
-    queryKey: [PROVIDER, "walletClient", privyEmbeddedWallet?.address],
+    queryKey: [PROVIDER, "walletClient", privyEmbeddedWallet?.address, chainId],
     queryFn: async () => {
       if (!privyEmbeddedWallet) {
         return null;
       }
       const walletClient = createWalletClient({
         account: privyEmbeddedWallet.address as Hex,
-        chain: base,
+        chain,
         transport: custom(await privyEmbeddedWallet.getEthereumProvider()),
       });
       return walletClient;
@@ -79,20 +89,24 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
    * Creates a public client for blockchain interactions
    * The configured public client or null if wallet client is not available
    */
-  const basePublicClient = usePublicClient({
-    chainId: base.id,
-  });
+
+  const publicClient = useMemo(() => {
+    return createPublicClient({
+      chain,
+      transport: http(bundlerRpc),
+    });
+  }, [chain, bundlerRpc]);
   /**
    * Creates a paymaster client for handling gas payments
    * The configured paymaster client or null if public client is not available
    */
-  const basePaymasterClient = useMemo(() => {
-    if (!basePublicClient) return null;
+  const paymasterClient = useMemo(() => {
+    if (!publicClient) return null;
     return createZeroDevPaymasterClient({
-      chain: base,
-      transport: http(basePaymasterRpc),
+      chain,
+      transport: http(paymasterRpc),
     });
-  }, [basePublicClient]);
+  }, [publicClient, paymasterRpc, chain]);
 
   /**
    * Creates an ECDSA validator for the kernel account
@@ -103,14 +117,14 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
       PROVIDER,
       "kernelClient",
       privyAccount?.account.address,
-      basePaymasterClient?.name,
-      basePublicClient?.name,
+      paymasterClient?.name,
+      publicClient?.name,
+      chainId,
     ],
     queryFn: async () => {
-      if (!privyAccount || !basePublicClient || !basePaymasterClient)
-        return null;
+      if (!privyAccount || !publicClient || !paymasterClient) return null;
 
-      const ecdsaValidator = await signerToEcdsaValidator(basePublicClient, {
+      const ecdsaValidator = await signerToEcdsaValidator(publicClient, {
         signer: privyAccount,
         entryPoint,
         kernelVersion,
@@ -118,10 +132,10 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
 
       const authorization = await signAuthorization({
         contractAddress: kernelAddresses.accountImplementationAddress,
-        chainId: base.id,
+        chainId,
       });
 
-      const kernelAccount = await create7702KernelAccount(basePublicClient, {
+      const kernelAccount = await create7702KernelAccount(publicClient, {
         signer: privyAccount,
         entryPoint,
         kernelVersion,
@@ -130,15 +144,20 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
 
       const kernelAccountClient = create7702KernelAccountClient({
         account: kernelAccount,
-        chain: base,
-        bundlerTransport: http(baseBundlerRpc),
-        paymaster: basePaymasterClient,
-        client: basePublicClient,
+        chain,
+        bundlerTransport: http(bundlerRpc),
+        paymaster: paymasterClient,
+        client: publicClient,
+        userOperation: {
+          estimateFeesPerGas: async ({ bundlerClient }) => {
+            return getUserOperationGasPrice(bundlerClient);
+          },
+        },
       });
 
       return { kernelAccountClient, kernelAccount, ecdsaValidator };
     },
-    enabled: !!basePublicClient && !!privyAccount && !!basePaymasterClient,
+    enabled: !!publicClient && !!privyAccount && !!paymasterClient,
   });
 
   /**
@@ -169,7 +188,13 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
   }, [user, privyEmbeddedWallet, createEmbeddedWallet]);
 
   const { data: embeddedWallet } = useQuery<EmbeddedWallet | null>({
-    queryKey: [PROVIDER, "embeddedWallet", privyEmbeddedWallet?.address, user],
+    queryKey: [
+      PROVIDER,
+      "embeddedWallet",
+      privyEmbeddedWallet?.address,
+      user,
+      chainId,
+    ],
     queryFn: async () => {
       if (!user) return null;
       if (!privyEmbeddedWallet) return null;
@@ -184,7 +209,12 @@ const PrivyAccountProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const { data: isDeployed } = useQuery({
-    queryKey: [PROVIDER, "isDeployed", kernelClients?.kernelAccount.address],
+    queryKey: [
+      PROVIDER,
+      "isDeployed",
+      kernelClients?.kernelAccount.address,
+      chainId,
+    ],
     queryFn: async () => {
       if (!kernelClients) return false;
       return kernelClients.kernelAccount.isDeployed();
