@@ -1,12 +1,20 @@
 import Image from "next/image";
-import { useLogin, usePrivy } from "@privy-io/react-auth";
-import { useDisconnect, useAccount } from "wagmi";
+import { useLogin, usePrivy, useWallets } from "@privy-io/react-auth";
+import { useChainId, useDisconnect } from "wagmi";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function ConnectWalletButton() {
-  const { ready: privyReady, authenticated, logout, linkWallet } = usePrivy();
-  const { address, chainId } = useAccount();
+  const {
+    ready: privyReady,
+    authenticated,
+    logout,
+    linkWallet,
+    user,
+  } = usePrivy();
+
+  const [address, setAddress] = useState<string | null>(null);
+  const chainId = useChainId();
   const { login } = useLogin();
   const { disconnect } = useDisconnect();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -64,6 +72,12 @@ export default function ConnectWalletButton() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    console.log(user);
+    setAddress(user.smartWallet?.address || null); // TODO: assertion
+  }, [user]);
 
   // 创建一个共享的背景样式
   const backgroundStyle = {

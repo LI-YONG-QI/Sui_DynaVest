@@ -1,12 +1,14 @@
 import { Address } from "viem";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { useMemo } from "react";
+import { useChainId } from "wagmi";
 
 import { BaseStrategy } from "@/classes/strategies/baseStrategy";
 import { Protocols } from "@/types/strategies";
 
 export function useStrategyExecutor() {
-  const { client } = useSmartWallets();
+  const { client, getClientForChain } = useSmartWallets();
+  const chainId = useChainId();
 
   const user = useMemo(() => {
     return client?.account?.address || null;
@@ -23,19 +25,18 @@ export function useStrategyExecutor() {
     amount: bigint,
     asset?: Address
   ): Promise<string> {
-    if (!client) {
-      throw new Error("Smart wallet client not available");
-    }
+    if (!client) throw new Error("Smart wallet client not available");
+    if (!user) throw new Error("Smart wallet account not found");
 
-    if (!user) {
-      throw new Error("Smart wallet account not found");
-    }
+    const clientForChain = await getClientForChain({ id: chainId });
+
+    console.log(await clientForChain?.getChainId());
 
     // Get calls from strategy
     const calls = await strategy.buildCalls(amount, user, asset);
 
     // Execute the calls
-    const userOp = await client.sendUserOperation({
+    const userOp = await clientForChain!.sendUserOperation({
       calls,
     });
 
@@ -47,8 +48,10 @@ export function useStrategyExecutor() {
       throw new Error("Smart wallet client not available");
     }
 
+    const clientForChain = await getClientForChain({ id: chainId });
+
     const { success, receipt, reason, userOpHash } =
-      await client.waitForUserOperationReceipt({
+      await clientForChain!.waitForUserOperationReceipt({
         hash: userOp,
       });
 
