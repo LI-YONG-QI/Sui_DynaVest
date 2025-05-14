@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useState } from "react";
-import { formatCoin, formatCurrency } from "@/utils";
+import { BNB, USDT, USDC, ETH } from "@/constants/coins";
+import useCurrencies from "@/hooks/useCurrencies";
 
 // TODO: Use real data
 const DUMMY_DATA = [
@@ -28,11 +29,14 @@ const DUMMY_DATA = [
   },
 ];
 
-export default function AssetsTableComponent() {
-  const [sortKey, setSortKey] = useState<"balance_coin" | null>("balance_coin");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+const SUPPORTED_TOKENS = [USDT, USDC, BNB, ETH];
 
-  const sortedData = [...DUMMY_DATA].sort((a, b) => {
+export default function AssetsTableComponent() {
+  const [sortKey, setSortKey] = useState<"balance" | null>("balance");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const { currencies } = useCurrencies(SUPPORTED_TOKENS);
+
+  const sortedData = [...currencies].sort((a, b) => {
     if (!sortKey) return 0;
     return sortDirection === "asc"
       ? a[sortKey] - b[sortKey]
@@ -40,10 +44,10 @@ export default function AssetsTableComponent() {
   });
 
   const handleSort = () => {
-    if (sortKey === "balance_coin") {
+    if (sortKey === "balance") {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      setSortKey("balance_coin");
+      setSortKey("balance");
       setSortDirection("desc");
     }
   };
@@ -60,22 +64,19 @@ export default function AssetsTableComponent() {
             >
               <div className="flex items-center justify-end">
                 Balance
-                {sortKey === "balance_coin" && (
+                {sortKey === "balance" && (
                   <span className="ml-1">
                     {sortDirection === "asc" ? "↑" : "↓"}
                   </span>
                 )}
               </div>
             </th>
-            <th className="w-[15%] text-right px-4 font-medium">Available</th>
-            <th className="w-[15%] text-right px-4 font-medium">Frozen</th>
-            <th className="w-[25%] text-right px-6 font-medium">Action</th>
           </tr>
         </thead>
         <tbody>
           {sortedData.map((asset) => (
             <tr
-              key={asset.coin_symbol}
+              key={asset.name}
               className="bg-white rounded-xl shadow-[0_0_0_0.2px_#3d84ff,_0px_4px_8px_rgba(0,0,0,0.1)] hover:shadow-[0_0_0_1.5px_#3d84ff,_0px_4px_12px_rgba(0,0,0,0.15)] transition-all"
             >
               {/* Coin */}
@@ -83,16 +84,16 @@ export default function AssetsTableComponent() {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center">
                     <Image
-                      src={`/${asset.coin_icon}`}
-                      alt={asset.coin_symbol}
+                      src={asset.icon}
+                      alt={asset.name}
                       width={24}
                       height={24}
                       className="object-contain"
                     />
                   </div>
                   <div>
-                    <div className="font-bold">{asset.coin_symbol}</div>
-                    <div className="text-sm text-gray-500">{asset.coin}</div>
+                    <div className="font-bold">{asset.name}</div>
+                    <div className="text-sm text-gray-500">{asset.name}</div>
                   </div>
                 </div>
               </td>
@@ -100,30 +101,10 @@ export default function AssetsTableComponent() {
               {/* Balance */}
               <td className="p-4 text-right">
                 <div className="font-medium text-md">
-                  {formatCoin(asset.balance_coin, asset.coin_symbol)}
+                  {asset.balance.toString()}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {formatCurrency(asset.balance_usd)}
-                </div>
-              </td>
-
-              {/* Available */}
-              <td className="p-4 text-right">
-                <div className="font-medium">
-                  {formatCoin(asset.balance_available_coin, asset.coin_symbol)}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {formatCurrency(asset.balance_available_usd)}
-                </div>
-              </td>
-
-              {/* Frozen */}
-              <td className="p-4 text-right">
-                <div className="font-medium">
-                  {formatCoin(asset.balance_frozen_coin, asset.coin_symbol)}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {formatCurrency(asset.balance_frozen_usd)}
+                  {`$ ${asset.balance.toString()}`}
                 </div>
               </td>
 

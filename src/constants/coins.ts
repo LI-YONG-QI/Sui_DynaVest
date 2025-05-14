@@ -35,7 +35,7 @@ export const ETH: Token = {
 
 export const BNB: Token = {
   name: "BNB",
-  icon: "/crypto-icons/bnb.svg",
+  icon: "/crypto-icons/chains/56.svg",
   decimals: 18,
   isNativeToken: true,
 };
