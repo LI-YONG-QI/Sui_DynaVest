@@ -21,31 +21,30 @@ export function getDeadline(): bigint {
 
 export function getStrategy(
   protocol: Protocol,
-  chainId: number,
-  kernelAccountClient: KernelAccountClient
+  chainId: number
 ): BaseStrategy<Protocols> {
   // The type casting here is safe because we've already verified the chainId is supported
   // for the specific protocol with isChainIdSupported
   switch (protocol) {
     case "MorphoSupply":
-      return new MorphoSupply(chainId, kernelAccountClient);
+      return new MorphoSupply(chainId);
     case "AaveV3Supply":
-      return new AaveV3Supply(chainId, kernelAccountClient);
-    case "StCeloStaking":
-      return new StCeloStaking(chainId, kernelAccountClient);
-    case "UniswapV3SwapLST": {
-      if (chainId === bsc.id) {
-        return new UniswapV3SwapLST(chainId, kernelAccountClient, BNB, wbETH);
-      } else {
-        return new UniswapV3SwapLST(chainId, kernelAccountClient, ETH, wstETH);
-      }
-    }
-    case "UniswapV3AddLiquidity":
-      return new UniswapV3AddLiquidity(chainId, kernelAccountClient);
-    case "CamelotStaking":
-      return new CamelotStaking(chainId, kernelAccountClient);
-    case "GMXDeposit":
-      return new GMXDeposit(chainId, kernelAccountClient);
+      return new AaveV3Supply(chainId);
+    // case "StCeloStaking":
+    //   return new StCeloStaking(chainId, kernelAccountClient);
+    // case "UniswapV3SwapLST": {
+    //   if (chainId === bsc.id) {
+    //     return new UniswapV3SwapLST(chainId, kernelAccountClient, BNB, wbETH);
+    //   } else {
+    //     return new UniswapV3SwapLST(chainId, kernelAccountClient, ETH, wstETH);
+    //   }
+    // }
+    // case "UniswapV3AddLiquidity":
+    //   return new UniswapV3AddLiquidity(chainId, kernelAccountClient);
+    // case "CamelotStaking":
+    //   return new CamelotStaking(chainId, kernelAccountClient);
+    // case "GMXDeposit":
+    //   return new GMXDeposit(chainId, kernelAccountClient);
     default:
       throw new Error("Unsupported protocol");
   }
