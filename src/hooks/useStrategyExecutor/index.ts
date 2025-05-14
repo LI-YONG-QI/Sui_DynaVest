@@ -30,8 +30,6 @@ export function useStrategyExecutor() {
 
     const clientForChain = await getClientForChain({ id: chainId });
 
-    console.log(await clientForChain?.getChainId());
-
     // Get calls from strategy
     const calls = await strategy.buildCalls(amount, user, asset);
 
@@ -68,6 +66,7 @@ export function useStrategyExecutor() {
     user,
     uiOptions,
     execute,
+    waitForUserOp,
     isReady: !!client && !!user,
   };
 }

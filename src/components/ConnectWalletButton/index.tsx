@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useLogin, usePrivy, useWallets } from "@privy-io/react-auth";
+import { useLogin, usePrivy } from "@privy-io/react-auth";
 import { useChainId, useDisconnect } from "wagmi";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -75,11 +75,9 @@ export default function ConnectWalletButton() {
 
   useEffect(() => {
     if (!user) return;
-    console.log(user);
     setAddress(user.smartWallet?.address || null); // TODO: assertion
   }, [user]);
 
-  // 创建一个共享的背景样式
   const backgroundStyle = {
     background:
       "linear-gradient(-86.667deg, rgba(95, 121, 241, 30%) 18%, rgba(253, 164, 175, 30%) 100%)",

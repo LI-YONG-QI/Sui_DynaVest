@@ -44,11 +44,9 @@ export default function InvestModalButton({
 
   const { address: user } = useAccount();
   const chainId = useChainId();
-  const {
-    handleSwitchChain,
-    isSupportedChain,
-    ready: isWalletReady,
-  } = useSwitchChain(strategy.chainId);
+  const { isSupportedChain, ready: isWalletReady } = useSwitchChain(
+    strategy.chainId
+  );
 
   const { execute } = useStrategyExecutor();
   const { switchChainAsync } = useWagmiSwitchChain();
