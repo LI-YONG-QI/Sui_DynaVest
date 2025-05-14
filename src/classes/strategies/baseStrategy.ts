@@ -1,4 +1,3 @@
-import { KernelAccountClient } from "@zerodev/sdk";
 import type { Address } from "viem";
 
 import type {
@@ -7,32 +6,35 @@ import type {
   ProtocolContracts,
 } from "@/types/strategies";
 
+export type StrategyCall = {
+  to: Address;
+  data: `0x${string}`;
+  value?: bigint;
+};
+
 export abstract class BaseStrategy<T extends Protocols> {
   public readonly chainId: ProtocolChains<T>;
-  public readonly user: Address;
 
-  constructor(
-    chainId: number,
-    public readonly kernelAccountClient: KernelAccountClient,
-    public readonly protocolAddresses: T
-  ) {
+  constructor(chainId: number, public readonly protocolAddresses: T) {
     if (this.isSupported(chainId)) {
       this.chainId = chainId as ProtocolChains<T>;
     } else {
       throw new Error("Chain not supported");
     }
-
-    if (this.kernelAccountClient.account?.address) {
-      this.user = this.kernelAccountClient.account.address;
-    } else {
-      throw new Error("Kernel account not found");
-    }
   }
 
   /**
+   * Builds transaction calls for the strategy
+   * @param amount - The amount to use in the strategy
+   * @param user - The user address that will execute the strategy
    * @param asset - (optional) The asset to invest in. If asset is undefined, the strategy is for native tokens.
+   * @returns Array of calls to be executed
    */
-  abstract execute(amount: bigint, asset?: Address): Promise<string>;
+  abstract buildCalls(
+    amount: bigint,
+    user: Address,
+    asset?: Address
+  ): Promise<StrategyCall[]>;
 
   isSupported(chainId: number): boolean {
     return Object.keys(this.protocolAddresses).map(Number).includes(chainId);
@@ -40,20 +42,5 @@ export abstract class BaseStrategy<T extends Protocols> {
 
   getAddress(contract: ProtocolContracts<T>) {
     return this.protocolAddresses[this.chainId][contract];
-  }
-
-  protected async waitForUserOp(userOp: `0x${string}`): Promise<string> {
-    const { success, receipt, reason, userOpHash } =
-      await this.kernelAccountClient.waitForUserOperationReceipt({
-        hash: userOp,
-      });
-
-    if (success === true) {
-      return receipt.transactionHash;
-    } else {
-      throw new Error(
-        `BaseStrategy: Reverted with reason: ${reason} / userOpHash: ${userOpHash} / txHash: ${receipt.transactionHash}  `
-      );
-    }
   }
 }

@@ -26,7 +26,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           walletChainType: "ethereum-only",
         },
         embeddedWallets: {
-          showWalletUIs: false,
           createOnLogin: "users-without-wallets",
         },
         supportedChains: [...wagmiConfig.chains],
