@@ -5,7 +5,7 @@ import { useChainId } from "wagmi";
 
 import { BaseStrategy } from "@/classes/strategies/baseStrategy";
 import { Protocols } from "@/types/strategies";
-
+import { MultiStrategy } from "@/classes/strategies/multiStrategy";
 export function useStrategyExecutor() {
   const { client, getClientForChain } = useSmartWallets();
   const chainId = useChainId();
@@ -21,7 +21,7 @@ export function useStrategyExecutor() {
   };
 
   async function execute<T extends Protocols>(
-    strategy: BaseStrategy<T>,
+    strategy: BaseStrategy<T> | MultiStrategy,
     amount: bigint,
     asset?: Address
   ): Promise<string> {

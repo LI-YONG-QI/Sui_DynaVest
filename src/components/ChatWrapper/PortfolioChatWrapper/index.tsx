@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { MoveUpRight, Percent } from "lucide-react";
-import { useAccount, useBalance } from "wagmi";
 import { parseUnits } from "viem";
 
 import { RiskLevel, RiskPortfolioStrategies } from "@/types";
@@ -12,6 +11,12 @@ import { PortfolioPieChart } from "../../RiskPortfolio/PieChart";
 import { RiskBadgeList } from "../../RiskBadgeList";
 import Button from "@/components/Button";
 import { USDC } from "@/constants/coins";
+import useCurrency from "@/hooks/useCurrency";
+import { getStrategy } from "@/utils/strategies";
+import { MultiStrategy } from "@/classes/strategies/multiStrategy";
+import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
+import { toast } from "react-toastify";
+
 interface PortfolioChatWrapperProps {
   message: PortfolioMessage;
   addBotMessage: (message: Message) => Promise<void>;
@@ -26,15 +31,12 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
     message.strategies
   );
   const [isEdit, setIsEdit] = useState(true);
-
-  const { address } = useAccount();
-  const { data: balance } = useBalance({
-    address,
-    token: USDC.chains![message.chain],
-  });
+  const { balance, isLoadingBalance } = useCurrency([USDC]);
+  const { execute } = useStrategyExecutor();
 
   const nextMessage = async (action: "build" | "edit") => {
-    // Settle message attributes
+    if (isLoadingBalance) return;
+
     message.risk = risk;
     message.strategies = strategies;
 
@@ -43,16 +45,37 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
     if (action === "build") {
       if (
         parseUnits(message.amount, USDC.decimals) >
-        (balance?.value ?? BigInt(0))
+        parseUnits(balance.toString(), USDC.decimals)
       ) {
         await addBotMessage(message.next("deposit"));
       } else {
+        await executeMultiStrategy();
         await addBotMessage(message.next("build"));
       }
     } else {
       await addBotMessage(message.next(action));
     }
   };
+
+  async function executeMultiStrategy() {
+    try {
+      const strategiesHandler = strategies.map((strategy) => ({
+        strategy: getStrategy(strategy.protocol, strategy.chainId),
+        allocation: strategy.allocation,
+      }));
+
+      const multiStrategy = new MultiStrategy(strategiesHandler);
+      const tx = await execute(
+        multiStrategy,
+        parseUnits(message.amount, USDC.decimals),
+        USDC.chains![message.chain]
+      );
+
+      toast.success(`Portfolio built successfully, ${tx}`);
+    } catch (error) {
+      toast.error(`Error building portfolio, ${error}`);
+    }
+  }
 
   useEffect(() => {
     setStrategies(message.strategiesSet[risk]);
