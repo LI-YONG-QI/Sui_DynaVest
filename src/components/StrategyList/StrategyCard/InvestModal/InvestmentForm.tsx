@@ -27,7 +27,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     setCurrency,
     balance: maxBalance,
     isLoadingBalance,
-  } = useCurrency(strategy.tokens);
+  } = useCurrency(strategy.tokens[0]);
 
   // Handle setting max amount
   const handleSetMax = () => {

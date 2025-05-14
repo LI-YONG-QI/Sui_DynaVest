@@ -7,9 +7,9 @@ import { wagmiConfig as config } from "@/providers/config";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { useChainId } from "wagmi";
 
-export default function useCurrency(tokens: Token[]) {
+export default function useCurrency(token: Token) {
   const { client, getClientForChain } = useSmartWallets();
-  const [currency, setCurrency] = useState<Token>(tokens[0]);
+  const [currency, setCurrency] = useState<Token>(token);
   const [balance, setBalance] = useState<number>(0);
   const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   const chainId = useChainId();

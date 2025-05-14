@@ -31,7 +31,7 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
     message.strategies
   );
   const [isEdit, setIsEdit] = useState(true);
-  const { balance, isLoadingBalance } = useCurrency([USDC]);
+  const { balance, isLoadingBalance } = useCurrency(USDC);
   const { execute } = useStrategyExecutor();
 
   const nextMessage = async (action: "build" | "edit") => {
