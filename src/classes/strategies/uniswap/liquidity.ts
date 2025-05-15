@@ -64,44 +64,44 @@ export class UniswapV3AddLiquidity extends BaseStrategy<
     const [token0, token1] = sortAddresses(asset, usdt);
 
     return [
-      {
-        to: token0,
-        data: encodeFunctionData({
-          abi: ERC20_ABI,
-          functionName: "approve",
-          args: [nftManager, amount],
-        }),
-      },
-      {
-        to: token1,
-        data: encodeFunctionData({
-          abi: ERC20_ABI,
-          functionName: "approve",
-          args: [nftManager, amount * BigInt(2)],
-        }),
-      },
-      {
-        to: nftManager,
-        data: encodeFunctionData({
-          abi: NFT_MANAGER_ABI,
-          functionName: "mint",
-          args: [
-            {
-              token0,
-              token1,
-              fee: 100,
-              tickLower: -887220,
-              tickUpper: 887220,
-              amount0Desired: amount,
-              amount1Desired: amount * BigInt(2), // TODO: calculate the valid amount of token1
-              amount0Min: BigInt(0), // TODO: add min amount
-              amount1Min: BigInt(0), // TODO: add min amount
+        {
+          to: token0,
+          data: encodeFunctionData({
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [nftManager, amount],
+          }),
+        },
+        {
+          to: token1,
+          data: encodeFunctionData({
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [nftManager, amount * BigInt(2)],
+          }),
+        },
+        {
+          to: nftManager,
+          data: encodeFunctionData({
+            abi: NFT_MANAGER_ABI,
+            functionName: "mint",
+            args: [
+              {
+                token0,
+                token1,
+                fee: 100,
+                tickLower: -887220,
+                tickUpper: 887220,
+                amount0Desired: amount,
+                amount1Desired: amount * BigInt(2), // TODO: calculate the valid amount of token1
+                amount0Min: BigInt(0), // TODO: add min amount
+                amount1Min: BigInt(0), // TODO: add min amount
               recipient: user,
-              deadline,
-            },
-          ],
-        }),
-      },
+                deadline,
+              },
+            ],
+          }),
+        },
     ];
   }
 }

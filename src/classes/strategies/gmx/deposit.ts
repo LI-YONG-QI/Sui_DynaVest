@@ -21,15 +21,15 @@ export class GMXDeposit extends BaseStrategy<typeof GMX_CONTRACTS> {
       const gmxStrategy = this.getAddress("gmxStrategy");
 
       return [
-        {
-          to: gmxStrategy,
-          value: amount,
-          data: encodeFunctionData({
-            abi: GMX_STRATEGY_ABI,
-            functionName: "depositToBeefyVaultWithETH",
-            args: [],
-          }),
-        },
+          {
+            to: gmxStrategy,
+            value: amount,
+            data: encodeFunctionData({
+              abi: GMX_STRATEGY_ABI,
+              functionName: "depositToBeefyVaultWithETH",
+              args: [],
+            }),
+          },
       ];
     } else {
       throw new Error(

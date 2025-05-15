@@ -31,42 +31,42 @@ export class CamelotStaking extends BaseStrategy<typeof CAMELOT_CONTRACTS> {
       // 1. Swap ETH to xGrail
       // 2. Then approve and allocate in a separate transaction
       const calls: StrategyCall[] = [
-        {
-          to: camelotStrategy,
-          value: amount,
-          data: encodeFunctionData({
-            abi: CAMELOT_STRATEGY_ABI,
-            functionName: "swapETHToXGrail",
-            args: [
-              {
-                amountIn: amount,
-                amountOut: BigInt(0),
-                path: [weth, grail],
-                adapters: [adapter],
-                recipients: [pair],
-              },
+          {
+            to: camelotStrategy,
+            value: amount,
+            data: encodeFunctionData({
+              abi: CAMELOT_STRATEGY_ABI,
+              functionName: "swapETHToXGrail",
+              args: [
+                {
+                  amountIn: amount,
+                  amountOut: BigInt(0),
+                  path: [weth, grail],
+                  adapters: [adapter],
+                  recipients: [pair],
+                },
               user,
-            ],
-          }),
-        },
+              ],
+            }),
+          },
         // These next steps would typically happen after the balance is known,
         // but for the sake of this refactoring we're including them all in one array
-        {
-          to: xGrail,
-          data: encodeFunctionData({
-            abi: XGRAIL_ABI,
-            functionName: "approveUsage",
+          {
+            to: xGrail,
+            data: encodeFunctionData({
+              abi: XGRAIL_ABI,
+              functionName: "approveUsage",
             args: [dividendsV2, amount], // Using input amount as a placeholder
-          }),
-        },
-        {
-          to: xGrail,
-          data: encodeFunctionData({
-            abi: XGRAIL_ABI,
-            functionName: "allocate",
+            }),
+          },
+          {
+            to: xGrail,
+            data: encodeFunctionData({
+              abi: XGRAIL_ABI,
+              functionName: "allocate",
             args: [dividendsV2, amount, "0x"], // Using input amount as a placeholder
-          }),
-        },
+            }),
+          },
       ];
 
       return calls;

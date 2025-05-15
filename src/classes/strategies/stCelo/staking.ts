@@ -17,15 +17,15 @@ export class StCeloStaking extends BaseStrategy<typeof ST_CELO_CONTRACTS> {
     const manager = this.getAddress("manager");
 
     return [
-      {
-        to: manager,
-        value: amount,
-        data: encodeFunctionData({
-          abi: STAKED_CELO_ABI,
-          functionName: "deposit",
-          args: [],
-        }),
-      },
+        {
+          to: manager,
+          value: amount,
+          data: encodeFunctionData({
+            abi: STAKED_CELO_ABI,
+            functionName: "deposit",
+            args: [],
+          }),
+        },
     ];
   }
 }
