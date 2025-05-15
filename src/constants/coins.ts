@@ -153,3 +153,10 @@ export function getWrappedToken(token: Token): Token {
     throw new Error("Token does't have wrapped token");
   }
 }
+
+export const COINGECKO_IDS = {
+  [USDT.name]: "tether",
+  [USDC.name]: "usd-coin",
+  [ETH.name]: "ethereum",
+  [BNB.name]: "binancecoin",
+};
