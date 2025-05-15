@@ -103,6 +103,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
               </div>
             )}
           </div>
+          
         </div>
         <div className="flex items-center px-4 pb-2">
           <div className="flex items-center w-full">

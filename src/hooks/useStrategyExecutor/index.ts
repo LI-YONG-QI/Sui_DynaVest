@@ -34,7 +34,7 @@ export function useStrategyExecutor() {
     const calls = await strategy.buildCalls(amount, user, asset);
 
     // Execute the calls
-    const userOp = await clientForChain!.sendUserOperation({
+    const userOp = await clientForChain!.sendTransaction({
       calls,
     });
 

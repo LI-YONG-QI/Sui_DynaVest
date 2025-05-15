@@ -187,11 +187,6 @@ export default function useCurrencies(tokens: Token[]) {
     refetchOnMount: true, // Force refetch on mount
   });
 
-  // Force an initial fetch if this is the first render and we have tokens
-  useEffect(() => {
-    refreshData();
-  }, [refreshData]);
-
   // Log errors if any
   useEffect(() => {
     if (isError) {

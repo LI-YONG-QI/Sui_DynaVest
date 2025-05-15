@@ -1,49 +1,59 @@
 import Image from "next/image";
 import { useState } from "react";
-import { BNB, USDT, USDC, ETH } from "@/constants/coins";
+import { Address, encodeFunctionData, parseUnits } from "viem";
+import { toast } from "react-toastify";
+import { useChainId } from "wagmi";
+import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
+
 import useCurrencies from "@/hooks/useCurrencies";
 import { Token } from "@/types";
-import { ERC20_ABI } from "@/constants/abis";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
-import { encodeFunctionData, parseUnits } from "viem";
-import { toast } from "react-toastify";
-
-// TODO: Use real data
-// const DUMMY_DATA = [
-//   {
-//     coin_symbol: "BNB",
-//     coin: "BNB",
-//     coin_icon: "crypto-icons/bnb.svg",
-//     balance_coin: 2.3,
-//     balance_usd: 1050.3,
-//     balance_available_coin: 1.2,
-//     balance_available_usd: 550,
-//     balance_frozen_coin: 1.1,
-//     balance_frozen_usd: 500.3,
-//   },
-//   {
-//     coin_symbol: "USDC",
-//     coin: "USD Coin",
-//     coin_icon: "crypto-icons/usdc.svg",
-//     balance_coin: 1250,
-//     balance_usd: 1250,
-//     balance_available_coin: 900,
-//     balance_available_usd: 900,
-//     balance_frozen_coin: 350,
-//     balance_frozen_usd: 350,
-//   },
-// ];
-
-const SUPPORTED_TOKENS = [USDT, USDC, BNB, ETH];
+import { WithdrawDialog } from "./WithdrawDialog";
+import { ERC20_ABI } from "@/constants";
+import { SUPPORTED_TOKENS } from "@/constants/profile";
 
 export default function AssetsTableComponent() {
   const [sortKey, setSortKey] = useState<"balance" | null>("balance");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const { tokensData, isLoading } = useCurrencies(SUPPORTED_TOKENS);
+  const { tokensData } = useCurrencies(SUPPORTED_TOKENS);
   const { client } = useSmartWallets();
+  const chainId = useChainId();
 
-  console.log(tokensData);
-  console.log(isLoading);
+  const handleWithdraw = async (asset: Token, amount: string, to: Address) => {
+    if (!client) {
+      toast.error("Client not found");
+      return;
+    }
+
+    await client.switchChain({ id: chainId });
+    try {
+      const decimals = asset.decimals || 6;
+      const amountInBaseUnits = parseUnits(amount, decimals);
+
+      let tx;
+      if (asset.isNativeToken) {
+        tx = await client.sendTransaction({
+          to,
+          value: amountInBaseUnits,
+        });
+      } else {
+        tx = await client.sendTransaction({
+          to: asset.chains?.[chainId],
+          data: encodeFunctionData({
+            abi: ERC20_ABI,
+            functionName: "transfer",
+            args: [to, amountInBaseUnits],
+          }),
+        });
+      }
+
+      toast.success(
+        `${asset.name} withdrawal submitted successfully, tx hash: ${tx}`
+      );
+    } catch (error) {
+      console.log("Error processing withdrawal:", error);
+      toast.error("Something went wrong");
+    }
+  };
 
   const sortedData = [...tokensData].sort((a, b) => {
     if (!sortKey) return 0;
@@ -58,38 +68,6 @@ export default function AssetsTableComponent() {
     } else {
       setSortKey("balance");
       setSortDirection("desc");
-    }
-  };
-
-  const withdraw = async (token: Token, _amount: string) => {
-    if (!client) throw new Error("Client not found");
-
-    const chainId = await client.getChainId();
-    const amount = parseUnits(_amount, token.decimals);
-
-    try {
-      let tx;
-
-      if (token.isNativeToken) {
-        tx = await client.sendTransaction({
-          to: token.chains?.[chainId],
-          value: amount,
-        });
-      } else {
-        tx = await client.sendTransaction({
-          to: token.chains?.[chainId],
-          data: encodeFunctionData({
-            abi: ERC20_ABI,
-            functionName: "transfer",
-            args: ["0x80dAdeBda19E5C010c4417985a4c05d0a8008A81", amount],
-          }),
-        });
-      }
-
-      toast.success(`Transaction sent: ${tx}`);
-    } catch (error) {
-      console.error(error);
-      toast.error("Transaction failed");
     }
   };
 
@@ -152,18 +130,19 @@ export default function AssetsTableComponent() {
                 </div>
               </td>
 
-              {/* TODO: Actions */}
+              {/* Actions */}
               <td className="p-4 text-right rounded-r-xl">
                 <div className="flex justify-end gap-1">
                   <button className="px-3 py-1.5 rounded-lg text-sm text-primary hover:bg-gray-50 transition-colors">
                     Deposit
                   </button>
-                  <button
-                    onClick={() => withdraw(asset.token, "0.00001")}
-                    className="px-3 py-1.5 rounded-lg text-sm text-primary hover:bg-gray-50 transition-colors"
-                  >
-                    Withdraw
-                  </button>
+                  <WithdrawDialog
+                    asset={asset.token}
+                    balance={asset.balance}
+                    onWithdraw={(amount, to) =>
+                      handleWithdraw(asset.token, amount, to)
+                    }
+                  />
                 </div>
               </td>
             </tr>
