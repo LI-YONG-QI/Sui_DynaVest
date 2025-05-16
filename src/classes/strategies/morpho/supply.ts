@@ -7,7 +7,12 @@ import { wagmiConfig as config } from "@/providers/config";
 
 export class MorphoSupply extends BaseStrategy<typeof MORPHO_CONTRACTS> {
   constructor(chainId: number) {
-    super(chainId, MORPHO_CONTRACTS);
+    super(chainId, MORPHO_CONTRACTS, {
+      protocol: "Morpho",
+      icon: "/crypto-icons/morpho.svg",
+      type: "Lending",
+      description: "Lend assets to Morpho",
+    });
   }
 
   async buildCalls(

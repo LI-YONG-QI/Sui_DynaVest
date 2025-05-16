@@ -7,6 +7,7 @@ import { waitForTransactionReceipt } from "viem/actions";
 import { BaseStrategy } from "@/classes/strategies/baseStrategy";
 import { Protocols } from "@/types/strategies";
 import { MultiStrategy } from "@/classes/strategies/multiStrategy";
+import axios from "axios";
 
 export function useStrategyExecutor() {
   const { client } = useSmartWallets();
@@ -41,7 +42,24 @@ export function useStrategyExecutor() {
       }
     );
 
-    return waitForUserOp(userOp);
+    const txHash = await waitForUserOp(userOp);
+
+    // TODO: doesn't process MultiStrategy yet
+    if (strategy instanceof BaseStrategy) {
+      axios.put("/api/user", {
+        address: user,
+        transactions: [
+          {
+            hash: txHash,
+            strategy: strategy.metadata.protocol,
+            type: strategy.metadata.type,
+            amount: amount.toString(),
+          },
+        ],
+      });
+    }
+
+    return txHash;
   }
 
   async function waitForUserOp(userOp: `0x${string}`): Promise<string> {
