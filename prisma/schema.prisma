@@ -27,9 +27,12 @@ model Tx {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id])
+  chainId   Int
+  icon      String
   userId    String
   strategy  String
   hash      String
   type      String
   amount    String
+  tokenName String
 }

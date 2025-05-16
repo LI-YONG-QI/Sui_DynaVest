@@ -9,6 +9,9 @@ interface Transaction {
   strategy: string;
   type: string;
   amount: string;
+  chainId: number;
+  icon: string;
+  tokenName: string;
 }
 
 // GET - Fetch all users or a specific user by address
@@ -80,6 +83,9 @@ export async function POST(req: NextRequest) {
                 strategy: tx.strategy,
                 type: tx.type,
                 amount: tx.amount,
+                chainId: tx.chainId,
+                icon: tx.icon,
+                tokenName: tx.tokenName,
               })),
             }
           : undefined,
@@ -130,6 +136,9 @@ export async function PUT(req: NextRequest) {
                 strategy: tx.strategy,
                 type: tx.type,
                 amount: tx.amount,
+                chainId: tx.chainId,
+                icon: tx.icon,
+                tokenName: tx.tokenName,
               })),
             }
           : undefined,
