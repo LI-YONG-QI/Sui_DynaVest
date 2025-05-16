@@ -65,19 +65,6 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     setAmount(maxBalance.toString());
   };
 
-  useEffect(() => {
-    setButtonState(
-      isLoading
-        ? ButtonState.Pending
-        : !isWalletReady
-        ? ButtonState.Pending
-        : isSupportedChain
-        ? ButtonState.Invest
-        : ButtonState.SwitchChain
-    );
-    setIsDisabled(isLoading);
-  }, [isWalletReady, isLoading, isSupportedChain]);
-
   const invest = async () => {
     if (Number(amount) < AMOUNT_LIMIT) {
       toast.error("Investment amount must be greater than 0.01");
@@ -89,6 +76,16 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
       setIsDisabled(false);
     } else {
       executeStrategy();
+    }
+  };
+
+  const handleSwitchChain = async (chainId: number) => {
+    try {
+      await switchChainAsync({ chainId });
+      toast.success("Switched chain successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to switch chain");
     }
   };
 
@@ -136,12 +133,25 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
         invest();
         break;
       case ButtonState.SwitchChain:
-        switchChainAsync({ chainId: strategy.chainId });
+        handleSwitchChain(strategy.chainId);
         break;
       default:
         break;
     }
   };
+
+  useEffect(() => {
+    setButtonState(
+      isLoading
+        ? ButtonState.Pending
+        : !isWalletReady
+        ? ButtonState.Pending
+        : isSupportedChain
+        ? ButtonState.Invest
+        : ButtonState.SwitchChain
+    );
+    setIsDisabled(isLoading);
+  }, [isWalletReady, isLoading, isSupportedChain]);
 
   return (
     <form onSubmit={handleSubmit}>

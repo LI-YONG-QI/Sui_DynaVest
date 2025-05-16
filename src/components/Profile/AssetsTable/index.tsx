@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useState } from "react";
+
 import { useAssets } from "@/contexts/AssetsContext";
 import { WithdrawDialog } from "./WithdrawDialog";
 import { DepositDialog } from "./DepositDialog";
