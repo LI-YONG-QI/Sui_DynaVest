@@ -7,7 +7,12 @@ import { AAVE_CONTRACTS } from "@/constants/protocols/aave";
 
 export class AaveV3Supply extends BaseStrategy<typeof AAVE_CONTRACTS> {
   constructor(chainId: number) {
-    super(chainId, AAVE_CONTRACTS);
+    super(chainId, AAVE_CONTRACTS, {
+      protocol: "Aave V3",
+      icon: "/crypto-icons/aave.svg",
+      type: "Lending",
+      description: "Lend assets to Aave V3",
+    });
   }
 
   async buildCalls(

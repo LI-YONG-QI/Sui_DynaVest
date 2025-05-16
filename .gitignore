@@ -40,4 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+# For dev
 src/app/dev/page.tsx
+
+# Prisma
+src/generated/prisma/
+
+

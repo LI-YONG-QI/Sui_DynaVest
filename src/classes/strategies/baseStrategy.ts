@@ -12,10 +12,21 @@ export type StrategyCall = {
   value?: bigint;
 };
 
+export type BaseStrategyMetadata = {
+  protocol: string;
+  icon: string;
+  type: "Lending" | "Trading" | "Staking" | "Yield" | "Other";
+  description: string;
+};
+
 export abstract class BaseStrategy<T extends Protocols> {
   public readonly chainId: ProtocolChains<T>;
 
-  constructor(chainId: number, public readonly protocolAddresses: T) {
+  constructor(
+    chainId: number,
+    public readonly protocolAddresses: T,
+    public readonly metadata: BaseStrategyMetadata
+  ) {
     if (this.isSupported(chainId)) {
       this.chainId = chainId as ProtocolChains<T>;
     } else {

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { useAssets } from "@/contexts/AssetsContext";
 import AssetsTableComponent from "@/components/Profile/AssetsTable";
-import StrategiesTableComponent from "@/components/Profile/StrategiesTable";
+// import StrategiesTableComponent from "@/components/Profile/StrategiesTable";
 import TransactionsTableComponent from "@/components/Profile/TransactionsTable";
 
 const PROFILE_TABS = [
@@ -13,10 +13,10 @@ const PROFILE_TABS = [
     label: "Assets",
     value: "assets",
   },
-  {
-    label: "Strategies",
-    value: "strategies",
-  },
+  // {
+  //   label: "Strategies",
+  //   value: "strategies",
+  // },
   {
     label: "Transactions",
     value: "transactions",
@@ -27,8 +27,8 @@ function getTabComponent(tab: string) {
   switch (tab) {
     case "assets":
       return <AssetsTableComponent />;
-    case "strategies":
-      return <StrategiesTableComponent />;
+    // case "strategies":
+    //   return <StrategiesTableComponent />;
     case "transactions":
       return <TransactionsTableComponent />;
     default:
