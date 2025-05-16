@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
+import { useAssets } from "@/contexts/AssetsContext";
 import AssetsTableComponent from "@/components/Profile/AssetsTable";
 import StrategiesTableComponent from "@/components/Profile/StrategiesTable";
 import TransactionsTableComponent from "@/components/Profile/TransactionsTable";
@@ -37,6 +38,7 @@ function getTabComponent(tab: string) {
 
 export default function ProfilePage() {
   const [selectedTab, setSelectedTab] = useState(PROFILE_TABS[0].value);
+  const { tokensData } = useAssets();
 
   return (
     <div className="pb-10 px-2 sm:px-0">
@@ -124,21 +126,26 @@ export default function ProfilePage() {
               Available Balance
             </h4>
             <p className="text-base sm:text-lg font-bold tracking-wide">
-              $ 1,352
+              ${" "}
+              {tokensData
+                .reduce((acc, token) => acc + token.value, 0)
+                .toFixed(2)}
             </p>
           </div>
           <div>
             <h4 className="text-xs sm:text-sm font-medium text-gray-300">
-              Total Asset
+              Total Assets
             </h4>
-            <p className="text-base sm:text-lg font-bold tracking-wide">$15</p>
+            <p className="text-base sm:text-lg font-bold tracking-wide">
+              {/* TODO: mock data */}$ 15
+            </p>
           </div>
           <div>
             <h4 className="text-xs sm:text-sm font-medium text-gray-300">
               Total Profit
             </h4>
             <p className="text-green-500 font-bold tracking-wide text-base sm:text-lg">
-              $ 213
+              {/* TODO: mock data */}$ 213
             </p>
           </div>
         </div>

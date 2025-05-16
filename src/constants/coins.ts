@@ -35,14 +35,14 @@ export const ETH: Token = {
 
 export const BNB: Token = {
   name: "BNB",
-  icon: "/crypto-icons/bnb.svg",
+  icon: "/crypto-icons/chains/56.svg",
   decimals: 18,
   isNativeToken: true,
 };
 
 export const wstETH: Token = {
   name: "wstETH",
-  icon: "/crypto-icons/weth.svg",
+  icon: "/crypto-icons/wstETH.webp",
   decimals: 18,
   isNativeToken: false,
   chains: {
@@ -53,7 +53,7 @@ export const wstETH: Token = {
 
 export const wbETH: Token = {
   name: "wbETH",
-  icon: "/crypto-icons/weth.svg",
+  icon: "/crypto-icons/wbeth.webp",
   decimals: 18,
   isNativeToken: false,
   chains: {
@@ -73,7 +73,7 @@ export const cbBTC: Token = {
 
 export const CELO: Token = {
   name: "CELO",
-  icon: "/crypto-icons/celo.svg",
+  icon: "/crypto-icons/chains/42220.svg",
   decimals: 18,
   isNativeToken: false,
   chains: {
@@ -83,7 +83,7 @@ export const CELO: Token = {
 
 export const FLOW: Token = {
   name: "FLOW",
-  icon: "/crypto-icons/flow.svg",
+  icon: "/crypto-icons/chains/747.svg",
   decimals: 18,
   isNativeToken: true,
 };
@@ -153,3 +153,10 @@ export function getWrappedToken(token: Token): Token {
     throw new Error("Token does't have wrapped token");
   }
 }
+
+export const COINGECKO_IDS = {
+  [USDT.name]: "tether",
+  [USDC.name]: "usd-coin",
+  [ETH.name]: "ethereum",
+  [BNB.name]: "binancecoin",
+};

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useLogin, usePrivy } from "@privy-io/react-auth";
-import { useChainId, useDisconnect } from "wagmi";
+import { useDisconnect } from "wagmi";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +14,6 @@ export default function ConnectWalletButton() {
   } = usePrivy();
 
   const [address, setAddress] = useState<string | null>(null);
-  const chainId = useChainId();
   const { login } = useLogin();
   const { disconnect } = useDisconnect();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -91,7 +90,6 @@ export default function ConnectWalletButton() {
       style={backgroundStyle}
       ref={dropdownRef}
     >
-      <div> {chainId} </div>
       <button
         disabled={!buttonReady}
         onClick={handleButtonOnClick}

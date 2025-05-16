@@ -4,6 +4,8 @@ import Link from "next/link";
 import ConnectWalletButton from "./ConnectWalletButton";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import ChainSelector from "./ChainSelector";
+
 interface NavItem {
   label: string;
   href: string;
@@ -44,7 +46,10 @@ export default function Header() {
         ))}
       </nav>
 
-      <ConnectWalletButton />
+      <div className="flex items-center gap-4">
+        <ChainSelector />
+        <ConnectWalletButton />
+      </div>
     </header>
   );
 }

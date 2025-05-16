@@ -9,12 +9,10 @@ export class StCeloStaking extends BaseStrategy<typeof ST_CELO_CONTRACTS> {
     super(chainId, ST_CELO_CONTRACTS);
   }
 
-  async buildCalls(
-    amount: bigint,
-    user: Address,
-    asset?: Address
-  ): Promise<StrategyCall[]> {
+  async buildCalls(amount: bigint, user: Address): Promise<StrategyCall[]> {
     const manager = this.getAddress("manager");
+
+    console.log(user);
 
     return [
       {
