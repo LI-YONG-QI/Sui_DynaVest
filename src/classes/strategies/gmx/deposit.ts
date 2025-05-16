@@ -7,8 +7,14 @@ import { wagmiConfig } from "@/providers/config";
 import { GMX_STRATEGY_ABI, ERC20_ABI } from "@/constants/abis";
 
 export class GMXDeposit extends BaseStrategy<typeof GMX_CONTRACTS> {
+  // TODO: mock metadata 
   constructor(chainId: number) {
-    super(chainId, GMX_CONTRACTS);
+    super(chainId, GMX_CONTRACTS, {
+      protocol: "Morpho",
+      icon: "/crypto-icons/morpho.svg",
+      type: "Lending",
+      description: "Lend assets to Morpho",
+    });
   }
 
   async buildCalls(
@@ -21,15 +27,15 @@ export class GMXDeposit extends BaseStrategy<typeof GMX_CONTRACTS> {
       const gmxStrategy = this.getAddress("gmxStrategy");
 
       return [
-          {
-            to: gmxStrategy,
-            value: amount,
-            data: encodeFunctionData({
-              abi: GMX_STRATEGY_ABI,
-              functionName: "depositToBeefyVaultWithETH",
-              args: [],
-            }),
-          },
+        {
+          to: gmxStrategy,
+          value: amount,
+          data: encodeFunctionData({
+            abi: GMX_STRATEGY_ABI,
+            functionName: "depositToBeefyVaultWithETH",
+            args: [],
+          }),
+        },
       ];
     } else {
       throw new Error(

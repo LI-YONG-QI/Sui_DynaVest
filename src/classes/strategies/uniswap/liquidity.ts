@@ -43,7 +43,13 @@ export class UniswapV3AddLiquidity extends BaseStrategy<
   typeof UNISWAP_CONTRACTS
 > {
   constructor(chainId: number) {
-    super(chainId, UNISWAP_CONTRACTS);
+    // TODO: mock metadata
+    super(chainId, UNISWAP_CONTRACTS, {
+      protocol: "Uniswap V3",
+      icon: "/crypto-icons/uniswap.svg",
+      type: "Lending",
+      description: "Lend assets to Uniswap V3",
+    });
   }
 
   // TODO: only support USDC/USDT, and user must have both
@@ -64,44 +70,44 @@ export class UniswapV3AddLiquidity extends BaseStrategy<
     const [token0, token1] = sortAddresses(asset, usdt);
 
     return [
-        {
-          to: token0,
-          data: encodeFunctionData({
-            abi: ERC20_ABI,
-            functionName: "approve",
-            args: [nftManager, amount],
-          }),
-        },
-        {
-          to: token1,
-          data: encodeFunctionData({
-            abi: ERC20_ABI,
-            functionName: "approve",
-            args: [nftManager, amount * BigInt(2)],
-          }),
-        },
-        {
-          to: nftManager,
-          data: encodeFunctionData({
-            abi: NFT_MANAGER_ABI,
-            functionName: "mint",
-            args: [
-              {
-                token0,
-                token1,
-                fee: 100,
-                tickLower: -887220,
-                tickUpper: 887220,
-                amount0Desired: amount,
-                amount1Desired: amount * BigInt(2), // TODO: calculate the valid amount of token1
-                amount0Min: BigInt(0), // TODO: add min amount
-                amount1Min: BigInt(0), // TODO: add min amount
+      {
+        to: token0,
+        data: encodeFunctionData({
+          abi: ERC20_ABI,
+          functionName: "approve",
+          args: [nftManager, amount],
+        }),
+      },
+      {
+        to: token1,
+        data: encodeFunctionData({
+          abi: ERC20_ABI,
+          functionName: "approve",
+          args: [nftManager, amount * BigInt(2)],
+        }),
+      },
+      {
+        to: nftManager,
+        data: encodeFunctionData({
+          abi: NFT_MANAGER_ABI,
+          functionName: "mint",
+          args: [
+            {
+              token0,
+              token1,
+              fee: 100,
+              tickLower: -887220,
+              tickUpper: 887220,
+              amount0Desired: amount,
+              amount1Desired: amount * BigInt(2), // TODO: calculate the valid amount of token1
+              amount0Min: BigInt(0), // TODO: add min amount
+              amount1Min: BigInt(0), // TODO: add min amount
               recipient: user,
-                deadline,
-              },
-            ],
-          }),
-        },
+              deadline,
+            },
+          ],
+        }),
+      },
     ];
   }
 }

@@ -1,0 +1,8 @@
+# Ignore Prisma generated files
+src/generated/**/*
+
+# Other generated files
+node_modules
+.next
+out
+build 

@@ -19,7 +19,13 @@ export class UniswapV3SwapLST extends BaseStrategy<typeof UNISWAP_CONTRACTS> {
     public readonly nativeToken: Token,
     public readonly lstToken: Token
   ) {
-    super(chainId, UNISWAP_CONTRACTS);
+    // TODO: mock metadata
+    super(chainId, UNISWAP_CONTRACTS, {
+      protocol: "Uniswap V3",
+      icon: "/crypto-icons/uniswap.svg",
+      type: "Lending",
+      description: "Lend assets to Uniswap V3",
+    });
   }
 
   async buildCalls(
@@ -35,25 +41,25 @@ export class UniswapV3SwapLST extends BaseStrategy<typeof UNISWAP_CONTRACTS> {
       const tokenOutAddress = this.lstToken.chains![this.chainId];
 
       return [
-          {
-            to: swapRouter,
-            value: amount,
-            data: encodeFunctionData({
-              abi: V3_SWAP_ROUTER_ABI,
-              functionName: "exactInputSingle",
-              args: [
-                {
-                  tokenIn: tokenInAddress,
-                  tokenOut: tokenOutAddress,
-                  fee: 100,
+        {
+          to: swapRouter,
+          value: amount,
+          data: encodeFunctionData({
+            abi: V3_SWAP_ROUTER_ABI,
+            functionName: "exactInputSingle",
+            args: [
+              {
+                tokenIn: tokenInAddress,
+                tokenOut: tokenOutAddress,
+                fee: 100,
                 recipient: user,
-                  amountIn: amount,
-                  amountOutMinimum: BigInt(0),
-                  sqrtPriceLimitX96: BigInt(0),
-                },
-              ],
-            }),
-          },
+                amountIn: amount,
+                amountOutMinimum: BigInt(0),
+                sqrtPriceLimitX96: BigInt(0),
+              },
+            ],
+          }),
+        },
       ];
     } else {
       throw new Error("UniswapV3SwapLST: ERC20 doesn't support yet.");
