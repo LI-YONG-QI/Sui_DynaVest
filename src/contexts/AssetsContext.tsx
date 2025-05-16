@@ -8,6 +8,7 @@ import useCurrencies, { TokenData } from "@/hooks/useCurrencies";
 import { Token } from "@/types";
 import { ERC20_ABI } from "@/constants";
 import { SUPPORTED_TOKENS } from "@/constants/profile";
+import type { SupportedChainIds } from "@/providers/config";
 
 interface AssetsContextType {
   tokensData: TokenData[];
@@ -34,10 +35,10 @@ interface AssetsProviderProps {
   tokens?: Token[];
 }
 
-export function AssetsProvider({
-  children,
-  tokens = SUPPORTED_TOKENS,
-}: AssetsProviderProps) {
+export function AssetsProvider({ children }: AssetsProviderProps) {
+  const chainId = useChainId() as SupportedChainIds;
+  const tokensWithChain = SUPPORTED_TOKENS[chainId];
+
   const {
     tokensData,
     isLoading,
@@ -45,10 +46,9 @@ export function AssetsProvider({
     getTokenBalance,
     getTokenPrice,
     getTokenValue,
-  } = useCurrencies(tokens);
+  } = useCurrencies(tokensWithChain);
 
   const { client } = useSmartWallets();
-  const chainId = useChainId();
 
   const handleWithdraw = async (asset: Token, amount: string, to: Address) => {
     if (!client) {

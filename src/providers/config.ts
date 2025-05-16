@@ -21,3 +21,6 @@ export const wagmiConfig = createConfig({
     ),
   },
 });
+
+// Create a mapped type for chain IDs from wagmiConfig.chains
+export type SupportedChainIds = (typeof wagmiConfig.chains)[number]["id"];

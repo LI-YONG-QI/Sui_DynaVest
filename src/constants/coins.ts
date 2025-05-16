@@ -73,7 +73,7 @@ export const cbBTC: Token = {
 
 export const CELO: Token = {
   name: "CELO",
-  icon: "/crypto-icons/celo.svg",
+  icon: "/crypto-icons/chains/42220.svg",
   decimals: 18,
   isNativeToken: false,
   chains: {
@@ -83,7 +83,7 @@ export const CELO: Token = {
 
 export const FLOW: Token = {
   name: "FLOW",
-  icon: "/crypto-icons/flow.svg",
+  icon: "/crypto-icons/chains/747.svg",
   decimals: 18,
   isNativeToken: true,
 };
