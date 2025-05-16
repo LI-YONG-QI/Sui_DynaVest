@@ -3,15 +3,24 @@ import { PrismaClient } from "@/generated/prisma";
 
 const prisma = new PrismaClient();
 
+// Define transaction interface to avoid using 'any'
+interface Transaction {
+  hash: string;
+  strategy: string;
+  type: string;
+  amount: string;
+}
+
 // GET - Fetch all users or a specific user by address
 export async function GET(req: NextRequest) {
   try {
     const address = req.nextUrl.searchParams.get("address");
 
     if (address) {
-      // Fetch a specific user by address
+      // Fetch a specific user by address with their transactions
       const user = await prisma.user.findUnique({
         where: { address },
+        include: { txs: true },
       });
 
       if (!user) {
@@ -20,8 +29,10 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(user);
     } else {
-      // Fetch all users
-      const users = await prisma.user.findMany();
+      // Fetch all users with their transactions
+      const users = await prisma.user.findMany({
+        include: { txs: true },
+      });
       return NextResponse.json(users);
     }
   } catch (error) {
@@ -37,7 +48,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { address, txs } = body;
+    const { address, transactions } = body;
 
     if (!address) {
       return NextResponse.json(
@@ -58,12 +69,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create a new user
+    // Create a new user with optional transactions
     const newUser = await prisma.user.create({
       data: {
         address,
-        txs: txs || [],
+        txs: transactions
+          ? {
+              create: transactions.map((tx: Transaction) => ({
+                hash: tx.hash,
+                strategy: tx.strategy,
+                type: tx.type,
+                amount: tx.amount,
+              })),
+            }
+          : undefined,
       },
+      include: { txs: true },
     });
 
     return NextResponse.json(newUser, { status: 201 });
@@ -76,11 +97,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PUT - Update an existing user
+// PUT - Update an existing user or add transactions
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { address, txs } = body;
+    const { address, transactions } = body;
 
     if (!address) {
       return NextResponse.json(
@@ -98,12 +119,22 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Update the user
+    // Update the user and add new transactions if provided
     const updatedUser = await prisma.user.update({
       where: { address },
       data: {
-        txs: txs || existingUser.txs,
+        txs: transactions
+          ? {
+              create: transactions.map((tx: Transaction) => ({
+                hash: tx.hash,
+                strategy: tx.strategy,
+                type: tx.type,
+                amount: tx.amount,
+              })),
+            }
+          : undefined,
       },
+      include: { txs: true },
     });
 
     return NextResponse.json(updatedUser);
@@ -116,7 +147,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// DELETE - Delete a user
+// DELETE - Delete a user and their transactions
 export async function DELETE(req: NextRequest) {
   try {
     const address = req.nextUrl.searchParams.get("address");
@@ -137,13 +168,18 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Delete all transactions for this user first
+    await prisma.tx.deleteMany({
+      where: { userId: existingUser.id },
+    });
+
     // Delete the user
     await prisma.user.delete({
       where: { address },
     });
 
     return NextResponse.json(
-      { message: "User deleted successfully" },
+      { message: "User and associated transactions deleted successfully" },
       { status: 200 }
     );
   } catch (error) {
