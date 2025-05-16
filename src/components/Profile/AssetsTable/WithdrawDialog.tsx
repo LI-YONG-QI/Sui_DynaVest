@@ -75,6 +75,7 @@ export function WithdrawDialog({
 
   const onSubmit = (values: WithdrawFormValues) => {
     onWithdraw(values.amount, values.to as Address);
+    form.reset();
   };
 
   return (

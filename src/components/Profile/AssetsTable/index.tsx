@@ -1,60 +1,14 @@
 import Image from "next/image";
 import { useState } from "react";
-import { Address, encodeFunctionData, parseUnits } from "viem";
-import { toast } from "react-toastify";
-import { useChainId } from "wagmi";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
-
-import useCurrencies from "@/hooks/useCurrencies";
-import { Token } from "@/types";
+import { useAssets } from "@/contexts/AssetsContext";
 import { WithdrawDialog } from "./WithdrawDialog";
-import { ERC20_ABI } from "@/constants";
-import { SUPPORTED_TOKENS } from "@/constants/profile";
 import { DepositDialog } from "./DepositDialog";
 
 export default function AssetsTableComponent() {
+  const { tokensData, handleWithdraw } = useAssets();
+
   const [sortKey, setSortKey] = useState<"balance" | null>("balance");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const { tokensData } = useCurrencies(SUPPORTED_TOKENS);
-  const { client } = useSmartWallets();
-  const chainId = useChainId();
-
-  const handleWithdraw = async (asset: Token, amount: string, to: Address) => {
-    if (!client) {
-      toast.error("Client not found");
-      return;
-    }
-
-    await client.switchChain({ id: chainId });
-    try {
-      const decimals = asset.decimals || 6;
-      const amountInBaseUnits = parseUnits(amount, decimals);
-
-      let tx;
-      if (asset.isNativeToken) {
-        tx = await client.sendTransaction({
-          to,
-          value: amountInBaseUnits,
-        });
-      } else {
-        tx = await client.sendTransaction({
-          to: asset.chains?.[chainId],
-          data: encodeFunctionData({
-            abi: ERC20_ABI,
-            functionName: "transfer",
-            args: [to, amountInBaseUnits],
-          }),
-        });
-      }
-
-      toast.success(
-        `${asset.name} withdrawal submitted successfully, tx hash: ${tx}`
-      );
-    } catch (error) {
-      console.log("Error processing withdrawal:", error);
-      toast.error("Something went wrong");
-    }
-  };
 
   const sortedData = [...tokensData].sort((a, b) => {
     if (!sortKey) return 0;
@@ -126,8 +80,9 @@ export default function AssetsTableComponent() {
                   {asset.balance.toString()}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {/* TODO: update with usd value */}
-                  {`$ ${asset.balance.toString()}`}
+                  {asset.price
+                    ? `$ ${(asset.balance * asset.price).toFixed(2)}`
+                    : `$ ${asset.balance.toString()}`}
                 </div>
               </td>
 

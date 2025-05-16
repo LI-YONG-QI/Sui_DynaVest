@@ -13,8 +13,8 @@ import { COINGECKO_IDS } from "@/constants/coins";
 export interface TokenData {
   token: Token;
   balance: number;
-  price?: number;
-  value?: number; // balance * price
+  value: number;
+  price: number;
 }
 
 export default function useCurrencies(tokens: Token[]) {
@@ -29,7 +29,7 @@ export default function useCurrencies(tokens: Token[]) {
       const emptyTokensData = tokens.map((token) => ({
         token,
         balance: 0,
-        price: undefined,
+        price: 0,
         value: 0,
       }));
       setInitialTokensData(emptyTokensData);
