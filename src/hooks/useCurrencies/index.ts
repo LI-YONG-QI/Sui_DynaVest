@@ -9,6 +9,7 @@ import { wagmiConfig as config } from "@/providers/config";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { Token } from "@/types";
 import { COINGECKO_IDS } from "@/constants/coins";
+import { toast } from "react-toastify";
 
 export interface TokenData {
   token: Token;
@@ -138,6 +139,8 @@ export default function useCurrencies(tokens: Token[]) {
         return updatedTokensData;
       } catch (error) {
         console.error("Error fetching balances:", error);
+
+        toast.error("Error fetching balances");
         return tokensData;
       }
     },
