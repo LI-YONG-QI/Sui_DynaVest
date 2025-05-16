@@ -23,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import { Token } from "@/types";
 import { Button } from "@/components/ui/button";
 
-// 创建一个schema工厂函数，接收用户余额作为参数
 const createWithdrawFormSchema = (balance: number) =>
   z.object({
     amount: z

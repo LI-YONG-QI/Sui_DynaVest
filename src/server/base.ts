@@ -1,42 +1,44 @@
-import { EXECUTOR_ABI } from "@/constants/abis";
-import { extractChain } from "viem";
-import type { Address } from "viem";
+// /* eslint-disable */
 
-import type { Call, ExecutionResult } from "./types";
-import { getAdminWallet } from "./utils";
-import {
-  DYNAVEST_CONTRACTS,
-  DynaVestSupportedChains,
-} from "@/constants/protocols/dynaVest";
-import { wagmiConfig } from "@/providers/config";
+// import { EXECUTOR_ABI } from "@/constants/abis";
+// import { extractChain } from "viem";
+// import type { Address } from "viem";
 
-export abstract class BaseStrategy<T extends DynaVestSupportedChains> {
-  public readonly executor: Address;
-  public readonly chainId: T;
+// import type { Call, ExecutionResult } from "./types";
+// import { getAdminWallet } from "./utils";
+// import {
+//   DYNAVEST_CONTRACTS,
+//   DynaVestSupportedChains,
+// } from "@/constants/protocols/dynaVest";
+// import { wagmiConfig } from "@/providers/config";
 
-  constructor(chainId: T) {
-    this.chainId = chainId;
-    this.executor = DYNAVEST_CONTRACTS[chainId].executor;
-  }
+// export abstract class BaseStrategy<T extends DynaVestSupportedChains> {
+//   public readonly executor: Address;
+//   public readonly chainId: T;
 
-  async multiCall(user: Address, calls: Call[]): Promise<ExecutionResult> {
-    const chain = extractChain({
-      chains: wagmiConfig.chains,
-      id: this.chainId,
-    });
+//   constructor(chainId: T) {
+//     this.chainId = chainId;
+//     this.executor = DYNAVEST_CONTRACTS[chainId].executor;
+//   }
 
-    const adminWallet = getAdminWallet(chain);
+//   async multiCall(user: Address, calls: Call[]): Promise<ExecutionResult> {
+//     const chain = extractChain({
+//       chains: wagmiConfig.chains,
+//       id: this.chainId,
+//     });
 
-    const tx = await adminWallet.writeContract({
-      abi: EXECUTOR_ABI,
-      address: this.executor,
-      functionName: "execute",
-      args: [calls, user],
-    });
+//     const adminWallet = getAdminWallet(chain);
 
-    return {
-      success: true,
-      message: `Success!! Transaction Hash: ${tx}`,
-    };
-  }
-}
+//     const tx = await adminWallet.writeContract({
+//       abi: EXECUTOR_ABI,
+//       address: this.executor,
+//       functionName: "execute",
+//       args: [calls, user],
+//     });
+
+//     return {
+//       success: true,
+//       message: `Success!! Transaction Hash: ${tx}`,
+//     };
+//   }
+// }

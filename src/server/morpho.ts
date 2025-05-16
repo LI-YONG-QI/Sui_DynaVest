@@ -1,110 +1,112 @@
-import "server-only";
+// /* eslint-disable */
 
-import { Address, encodeFunctionData, Hex, parseSignature, toHex } from "viem";
-import { readContract } from "@wagmi/core";
+// import "server-only";
 
-import { ERC20_ABI, ERC20_PERMIT_ABI, MORPHO_ABI } from "@/constants/abis";
-import { MORPHO_CONTRACTS, MorphoSupportedChains } from "@/constants/protocols";
-import { wagmiConfig as config } from "@/providers/config";
-import { BaseStrategy } from "@/server/base";
-import type { Call } from "./types";
+// import { Address, encodeFunctionData, Hex, parseSignature, toHex } from "viem";
+// import { readContract } from "@wagmi/core";
 
-export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains> {
-  private readonly morpho: Address;
+// import { ERC20_ABI, ERC20_PERMIT_ABI, MORPHO_ABI } from "@/constants/abis";
+// import { MORPHO_CONTRACTS, MorphoSupportedChains } from "@/constants/protocols";
+// import { wagmiConfig as config } from "@/providers/config";
+// import { BaseStrategy } from "@/server/base";
+// import type { Call } from "./types";
 
-  constructor(chainId: MorphoSupportedChains) {
-    super(chainId);
-    this.morpho = MORPHO_CONTRACTS[chainId].morpho;
-  }
+// export class MorphoSupplyingStrategy extends BaseStrategy<MorphoSupportedChains> {
+//   private readonly morpho: Address;
 
-  async buildCalls(
-    user: Address,
-    asset: Address,
-    amount: bigint,
-    deadline: bigint,
-    signature: Hex
-  ) {
-    const calls: Call[] = [];
+//   constructor(chainId: MorphoSupportedChains) {
+//     super(chainId);
+//     this.morpho = MORPHO_CONTRACTS[chainId].morpho;
+//   }
 
-    const { r, s, v } = parseSignature(signature);
+//   async buildCalls(
+//     user: Address,
+//     asset: Address,
+//     amount: bigint,
+//     deadline: bigint,
+//     signature: Hex
+//   ) {
+//     const calls: Call[] = [];
 
-    //* Step 1  USDC Permit
-    {
-      const data = encodeFunctionData({
-        abi: ERC20_PERMIT_ABI,
-        functionName: "permit",
-        args: [user, this.executor, amount, deadline, Number(v), r, s],
-      });
-      calls.push({
-        target: asset,
-        callData: data,
-      });
-    }
+//     const { r, s, v } = parseSignature(signature);
 
-    //* Step 2  USDC Transfer to Executor
-    {
-      const data = encodeFunctionData({
-        abi: ERC20_ABI,
-        functionName: "transferFrom",
-        args: [user, this.executor, amount],
-      });
-      calls.push({
-        target: asset,
-        callData: data,
-      });
-    }
+//     //* Step 1  USDC Permit
+//     {
+//       const data = encodeFunctionData({
+//         abi: ERC20_PERMIT_ABI,
+//         functionName: "permit",
+//         args: [user, this.executor, amount, deadline, Number(v), r, s],
+//       });
+//       calls.push({
+//         target: asset,
+//         callData: data,
+//       });
+//     }
 
-    //* Step 3 Approve to morpho blue
-    {
-      const data = encodeFunctionData({
-        abi: ERC20_ABI,
-        functionName: "approve",
-        args: [this.morpho, amount],
-      });
-      calls.push({
-        target: asset,
-        callData: data,
-      });
-    }
+//     //* Step 2  USDC Transfer to Executor
+//     {
+//       const data = encodeFunctionData({
+//         abi: ERC20_ABI,
+//         functionName: "transferFrom",
+//         args: [user, this.executor, amount],
+//       });
+//       calls.push({
+//         target: asset,
+//         callData: data,
+//       });
+//     }
 
-    //* Step 4  Supply USDC to morpho blue
-    {
-      const wethUsdcMarket =
-        "0x8793cf302b8ffd655ab97bd1c695dbd967807e8367a65cb2f4edaf1380ba1bda"; // TODO: mock market id
-      const marketParams = await this.getMarketParams(wethUsdcMarket);
+//     //* Step 3 Approve to morpho blue
+//     {
+//       const data = encodeFunctionData({
+//         abi: ERC20_ABI,
+//         functionName: "approve",
+//         args: [this.morpho, amount],
+//       });
+//       calls.push({
+//         target: asset,
+//         callData: data,
+//       });
+//     }
 
-      const data = encodeFunctionData({
-        abi: MORPHO_ABI,
-        functionName: "supply",
-        args: [marketParams, amount, BigInt(0), user, toHex("")],
-      });
-      calls.push({
-        target: this.morpho,
-        callData: data,
-      });
-    }
+//     //* Step 4  Supply USDC to morpho blue
+//     {
+//       const wethUsdcMarket =
+//         "0x8793cf302b8ffd655ab97bd1c695dbd967807e8367a65cb2f4edaf1380ba1bda"; // TODO: mock market id
+//       const marketParams = await this.getMarketParams(wethUsdcMarket);
 
-    return calls;
-  }
+//       const data = encodeFunctionData({
+//         abi: MORPHO_ABI,
+//         functionName: "supply",
+//         args: [marketParams, amount, BigInt(0), user, toHex("")],
+//       });
+//       calls.push({
+//         target: this.morpho,
+//         callData: data,
+//       });
+//     }
 
-  private async getMarketParams(marketId: Hex) {
-    const [loanToken, collateralToken, oracle, irm, lltv] = await readContract(
-      config,
-      {
-        chainId: this.chainId,
-        abi: MORPHO_ABI,
-        address: this.morpho,
-        functionName: "idToMarketParams",
-        args: [marketId],
-      }
-    );
+//     return calls;
+//   }
 
-    return {
-      loanToken,
-      collateralToken,
-      oracle,
-      irm,
-      lltv,
-    };
-  }
-}
+//   private async getMarketParams(marketId: Hex) {
+//     const [loanToken, collateralToken, oracle, irm, lltv] = await readContract(
+//       config,
+//       {
+//         chainId: this.chainId,
+//         abi: MORPHO_ABI,
+//         address: this.morpho,
+//         functionName: "idToMarketParams",
+//         args: [marketId],
+//       }
+//     );
+
+//     return {
+//       loanToken,
+//       collateralToken,
+//       oracle,
+//       irm,
+//       lltv,
+//     };
+//   }
+// }

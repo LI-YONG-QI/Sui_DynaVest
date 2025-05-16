@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import type { Address, Hex } from "viem";
 
 export interface Call {

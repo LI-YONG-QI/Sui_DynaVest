@@ -6,19 +6,14 @@ import { useChainId } from "wagmi";
 import { BaseStrategy } from "@/classes/strategies/baseStrategy";
 import { Protocols } from "@/types/strategies";
 import { MultiStrategy } from "@/classes/strategies/multiStrategy";
+
 export function useStrategyExecutor() {
-  const { client, getClientForChain } = useSmartWallets();
+  const { client } = useSmartWallets();
   const chainId = useChainId();
 
   const user = useMemo(() => {
     return client?.account?.address || null;
   }, [client?.account?.address]);
-
-  const uiOptions = {
-    title: "Sample title text",
-    description: "Sample description text",
-    buttonText: "Sample button text",
-  };
 
   async function execute<T extends Protocols>(
     strategy: BaseStrategy<T> | MultiStrategy,
@@ -28,15 +23,22 @@ export function useStrategyExecutor() {
     if (!client) throw new Error("Smart wallet client not available");
     if (!user) throw new Error("Smart wallet account not found");
 
-    const clientForChain = await getClientForChain({ id: chainId });
+    await client.switchChain({ id: chainId });
 
     // Get calls from strategy
     const calls = await strategy.buildCalls(amount, user, asset);
 
     // Execute the calls
-    const userOp = await clientForChain!.sendTransaction({
-      calls,
-    });
+    const userOp = await client.sendTransaction(
+      {
+        calls,
+      },
+      {
+        uiOptions: {
+          showWalletUIs: false,
+        },
+      }
+    );
 
     return waitForUserOp(userOp);
   }
@@ -46,10 +48,12 @@ export function useStrategyExecutor() {
       throw new Error("Smart wallet client not available");
     }
 
-    const clientForChain = await getClientForChain({ id: chainId });
+    console.log(userOp);
+
+    await client.switchChain({ id: chainId });
 
     const { success, receipt, reason, userOpHash } =
-      await clientForChain!.waitForUserOperationReceipt({
+      await client.waitForUserOperationReceipt({
         hash: userOp,
       });
 
@@ -64,7 +68,6 @@ export function useStrategyExecutor() {
 
   return {
     user,
-    uiOptions,
     execute,
     waitForUserOp,
     isReady: !!client && !!user,

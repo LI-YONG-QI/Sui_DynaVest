@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import "server-only";
 
 import { createWalletClient } from "viem";

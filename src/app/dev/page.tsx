@@ -11,7 +11,7 @@ import useCurrency from "@/hooks/useCurrency";
 const Dev = () => {
   const { client } = useSmartWallets();
   const { user, authenticated } = usePrivy();
-  const { balance } = useCurrency([USDC]);
+  const { balance } = useCurrency(USDC);
 
   console.log(user);
   console.log(authenticated);

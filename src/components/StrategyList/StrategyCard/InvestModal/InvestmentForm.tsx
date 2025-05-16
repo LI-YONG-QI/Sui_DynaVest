@@ -1,16 +1,32 @@
 import Image from "next/image";
-import { FC, useState } from "react";
+import { FC, useState, useEffect, FormEvent } from "react";
+import { toast } from "react-toastify";
+import {
+  useAccount,
+  useChainId,
+  useSwitchChain as useWagmiSwitchChain,
+} from "wagmi";
+import { parseUnits } from "viem";
 
 import useCurrency from "@/hooks/useCurrency";
 import useSwitchChain from "@/hooks/useSwitchChain";
-import InvestModalButton from "./button";
 import { InvestStrategy } from "@/types";
 import { MoonLoader } from "react-spinners";
+import { getStrategy } from "@/utils/strategies";
+import { useAccountProviderContext } from "@/contexts/AccountContext";
+import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
+
 // Props interface
 interface InvestmentFormProps {
   strategy: InvestStrategy;
   handleClose?: () => void;
   handlePortfolio?: (amount: string) => void;
+}
+
+enum ButtonState {
+  Pending = "Processing...",
+  Invest = "Invest",
+  SwitchChain = "Switch Chain",
 }
 
 const InvestmentForm: FC<InvestmentFormProps> = ({
@@ -20,8 +36,16 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
 }) => {
   const [amount, setAmount] = useState<string>("");
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const [buttonState, setButtonState] = useState<ButtonState>(
+    ButtonState.Pending
+  );
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { isSupportedChain } = useSwitchChain(strategy.chainId);
+  const { isSupportedChain, ready: isWalletReady } = useSwitchChain(
+    strategy.chainId
+  );
+  const { switchChainAsync } = useWagmiSwitchChain();
   const {
     currency,
     setCurrency,
@@ -29,13 +53,98 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     isLoadingBalance,
   } = useCurrency(strategy.tokens[0]);
 
+  const { address: user } = useAccount();
+  const chainId = useChainId();
+  const { kernelAccountClient } = useAccountProviderContext();
+  const { execute } = useStrategyExecutor();
+
+  const AMOUNT_LIMIT = 0.01;
+
   // Handle setting max amount
   const handleSetMax = () => {
     setAmount(maxBalance.toString());
   };
 
+  useEffect(() => {
+    setButtonState(
+      isLoading
+        ? ButtonState.Pending
+        : !isWalletReady
+        ? ButtonState.Pending
+        : isSupportedChain
+        ? ButtonState.Invest
+        : ButtonState.SwitchChain
+    );
+    setIsDisabled(isLoading);
+  }, [isWalletReady, isLoading, isSupportedChain]);
+
+  const invest = async () => {
+    if (Number(amount) < AMOUNT_LIMIT) {
+      toast.error("Investment amount must be greater than 0.01");
+      return;
+    }
+
+    if (handlePortfolio) {
+      handlePortfolio(amount);
+      setIsDisabled(false);
+    } else {
+      executeStrategy();
+    }
+  };
+
+  const executeStrategy = async () => {
+    setIsLoading(true);
+
+    if (!user || !kernelAccountClient) {
+      console.error("no user or kernel account client");
+      toast.error("Something went wrong");
+      setIsLoading(false);
+      return;
+    }
+
+    const strategyHandler = getStrategy(strategy.protocol, chainId);
+    const parsedAmount = parseUnits(amount, currency.decimals);
+
+    try {
+      let result;
+      if (currency.isNativeToken) {
+        result = await execute(strategyHandler, parsedAmount);
+      } else {
+        result = await execute(
+          strategyHandler,
+          parsedAmount,
+          currency.chains![chainId]
+        );
+      }
+
+      toast.success(`Investment successful! ${result}`);
+
+      if (handleClose) handleClose();
+    } catch (error) {
+      console.error(error);
+      toast.error(`Investment failed! ${error}`);
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    switch (buttonState) {
+      case ButtonState.Invest:
+        invest();
+        break;
+      case ButtonState.SwitchChain:
+        switchChainAsync({ chainId: strategy.chainId });
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       {/* Amount input */}
       <div className="bg-gray-100 rounded-md border border-gray-300 mb-6">
         <div className="flex items-center w-full gap-2">
@@ -103,7 +212,6 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
               </div>
             )}
           </div>
-          
         </div>
         <div className="flex items-center px-4 pb-2">
           <div className="flex items-center w-full">
@@ -133,14 +241,14 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
       </div>
 
       {/* Invest button */}
-      <InvestModalButton
-        currency={currency}
-        strategy={strategy}
-        amount={amount}
-        handleClose={handleClose}
-        handlePortfolio={handlePortfolio}
-      />
-    </div>
+      <button
+        type="submit"
+        disabled={isDisabled}
+        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-[#5F79F1] hover:bg-[#4A64DC] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+      >
+        {buttonState}
+      </button>
+    </form>
   );
 };
 

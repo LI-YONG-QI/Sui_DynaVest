@@ -9,23 +9,21 @@ export class StCeloStaking extends BaseStrategy<typeof ST_CELO_CONTRACTS> {
     super(chainId, ST_CELO_CONTRACTS);
   }
 
-  async buildCalls(
-    amount: bigint,
-    user: Address,
-    asset?: Address
-  ): Promise<StrategyCall[]> {
+  async buildCalls(amount: bigint, user: Address): Promise<StrategyCall[]> {
     const manager = this.getAddress("manager");
 
+    console.log(user);
+
     return [
-        {
-          to: manager,
-          value: amount,
-          data: encodeFunctionData({
-            abi: STAKED_CELO_ABI,
-            functionName: "deposit",
-            args: [],
-          }),
-        },
+      {
+        to: manager,
+        value: amount,
+        data: encodeFunctionData({
+          abi: STAKED_CELO_ABI,
+          functionName: "deposit",
+          args: [],
+        }),
+      },
     ];
   }
 }
