@@ -3,6 +3,15 @@ import { useLogin, usePrivy } from "@privy-io/react-auth";
 import { useDisconnect } from "wagmi";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Address } from "viem";
+
+async function createUser(smartWallet: Address) {
+  const response = await fetch("/api/user", {
+    method: "POST",
+    body: JSON.stringify({ address: smartWallet }),
+  });
+  return response.json();
+}
 
 export default function ConnectWalletButton() {
   const {
@@ -14,7 +23,19 @@ export default function ConnectWalletButton() {
   } = usePrivy();
 
   const [address, setAddress] = useState<string | null>(null);
-  const { login } = useLogin();
+  const { login } = useLogin({
+    onComplete: async (loginResponse) => {
+      console.log("User logged in successfully", loginResponse);
+
+      const smartWallet = loginResponse.user.smartWallet;
+      await createUser(smartWallet!.address as Address);
+      // Navigate to dashboard, show welcome message, etc.
+    },
+    onError: (error) => {
+      console.error("Login failed", error);
+      // Show error message
+    },
+  });
   const { disconnect } = useDisconnect();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
