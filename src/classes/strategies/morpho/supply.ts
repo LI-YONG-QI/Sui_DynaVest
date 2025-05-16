@@ -6,6 +6,8 @@ import { BaseStrategy, StrategyCall } from "../baseStrategy";
 import { wagmiConfig as config } from "@/providers/config";
 
 export class MorphoSupply extends BaseStrategy<typeof MORPHO_CONTRACTS> {
+
+  
   constructor(chainId: number) {
     super(chainId, MORPHO_CONTRACTS, {
       protocol: "Morpho",
