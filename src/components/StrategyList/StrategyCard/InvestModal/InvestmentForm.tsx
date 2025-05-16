@@ -1,11 +1,7 @@
 import Image from "next/image";
 import { FC, useState, useEffect, FormEvent } from "react";
 import { toast } from "react-toastify";
-import {
-  useAccount,
-  useChainId,
-  useSwitchChain as useWagmiSwitchChain,
-} from "wagmi";
+import { useChainId, useSwitchChain as useWagmiSwitchChain } from "wagmi";
 import { parseUnits } from "viem";
 
 import useCurrency from "@/hooks/useCurrency";
@@ -13,7 +9,6 @@ import useSwitchChain from "@/hooks/useSwitchChain";
 import { InvestStrategy } from "@/types";
 import { MoonLoader } from "react-spinners";
 import { getStrategy } from "@/utils/strategies";
-import { useAccountProviderContext } from "@/contexts/AccountContext";
 import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
 
 // Props interface
@@ -53,9 +48,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     isLoadingBalance,
   } = useCurrency(strategy.tokens[0]);
 
-  const { address: user } = useAccount();
   const chainId = useChainId();
-  const { kernelAccountClient } = useAccountProviderContext();
   const { execute } = useStrategyExecutor();
 
   const AMOUNT_LIMIT = 0.01;
@@ -91,13 +84,6 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
 
   const executeStrategy = async () => {
     setIsLoading(true);
-
-    if (!user || !kernelAccountClient) {
-      console.error("no user or kernel account client");
-      toast.error("Something went wrong");
-      setIsLoading(false);
-      return;
-    }
 
     const strategyHandler = getStrategy(strategy.protocol, chainId);
     const parsedAmount = parseUnits(amount, currency.decimals);

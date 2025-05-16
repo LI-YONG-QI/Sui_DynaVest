@@ -1,7 +1,9 @@
 import Image from "next/image";
 import { useLogin, usePrivy } from "@privy-io/react-auth";
+import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { useDisconnect } from "wagmi";
 import { useState, useRef, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { Address } from "viem";
 
@@ -23,12 +25,28 @@ export default function ConnectWalletButton() {
   } = usePrivy();
 
   const [address, setAddress] = useState<string | null>(null);
+  const { client } = useSmartWallets();
   const { login } = useLogin({
     onComplete: async (loginResponse) => {
-      console.log("User logged in successfully", loginResponse);
-
       const smartWallet = loginResponse.user.smartWallet;
-      await createUser(smartWallet!.address as Address);
+
+      if (client?.account.isDeployed()) {
+        //! Trigger CA deployment
+        const tx = await client.sendTransaction(
+          {
+            to: smartWallet!.address as Address, // 自身地址即可
+            value: BigInt(0), // 零 ETH
+            data: "0x",
+          },
+          {
+            uiOptions: {
+              showWalletUIs: false,
+            },
+          }
+        );
+        await createUser(smartWallet!.address as Address);
+        toast.success(`Wallet created successfully: ${tx}`);
+      }
       // Navigate to dashboard, show welcome message, etc.
     },
     onError: (error) => {

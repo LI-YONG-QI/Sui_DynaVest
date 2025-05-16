@@ -1,7 +1,7 @@
 import { Address } from "viem";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { useMemo } from "react";
-import { useClient } from "wagmi";
+import { useChainId, useClient } from "wagmi";
 import axios from "axios";
 import { waitForTransactionReceipt } from "viem/actions";
 
@@ -11,6 +11,7 @@ import { MultiStrategy } from "@/classes/strategies/multiStrategy";
 
 export function useStrategyExecutor() {
   const { client } = useSmartWallets();
+  const chainId = useChainId();
   const publicClient = useClient();
 
   const user = useMemo(() => {
@@ -25,8 +26,7 @@ export function useStrategyExecutor() {
     if (!client || !publicClient) throw new Error("Client not available");
     if (!user) throw new Error("Smart wallet account not found");
 
-    await client.switchChain({ id: publicClient.chain.id });
-    const chainId = await client.getChainId();
+    await client.switchChain({ id: chainId });
 
     // Get calls from strategy
     const calls = await strategy.buildCalls(amount, user, asset);
