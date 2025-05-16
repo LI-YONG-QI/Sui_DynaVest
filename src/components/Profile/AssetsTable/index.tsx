@@ -10,6 +10,7 @@ import { Token } from "@/types";
 import { WithdrawDialog } from "./WithdrawDialog";
 import { ERC20_ABI } from "@/constants";
 import { SUPPORTED_TOKENS } from "@/constants/profile";
+import { DepositDialog } from "./DepositDialog";
 
 export default function AssetsTableComponent() {
   const [sortKey, setSortKey] = useState<"balance" | null>("balance");
@@ -133,9 +134,8 @@ export default function AssetsTableComponent() {
               {/* Actions */}
               <td className="p-4 text-right rounded-r-xl">
                 <div className="flex justify-end gap-1">
-                  <button className="px-3 py-1.5 rounded-lg text-sm text-primary hover:bg-gray-50 transition-colors">
-                    Deposit
-                  </button>
+                  <DepositDialog />
+
                   <WithdrawDialog
                     asset={asset.token}
                     balance={asset.balance}

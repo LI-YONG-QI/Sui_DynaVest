@@ -2,16 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { MoveUpRight } from "lucide-react";
 import { MoonLoader } from "react-spinners";
-import { QRCodeSVG } from "qrcode.react";
 import { parseUnits } from "viem";
 
 import { RiskBadge } from "../../RiskPortfolio";
 import InvestmentForm from "../../StrategyList/StrategyCard/InvestModal/InvestmentForm";
-import CopyButton from "../../CopyButton";
 import { DepositMessage, Message } from "@/classes/message";
 import { USDC } from "@/constants/coins";
 import { BOT_STRATEGY } from "@/constants/strategies";
 import Button from "@/components/Button";
+import AddressQRCode from "@/components/AddressQRCode";
 
 const DEPOSIT_ACTIONS = ["Deposit", "Change Amount"];
 
@@ -39,8 +38,6 @@ const DepositChatWrapper = ({
       refetchInterval: 3 * 1000,
     },
   });
-
-  const uri = `ethereum:${address}`;
 
   useEffect(() => {
     if (balance?.value) {
@@ -71,18 +68,7 @@ const DepositChatWrapper = ({
 
       {selectedAction === "Deposit" ? (
         <div className="flex flex-col gap-2 items-center justify-center">
-          <div className="p-4 bg-white rounded-lg flex flex-col items-center justify-center">
-            <QRCodeSVG
-              value={uri}
-              size={100}
-              // 以下屬性可自行調整
-              level="H" // 容錯率：L, M, Q, H
-            />
-          </div>
-          <div className="flex gap-2 items-center justify-center">
-            <p>{address}</p>
-            <CopyButton text={address!} />
-          </div>
+          <AddressQRCode address={address!} />
 
           <div className="pt-8 flex flex-col gap-4 self-start">
             {isDeposit ? (
