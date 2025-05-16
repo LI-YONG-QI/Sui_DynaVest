@@ -87,7 +87,7 @@ export default function AssetsTableComponent() {
               {/* Balance */}
               <td className="p-4 text-right">
                 <div className="font-medium text-md">
-                  {asset.balance.toString()}
+                  {asset.balance.toFixed(4).toString()}
                 </div>
                 <div className="text-sm text-gray-500">
                   {asset.price

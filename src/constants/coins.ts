@@ -42,7 +42,7 @@ export const BNB: Token = {
 
 export const wstETH: Token = {
   name: "wstETH",
-  icon: "/crypto-icons/weth.svg",
+  icon: "/crypto-icons/wstETH.webp",
   decimals: 18,
   isNativeToken: false,
   chains: {
@@ -53,7 +53,7 @@ export const wstETH: Token = {
 
 export const wbETH: Token = {
   name: "wbETH",
-  icon: "/crypto-icons/weth.svg",
+  icon: "/crypto-icons/wbeth.webp",
   decimals: 18,
   isNativeToken: false,
   chains: {
