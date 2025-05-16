@@ -20,45 +20,34 @@ export default function useCurrency(token: Token) {
   const fetchTokenBalance = useCallback(async () => {
     if (!client) return 0;
 
-    try {
-      await client.switchChain({ id: chainId });
-      const user = client.account.address;
+    await client.switchChain({ id: chainId });
+    const user = client.account.address;
 
-      if (!user) return 0;
+    if (!user) return 0;
 
-      const params = {
-        address: user,
-        ...(currency.isNativeToken
-          ? {}
-          : { token: currency.chains?.[chainId] }),
-      };
+    const params = {
+      address: user,
+      ...(currency.isNativeToken ? {} : { token: currency.chains?.[chainId] }),
+    };
 
-      const { value, decimals } = await getBalance(config, params);
-      return Number(formatUnits(value, decimals));
-    } catch (error) {
-      console.error("Error fetching balance:", error);
-      return 0;
-    }
+    const { value, decimals } = await getBalance(config, params);
+    return Number(formatUnits(value, decimals));
   }, [client, currency, chainId]);
 
   const fetchTokenPrice = useCallback(async () => {
     const id = COINGECKO_IDS[currency.name];
 
-    try {
-      const response = await axios.get(
-        "https://api.coingecko.com/api/v3/simple/price",
-        {
-          params: {
-            ids: id,
-            vs_currencies: "usd",
-          },
-        }
-      );
+    const response = await axios.get(
+      "https://api.coingecko.com/api/v3/simple/price",
+      {
+        params: {
+          ids: id,
+          vs_currencies: "usd",
+        },
+      }
+    );
 
-      return response.data[id].usd;
-    } catch (error) {
-      console.error("Failed to fetch token price:", error);
-    }
+    return response.data[id].usd;
   }, [currency.name]);
 
   // Use React Query for fetching and caching the balance
@@ -67,6 +56,7 @@ export default function useCurrency(token: Token) {
     isLoading: isLoadingBalance,
     refetch: fetchBalance,
     isError,
+    isLoadingError,
     error,
   } = useQuery({
     queryKey: [
@@ -82,16 +72,15 @@ export default function useCurrency(token: Token) {
   });
 
   // Log errors if any
-  if (isError) {
-    console.error("Error fetching token balance:", error);
-  }
-
   return {
     currency,
     setCurrency,
     balance,
     fetchBalance,
     fetchTokenPrice,
+    isError,
+    error,
     isLoadingBalance,
+    isLoadingError,
   };
 }

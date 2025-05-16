@@ -1,12 +1,14 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAssets } from "@/contexts/AssetsContext";
 import { WithdrawDialog } from "./WithdrawDialog";
 import { DepositDialog } from "./DepositDialog";
+import { toast } from "react-toastify";
 
 export default function AssetsTableComponent() {
-  const { tokensData, handleWithdraw } = useAssets();
+  const { tokensData, handleWithdraw, isError, isLoadingError, error } =
+    useAssets();
 
   const [sortKey, setSortKey] = useState<"balance" | null>("balance");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -26,6 +28,13 @@ export default function AssetsTableComponent() {
       setSortDirection("desc");
     }
   };
+
+  useEffect(() => {
+    if (isError && isLoadingError) {
+      console.log(error);
+      toast.error("Error fetching assets");
+    }
+  }, [isError, isLoadingError, error]);
 
   return (
     <div className="mx-4 w-[calc(100%-2rem)]">

@@ -13,6 +13,9 @@ import type { SupportedChainIds } from "@/providers/config";
 interface AssetsContextType {
   tokensData: TokenData[];
   isLoading: boolean;
+  isError: boolean;
+  isLoadingError: boolean;
+  error: Error | null;
   refreshData: () => void;
   handleWithdraw: (asset: Token, amount: string, to: Address) => Promise<void>;
   getTokenBalance: (name: string) => number;
@@ -42,6 +45,9 @@ export function AssetsProvider({ children }: AssetsProviderProps) {
   const {
     tokensData,
     isLoading,
+    isError,
+    error,
+    isLoadingError,
     refreshData,
     getTokenBalance,
     getTokenPrice,
@@ -93,6 +99,9 @@ export function AssetsProvider({ children }: AssetsProviderProps) {
   const value = {
     tokensData,
     isLoading,
+    isError,
+    isLoadingError,
+    error,
     refreshData,
     handleWithdraw,
     getTokenBalance,

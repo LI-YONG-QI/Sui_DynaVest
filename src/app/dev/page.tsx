@@ -1,25 +1,27 @@
 "use client";
 
-import React from "react";
-import { usePrivy } from "@privy-io/react-auth";
+import React, { useEffect } from "react";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { encodeFunctionData } from "viem";
-import { ERC20_ABI, USDC } from "@/constants";
 import { base } from "viem/chains";
+import { toast } from "react-toastify";
+
+import { CELO, ERC20_ABI, USDC } from "@/constants";
 import useCurrency from "@/hooks/useCurrency";
 
 const Dev = () => {
   const { client } = useSmartWallets();
-  const { user, authenticated } = usePrivy();
-  const { balance } = useCurrency(USDC);
+  const { isError, error, isLoadingError } = useCurrency(CELO);
 
-  console.log(user);
-  console.log(authenticated);
+  console.log(isError, isLoadingError);
 
-  console.log(balance);
+  useEffect(() => {
+    if (isError && isLoadingError) {
+      toast.error("Error fetching balance");
+    }
+  }, [isError, error, isLoadingError]);
 
   async function sendCalls() {
-    console.log(client);
     await client!.sendTransaction({
       calls: [
         // Approve transaction

@@ -9,7 +9,6 @@ import { wagmiConfig as config } from "@/providers/config";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { Token } from "@/types";
 import { COINGECKO_IDS } from "@/constants/coins";
-import { toast } from "react-toastify";
 
 export interface TokenData {
   token: Token;
@@ -42,44 +41,37 @@ export default function useCurrencies(tokens: Token[]) {
     async (tokensData: TokenData[]): Promise<TokenData[]> => {
       if (!tokens || tokens.length === 0) return tokensData;
 
-      try {
-        const tokenIds = tokens
-          .map((token) => COINGECKO_IDS[token.name])
-          .filter((id) => !!id);
+      const tokenIds = tokens
+        .map((token) => COINGECKO_IDS[token.name])
+        .filter((id) => !!id);
 
-        if (tokenIds.length > 0) {
-          const priceResponse = await axios.get(
-            "https://api.coingecko.com/api/v3/simple/price",
-            {
-              params: {
-                ids: tokenIds.join(","),
-                vs_currencies: "usd",
-              },
-            }
-          );
-
-          // Create a new array with updated prices
-          const updatedTokensData = tokensData.map((tokenData) => {
-            const id = COINGECKO_IDS[tokenData.token.name];
-            if (id && priceResponse.data[id]) {
-              return {
-                ...tokenData,
-                price: priceResponse.data[id].usd,
-              };
-            }
-            return tokenData;
-          });
-
-          return updatedTokensData;
-        }
-
-        // No token IDs to fetch prices for
-        return tokensData;
-      } catch (error) {
-        console.error("Failed to fetch token prices:", error);
-        // Return original data if anything fails
+      if (tokenIds.length === 0) {
         return tokensData;
       }
+
+      const priceResponse = await axios.get(
+        "https://api.coingecko.com/api/v3/simple/price",
+        {
+          params: {
+            ids: tokenIds.join(","),
+            vs_currencies: "usd",
+          },
+        }
+      );
+
+      // Create a new array with updated prices
+      const updatedTokensData = tokensData.map((tokenData) => {
+        const id = COINGECKO_IDS[tokenData.token.name];
+        if (id && priceResponse.data[id]) {
+          return {
+            ...tokenData,
+            price: priceResponse.data[id].usd,
+          };
+        }
+        return tokenData;
+      });
+
+      return updatedTokensData;
     },
     [tokens]
   );
@@ -91,58 +83,42 @@ export default function useCurrencies(tokens: Token[]) {
         return tokensData;
       }
 
-      try {
-        await client.switchChain({ id: chainId });
-        const user = client.account.address;
+      await client.switchChain({ id: chainId });
+      const user = client.account.address;
 
-        if (!user) {
-          return tokensData;
-        }
-
-        // Create a copy of tokensData to update
-        const updatedTokensData = [...tokensData];
-
-        // Fetch balances in parallel - use tokensData to match tokens with their TokenData objects
-        const balancePromises = updatedTokensData.map(
-          async (tokenData, index) => {
-            try {
-              const token = tokenData.token;
-              const params = {
-                address: user,
-                ...(token.isNativeToken
-                  ? {}
-                  : { token: token.chains?.[chainId] }),
-              };
-
-              const { value, decimals } = await getBalance(config, params);
-              updatedTokensData[index].balance = Number(
-                formatUnits(value, decimals)
-              );
-
-              // Calculate value if price exists
-              if (updatedTokensData[index].price) {
-                updatedTokensData[index].value =
-                  updatedTokensData[index].balance *
-                  updatedTokensData[index].price!;
-              }
-            } catch (error) {
-              console.error(
-                `Error fetching balance for ${tokenData.token.name}:`,
-                error
-              );
-            }
-          }
-        );
-
-        await Promise.all(balancePromises);
-
-        return updatedTokensData;
-      } catch (error) {
-        console.error("Error fetching balances:", error);
-
-        toast.error("Error fetching balances");
+      if (!user) {
         return tokensData;
       }
+
+      // Create a copy of tokensData to update
+      const updatedTokensData = [...tokensData];
+
+      // Fetch balances in parallel - use tokensData to match tokens with their TokenData objects
+      const balancePromises = updatedTokensData.map(
+        async (tokenData, index) => {
+          const token = tokenData.token;
+          const params = {
+            address: user,
+            ...(token.isNativeToken ? {} : { token: token.chains?.[chainId] }),
+          };
+
+          const { value, decimals } = await getBalance(config, params);
+          updatedTokensData[index].balance = Number(
+            formatUnits(value, decimals)
+          );
+
+          // Calculate value if price exists
+          if (updatedTokensData[index].price) {
+            updatedTokensData[index].value =
+              updatedTokensData[index].balance *
+              updatedTokensData[index].price!;
+          }
+        }
+      );
+
+      await Promise.all(balancePromises);
+
+      return updatedTokensData;
     },
     [client, tokens, chainId]
   );
@@ -176,6 +152,7 @@ export default function useCurrencies(tokens: Token[]) {
   const {
     data: tokensData = initialTokensData,
     isLoading,
+    isLoadingError,
     isError,
     error,
     refetch: refreshData,
@@ -188,18 +165,15 @@ export default function useCurrencies(tokens: Token[]) {
     refetchInterval: 2 * 60 * 1000, // Refresh data every 2 minutes
     placeholderData: initialTokensData,
     refetchOnMount: true, // Force refetch on mount
+    retry: 2,
   });
-
-  // Log errors if any
-  useEffect(() => {
-    if (isError) {
-      console.error("Error fetching token data:", error);
-    }
-  }, [isError, error]);
 
   return {
     tokensData,
-    isLoading, // TODO: not useful
+    isLoading,
+    isLoadingError,
+    isError,
+    error,
     refreshData,
     // Helper methods
     getTokenBalance: (name: string) =>
