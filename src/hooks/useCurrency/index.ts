@@ -11,7 +11,7 @@ import { wagmiConfig as config } from "@/providers/config";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 
 export default function useCurrency(token: Token) {
-  const { client, getClientForChain } = useSmartWallets();
+  const { client } = useSmartWallets();
 
   const [currency, setCurrency] = useState<Token>(token);
   const chainId = useChainId();
@@ -21,8 +21,8 @@ export default function useCurrency(token: Token) {
     if (!client) return 0;
 
     try {
-      const chainClient = await getClientForChain({ id: chainId });
-      const user = chainClient?.account.address;
+      await client.switchChain({ id: chainId });
+      const user = client.account.address;
 
       if (!user) return 0;
 
@@ -39,7 +39,7 @@ export default function useCurrency(token: Token) {
       console.error("Error fetching balance:", error);
       return 0;
     }
-  }, [client, currency, chainId, getClientForChain]);
+  }, [client, currency, chainId]);
 
   const fetchTokenPrice = useCallback(async () => {
     const id = COINGECKO_IDS[currency.name];

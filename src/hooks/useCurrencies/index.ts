@@ -18,7 +18,7 @@ export interface TokenData {
 }
 
 export default function useCurrencies(tokens: Token[]) {
-  const { client, getClientForChain } = useSmartWallets();
+  const { client } = useSmartWallets();
   const chainId = useChainId();
 
   // Initialize with empty data
@@ -91,8 +91,8 @@ export default function useCurrencies(tokens: Token[]) {
       }
 
       try {
-        const chainClient = await getClientForChain({ id: chainId });
-        const user = chainClient?.account.address;
+        await client.switchChain({ id: chainId });
+        const user = client.account.address;
 
         if (!user) {
           return tokensData;
@@ -141,7 +141,7 @@ export default function useCurrencies(tokens: Token[]) {
         return tokensData;
       }
     },
-    [client, tokens, chainId, getClientForChain]
+    [client, tokens, chainId]
   );
 
   // Main function that handles fetching both balances and prices
@@ -154,7 +154,7 @@ export default function useCurrencies(tokens: Token[]) {
     const tokensData: TokenData[] = tokens.map((token) => ({
       token,
       balance: 0,
-      price: undefined,
+      price: 0,
       value: 0,
     }));
 
