@@ -148,7 +148,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     chainId: base.id,
   },
   {
-    title: "Uniswap Liquidity",
+    title: "Uniswap Liquidity Narrow Range",
     apy: 32.5,
     risk: {
       level: "high" as const,
@@ -383,5 +383,44 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
       "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
     tokens: [USDC],
     chainId: polygon.id,
+  },
+  // TODO: mock for demo
+  {
+    title: "Aave Lending Leverage",
+    apy: 10.1,
+    risk: {
+      level: "low" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "AaveV3Supply",
+    description:
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
+    image: "/crypto-icons/polygon.svg",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    tokens: [USDC],
+    chainId: base.id,
+  },
+  {
+    title: "Uniswap Liquidity Full Range",
+    apy: 10.1,
+    risk: {
+      level: "low" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "AaveV3Supply",
+    description:
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
+    image: "/crypto-icons/polygon.svg",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    tokens: [USDC],
+    chainId: base.id,
   },
 ];

@@ -61,6 +61,24 @@ export function useStrategyExecutor() {
           },
         ],
       });
+    } else if (strategy instanceof MultiStrategy) {
+      // TODO: rename
+      const transactions = strategy.strategies.map((strategy) => {
+        return {
+          hash: txHash,
+          chainId,
+          strategy: strategy.strategy.metadata.protocol,
+          type: strategy.strategy.metadata.type,
+          amount: amount.toString(),
+          icon: strategy.strategy.metadata.icon,
+          tokenName: "USDC",
+        };
+      });
+
+      axios.put("/api/user", {
+        address: user,
+        transactions,
+      });
     }
 
     return txHash;
