@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { FC, useState, useEffect, FormEvent } from "react";
 import { toast } from "react-toastify";
-import { useChainId, useSwitchChain as useWagmiSwitchChain } from "wagmi";
-import { parseUnits } from "viem";
+import { useChainId } from "wagmi";
+import { formatUnits, parseUnits } from "viem";
 
 import useCurrency from "@/hooks/useCurrency";
 import useSwitchChain from "@/hooks/useSwitchChain";
@@ -37,10 +37,12 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isSupportedChain, ready: isWalletReady } = useSwitchChain(
-    strategy.chainId
-  );
-  const { switchChainAsync } = useWagmiSwitchChain();
+  const {
+    switchChain,
+    isSupportedChain,
+    ready: isWalletReady,
+  } = useSwitchChain(strategy.chainId);
+
   const {
     currency,
     setCurrency,
@@ -72,9 +74,9 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     }
   };
 
-  const handleSwitchChain = async (chainId: number) => {
+  const handleSwitchChain = async () => {
     try {
-      await switchChainAsync({ chainId });
+      await switchChain();
       toast.success("Switched chain successfully");
     } catch (error) {
       console.error(error);
@@ -119,7 +121,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
         invest();
         break;
       case ButtonState.SwitchChain:
-        handleSwitchChain(strategy.chainId);
+        handleSwitchChain();
         break;
       default:
         break;
@@ -218,7 +220,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
                 {isLoadingBalance ? (
                   <MoonLoader size={10} />
                 ) : isSupportedChain ? (
-                  maxBalance.toFixed(4)
+                  formatUnits(maxBalance, currency.decimals)
                 ) : (
                   "NaN"
                 )}

@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import { getBalance } from "@wagmi/core";
 import { useChainId } from "wagmi";
-import { formatUnits } from "viem";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
@@ -19,21 +18,20 @@ export default function useCurrency(token: Token) {
 
   // Fetch balance function to be used with useQuery
   const fetchTokenBalance = useCallback(async () => {
-    console.log("Fetch EVM");
-    if (!client) return 0;
+    if (!client) return BigInt(0);
 
     await client.switchChain({ id: chainId });
     const user = client.account.address;
 
-    if (!user) return 0;
+    if (!user) return BigInt(0);
 
     const params = {
       address: user,
       ...(currency.isNativeToken ? {} : { token: currency.chains?.[chainId] }),
     };
 
-    const { value, decimals } = await getBalance(config, params);
-    return Number(formatUnits(value, decimals));
+    const { value } = await getBalance(config, params);
+    return value;
   }, [client, currency, chainId]);
 
   const fetchTokenPrice = useCallback(async () => {
@@ -54,13 +52,13 @@ export default function useCurrency(token: Token) {
 
   // Use React Query for fetching and caching the balance
   const {
-    data: balance = 0,
+    data: balance = BigInt(0),
     isLoading: isEvmLoadingBalance,
     refetch: fetchBalance,
     isError: isEvmError,
     isLoadingError: isEvmLoadingError,
     error: evmError,
-  } = useQuery({
+  } = useQuery<bigint>({
     queryKey: [
       "tokenBalance",
       chainId,
@@ -75,7 +73,7 @@ export default function useCurrency(token: Token) {
 
   const account = useCurrentAccount();
   const {
-    data: suiBalance = 0,
+    data: suiBalance,
     refetch: refetchSuiBalance,
     isLoading: isSuiLoadingBalance,
     isLoadingError: isSuiLoadingError,
@@ -94,7 +92,7 @@ export default function useCurrency(token: Token) {
     return {
       currency,
       setCurrency,
-      balance: suiBalance,
+      balance: BigInt(suiBalance?.totalBalance ?? "0"),
       fetchBalance: refetchSuiBalance,
       fetchTokenPrice,
       isError: isSuiError,

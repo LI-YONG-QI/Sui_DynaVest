@@ -47,7 +47,7 @@ export const BNB: Token = {
 export const SUI: Token = {
   name: "SUI",
   icon: "/crypto-icons/chains/-1.svg",
-  decimals: 18,
+  decimals: 9,
   isNativeToken: true,
   ecosystem: "SUI",
 };
