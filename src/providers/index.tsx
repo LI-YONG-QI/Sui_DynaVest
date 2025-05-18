@@ -3,8 +3,9 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { SmartWalletsProvider } from "@privy-io/react-auth/smart-wallets";
+import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 
-import { wagmiConfig } from "./config";
+import { wagmiConfig, suiConfig } from "./config";
 import PrivyAccountProvider from "@/contexts/PrivyAccountProvider";
 
 const queryClient = new QueryClient();
@@ -30,11 +31,15 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       }}
     >
       <SmartWalletsProvider>
-        <QueryClientProvider client={queryClient}>
-          <WagmiProvider config={wagmiConfig}>
-            <PrivyAccountProvider>{children}</PrivyAccountProvider>
-          </WagmiProvider>
-        </QueryClientProvider>
+        <SuiClientProvider networks={suiConfig} defaultNetwork="mainnet">
+          <QueryClientProvider client={queryClient}>
+            <WalletProvider>
+              <WagmiProvider config={wagmiConfig}>
+                <PrivyAccountProvider>{children}</PrivyAccountProvider>
+              </WagmiProvider>
+            </WalletProvider>
+          </QueryClientProvider>
+        </SuiClientProvider>
       </SmartWalletsProvider>
     </PrivyProvider>
   );

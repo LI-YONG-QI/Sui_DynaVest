@@ -6,6 +6,7 @@ export const USDT: Token = {
   icon: "/crypto-icons/usdt.svg",
   decimals: 6,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [arbitrum.id]: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
     [base.id]: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
@@ -18,6 +19,7 @@ export const USDC: Token = {
   icon: "/crypto-icons/usdc.svg",
   decimals: 6,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [arbitrum.id]: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
     [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
@@ -31,6 +33,7 @@ export const ETH: Token = {
   icon: "/crypto-icons/eth.svg",
   decimals: 18,
   isNativeToken: true,
+  ecosystem: "EVM",
 };
 
 export const BNB: Token = {
@@ -38,6 +41,15 @@ export const BNB: Token = {
   icon: "/crypto-icons/chains/56.svg",
   decimals: 18,
   isNativeToken: true,
+  ecosystem: "EVM",
+};
+
+export const SUI: Token = {
+  name: "SUI",
+  icon: "/crypto-icons/chains/-1.svg",
+  decimals: 18,
+  isNativeToken: true,
+  ecosystem: "SUI",
 };
 
 export const wstETH: Token = {
@@ -45,6 +57,7 @@ export const wstETH: Token = {
   icon: "/crypto-icons/wstETH.webp",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [base.id]: "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
     [arbitrum.id]: "0x5979D7b546E38E414F7E9822514be443A4800529",
@@ -56,6 +69,7 @@ export const wbETH: Token = {
   icon: "/crypto-icons/wbeth.webp",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [bsc.id]: "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
   },
@@ -66,6 +80,7 @@ export const cbBTC: Token = {
   icon: "/crypto-icons/cbBTC.svg",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [base.id]: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
   },
@@ -76,6 +91,7 @@ export const CELO: Token = {
   icon: "/crypto-icons/chains/42220.svg",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [celo.id]: "0x471EcE3750Da237f93B8E339c536989b8978a438",
   },
@@ -86,6 +102,7 @@ export const FLOW: Token = {
   icon: "/crypto-icons/chains/747.svg",
   decimals: 18,
   isNativeToken: true,
+  ecosystem: "EVM",
 };
 
 export const cEUR: Token = {
@@ -93,6 +110,7 @@ export const cEUR: Token = {
   icon: "/crypto-icons/cEUR.png",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [celo.id]: "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73",
   },
@@ -103,6 +121,7 @@ export const WETH: Token = {
   icon: "/crypto-icons/weth.svg",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [base.id]: "0x4200000000000000000000000000000000000006",
     [arbitrum.id]: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
@@ -114,6 +133,7 @@ export const GRAIL: Token = {
   icon: "/crypto-icons/grail.svg",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [arbitrum.id]: "0x3d9907F9a368ad0a51Be60f7Da3b97cf940982D8",
   },
@@ -124,6 +144,7 @@ export const xGRAIL: Token = {
   icon: "/crypto-icons/xgrail.svg",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [arbitrum.id]: "0x3CAaE25Ee616f2C8E13C74dA0813402eae3F496b",
   },
@@ -134,6 +155,7 @@ export const WBNB: Token = {
   icon: "/crypto-icons/bnb.svg",
   decimals: 18,
   isNativeToken: false,
+  ecosystem: "EVM",
   chains: {
     [bsc.id]: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
   },
@@ -159,4 +181,5 @@ export const COINGECKO_IDS = {
   [USDC.name]: "usd-coin",
   [ETH.name]: "ethereum",
   [BNB.name]: "binancecoin",
+  [SUI.name]: "sui",
 };

@@ -1,3 +1,5 @@
+import { getFullnodeUrl } from "@mysten/sui/client";
+import { createNetworkConfig } from "@mysten/dapp-kit";
 import { createConfig } from "@privy-io/wagmi";
 import { celo, flowMainnet, base, bsc, arbitrum, polygon } from "viem/chains";
 import { http } from "wagmi";
@@ -20,6 +22,11 @@ export const wagmiConfig = createConfig({
       `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
     ),
   },
+});
+
+export const { networkConfig: suiConfig } = createNetworkConfig({
+  localnet: { url: getFullnodeUrl("localnet") },
+  mainnet: { url: getFullnodeUrl("mainnet") },
 });
 
 // Create a mapped type for chain IDs from wagmiConfig.chains

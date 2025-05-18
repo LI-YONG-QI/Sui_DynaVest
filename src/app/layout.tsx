@@ -10,6 +10,7 @@ import {
 import localFont from "next/font/local";
 
 import "./globals.css";
+import "@mysten/dapp-kit/dist/index.css";
 import Providers from "@/providers";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";

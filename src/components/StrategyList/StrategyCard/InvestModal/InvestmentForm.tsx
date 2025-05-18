@@ -153,6 +153,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
+
           {/* Custom dropdown with icons */}
           <div className="shrink-0 md:min-w-[100px] relative">
             <button

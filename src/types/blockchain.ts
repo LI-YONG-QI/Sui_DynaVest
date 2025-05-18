@@ -15,6 +15,7 @@ export type Token = {
   icon: string;
   decimals: number;
   isNativeToken: boolean;
+  ecosystem: "EVM" | "SUI";
   chains?: {
     [key: number]: Address;
   };

@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import ConnectWalletButton from "./ConnectWalletButton";
 import { usePathname } from "next/navigation";
+import { ConnectButton as SuiConnectButton } from "@mysten/dapp-kit";
 import Image from "next/image";
+
+import ConnectWalletButton from "./ConnectWalletButton";
 import ChainSelector from "./ChainSelector";
 import { usePrivy } from "@privy-io/react-auth";
 
@@ -16,7 +18,6 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Strategies", href: "/strategies", isActive: true },
   { label: "Bot", href: "/", isActive: true },
-  // { label: "Quests", href: "/quests" },
 ];
 
 export default function Header() {
@@ -51,6 +52,7 @@ export default function Header() {
       </nav>
 
       <div className="flex items-center gap-4">
+        <SuiConnectButton />
         <ChainSelector />
         <ConnectWalletButton />
       </div>
