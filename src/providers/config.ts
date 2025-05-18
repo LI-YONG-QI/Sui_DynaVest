@@ -25,7 +25,6 @@ export const wagmiConfig = createConfig({
 });
 
 export const { networkConfig: suiConfig } = createNetworkConfig({
-  localnet: { url: getFullnodeUrl("localnet") },
   mainnet: { url: getFullnodeUrl("mainnet") },
 });
 
