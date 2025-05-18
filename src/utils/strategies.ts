@@ -3,7 +3,6 @@ import { bsc } from "viem/chains";
 import { Protocol, Protocols } from "@/types";
 import { BNB, ETH, PERMIT_EXPIRY, wbETH, wstETH } from "@/constants";
 import {
-  BaseStrategy,
   MorphoSupply,
   UniswapV3SwapLST,
   CamelotStaking,
@@ -12,6 +11,7 @@ import {
   AaveV3Supply,
   UniswapV3AddLiquidity,
 } from "@/classes/strategies";
+import { EVMBaseStrategy } from "@/classes/strategies/base";
 
 export function getDeadline(): bigint {
   const timestampInSeconds = Math.floor(Date.now() / 1000);
@@ -21,7 +21,7 @@ export function getDeadline(): bigint {
 export function getStrategy(
   protocol: Protocol,
   chainId: number
-): BaseStrategy<Protocols> {
+): EVMBaseStrategy<Protocols> {
   // The type casting here is safe because we've already verified the chainId is supported
   // for the specific protocol with isChainIdSupported
   switch (protocol) {

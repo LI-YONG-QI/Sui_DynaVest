@@ -1,13 +1,13 @@
 import { Address, encodeFunctionData } from "viem";
 import { readContract } from "@wagmi/core";
 
-import { BaseStrategy, StrategyCall } from "../baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "../base";
 import { GMX_CONTRACTS } from "@/constants/protocols/gmx";
 import { wagmiConfig } from "@/providers/config";
 import { GMX_STRATEGY_ABI, ERC20_ABI } from "@/constants/abis";
 
-export class GMXDeposit extends BaseStrategy<typeof GMX_CONTRACTS> {
-  // TODO: mock metadata 
+export class GMXDeposit extends EVMBaseStrategy<typeof GMX_CONTRACTS> {
+  // TODO: mock metadata
   constructor(chainId: number) {
     super(chainId, GMX_CONTRACTS, {
       protocol: "Morpho",

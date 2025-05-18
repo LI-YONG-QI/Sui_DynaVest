@@ -1,6 +1,6 @@
 import { Address } from "viem";
 
-import { BaseStrategy, StrategyCall } from "./baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "./base";
 import { Protocols } from "@/types";
 
 /**
@@ -10,7 +10,7 @@ import { Protocols } from "@/types";
 export class MultiStrategy {
   constructor(
     public readonly strategies: {
-      strategy: BaseStrategy<Protocols>;
+      strategy: EVMBaseStrategy<Protocols>;
       allocation: number;
     }[]
   ) {}

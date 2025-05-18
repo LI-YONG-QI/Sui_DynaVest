@@ -5,5 +5,5 @@ export * from "./uniswap/liquidity";
 export * from "./camelot/staking";
 export * from "./gmx/deposit";
 export * from "./morpho/supply";
-export * from "./baseStrategy";
+export * from "./base";
 export * from "./aave/supply";

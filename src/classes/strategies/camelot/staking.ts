@@ -1,11 +1,11 @@
 import { Address, encodeFunctionData } from "viem";
 
-import { BaseStrategy, StrategyCall } from "../baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "../base";
 import { CAMELOT_CONTRACTS } from "@/constants/protocols";
 import { XGRAIL_ABI, CAMELOT_STRATEGY_ABI } from "@/constants/abis";
 import { GRAIL, WETH, xGRAIL } from "@/constants/coins";
 
-export class CamelotStaking extends BaseStrategy<typeof CAMELOT_CONTRACTS> {
+export class CamelotStaking extends EVMBaseStrategy<typeof CAMELOT_CONTRACTS> {
   // TODO: mock metadata
   constructor(chainId: number) {
     super(chainId, CAMELOT_CONTRACTS, {

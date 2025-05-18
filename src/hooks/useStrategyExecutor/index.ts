@@ -5,7 +5,7 @@ import { useChainId, useClient } from "wagmi";
 import axios from "axios";
 import { waitForTransactionReceipt } from "viem/actions";
 
-import { BaseStrategy } from "@/classes/strategies/baseStrategy";
+import { EVMBaseStrategy } from "@/classes/strategies/base";
 import { Protocols } from "@/types/strategies";
 import { MultiStrategy } from "@/classes/strategies/multiStrategy";
 
@@ -19,7 +19,7 @@ export function useStrategyExecutor() {
   }, [client?.account?.address]);
 
   async function execute<T extends Protocols>(
-    strategy: BaseStrategy<T> | MultiStrategy,
+    strategy: EVMBaseStrategy<T> | MultiStrategy,
     amount: bigint,
     asset?: Address
   ): Promise<string> {
@@ -45,8 +45,7 @@ export function useStrategyExecutor() {
 
     const txHash = await waitForUserOp(userOp);
 
-    // TODO: doesn't process MultiStrategy yet
-    if (strategy instanceof BaseStrategy) {
+    if (strategy instanceof EVMBaseStrategy) {
       axios.put("/api/user", {
         address: user,
         transactions: [

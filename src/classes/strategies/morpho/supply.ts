@@ -2,12 +2,10 @@ import { Address, encodeFunctionData, Hex, toHex } from "viem";
 import { readContract } from "@wagmi/core";
 
 import { MORPHO_CONTRACTS, ERC20_ABI, MORPHO_ABI } from "@/constants";
-import { BaseStrategy, StrategyCall } from "../baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "../base";
 import { wagmiConfig as config } from "@/providers/config";
 
-export class MorphoSupply extends BaseStrategy<typeof MORPHO_CONTRACTS> {
-
-  
+export class MorphoSupply extends EVMBaseStrategy<typeof MORPHO_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, MORPHO_CONTRACTS, {
       protocol: "Morpho",

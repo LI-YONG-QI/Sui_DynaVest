@@ -2,7 +2,7 @@
 
 import { Address, encodeFunctionData } from "viem";
 
-import { BaseStrategy, StrategyCall } from "../baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "../base";
 import { UNISWAP_CONTRACTS } from "@/constants/protocols/uniswap";
 import { ERC20_ABI, NFT_MANAGER_ABI } from "@/constants/abis";
 import { USDT } from "@/constants/coins";
@@ -39,7 +39,7 @@ export function sortAddresses(
     : [addressB, addressA];
 }
 
-export class UniswapV3AddLiquidity extends BaseStrategy<
+export class UniswapV3AddLiquidity extends EVMBaseStrategy<
   typeof UNISWAP_CONTRACTS
 > {
   constructor(chainId: number) {

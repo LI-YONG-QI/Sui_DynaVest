@@ -1,10 +1,10 @@
 import { Address, encodeFunctionData } from "viem";
 
-import { BaseStrategy, StrategyCall } from "../baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "../base";
 import { STAKED_CELO_ABI } from "@/constants/abis";
 import { ST_CELO_CONTRACTS } from "@/constants/protocols";
 
-export class StCeloStaking extends BaseStrategy<typeof ST_CELO_CONTRACTS> {
+export class StCeloStaking extends EVMBaseStrategy<typeof ST_CELO_CONTRACTS> {
   // TODO: mock metadata
   constructor(chainId: number) {
     super(chainId, ST_CELO_CONTRACTS, {

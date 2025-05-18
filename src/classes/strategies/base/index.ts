@@ -1,10 +1,14 @@
 import type { Address } from "viem";
+import { Transaction } from "@mysten/sui/transactions";
 
 import type {
   Protocols,
   ProtocolChains,
   ProtocolContracts,
 } from "@/types/strategies";
+
+export * from "./evm";
+export * from "./sui";
 
 export type StrategyCall = {
   to: Address;
@@ -45,7 +49,7 @@ export abstract class BaseStrategy<T extends Protocols> {
     amount: bigint,
     user: Address,
     asset?: Address
-  ): Promise<StrategyCall[]>;
+  ): Promise<StrategyCall[] | Transaction>; // EVM & Sui
 
   isSupported(chainId: number): boolean {
     return Object.keys(this.protocolAddresses).map(Number).includes(chainId);

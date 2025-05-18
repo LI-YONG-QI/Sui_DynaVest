@@ -1,6 +1,6 @@
 import { Address, encodeFunctionData } from "viem";
 
-import { BaseStrategy, StrategyCall } from "../baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "../base";
 
 import { V3_SWAP_ROUTER_ABI } from "@/constants/abis";
 import { getWrappedToken } from "@/constants/coins";
@@ -13,7 +13,9 @@ import { Token } from "@/types/blockchain";
  * @notice BSC: BNB -> wbETH
  */
 
-export class UniswapV3SwapLST extends BaseStrategy<typeof UNISWAP_CONTRACTS> {
+export class UniswapV3SwapLST extends EVMBaseStrategy<
+  typeof UNISWAP_CONTRACTS
+> {
   constructor(
     chainId: number,
     public readonly nativeToken: Token,

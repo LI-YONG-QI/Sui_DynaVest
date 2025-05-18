@@ -2,10 +2,10 @@ import type { Address } from "viem";
 import { encodeFunctionData } from "viem";
 
 import { AAVE_V3_ABI, ERC20_ABI } from "@/constants/abis";
-import { BaseStrategy, StrategyCall } from "../baseStrategy";
+import { EVMBaseStrategy, StrategyCall } from "../base";
 import { AAVE_CONTRACTS } from "@/constants/protocols/aave";
 
-export class AaveV3Supply extends BaseStrategy<typeof AAVE_CONTRACTS> {
+export class AaveV3Supply extends EVMBaseStrategy<typeof AAVE_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, AAVE_CONTRACTS, {
       protocol: "Aave V3",
