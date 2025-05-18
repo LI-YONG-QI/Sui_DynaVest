@@ -1,6 +1,6 @@
 import { bsc } from "viem/chains";
 
-import { Protocol, Protocols } from "@/types";
+import { EVMProtocol, SuiProtocol, Protocols } from "@/types";
 import { BNB, ETH, PERMIT_EXPIRY, wbETH, wstETH } from "@/constants";
 import {
   MorphoSupply,
@@ -19,12 +19,13 @@ export function getDeadline(): bigint {
   return BigInt(timestampInSeconds) + BigInt(PERMIT_EXPIRY);
 }
 
-export function getStrategy(
-  protocol: Protocol,
+export function getEVMStrategy(
+  protocol: EVMProtocol,
   chainId: number
 ): EVMBaseStrategy<Protocols> {
   // The type casting here is safe because we've already verified the chainId is supported
   // for the specific protocol with isChainIdSupported
+
   switch (protocol) {
     case "MorphoSupply":
       return new MorphoSupply(chainId);
@@ -51,7 +52,7 @@ export function getStrategy(
 }
 
 export function getSuiStrategy(
-  protocol: "BucketLending",
+  protocol: SuiProtocol,
   chainId: number
 ): SuiBaseStrategy<Protocols> {
   switch (protocol) {

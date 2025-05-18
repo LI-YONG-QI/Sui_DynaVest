@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MoveUpRight, Percent } from "lucide-react";
 import { parseUnits } from "viem";
 
-import { RiskLevel, RiskPortfolioStrategies } from "@/types";
+import { EVMProtocol, RiskLevel, RiskPortfolioStrategies } from "@/types";
 import type { Message, PortfolioMessage } from "@/classes/message";
 import { RISK_OPTIONS } from "@/constants/risk";
 import { createPieChartStrategies } from "@/utils/pie";
@@ -12,7 +12,7 @@ import { RiskBadgeList } from "../../RiskBadgeList";
 import Button from "@/components/Button";
 import { USDC } from "@/constants/coins";
 import useCurrency from "@/hooks/useCurrency";
-import { getStrategy } from "@/utils/strategies";
+import { getEVMStrategy } from "@/utils/strategies";
 import { MultiStrategy } from "@/classes/strategies/multiStrategy";
 import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
 import { toast } from "react-toastify";
@@ -60,7 +60,11 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
   async function executeMultiStrategy() {
     try {
       const strategiesHandler = strategies.map((strategy) => ({
-        strategy: getStrategy(strategy.protocol, strategy.chainId),
+        strategy: getEVMStrategy(
+          //! not type safe
+          strategy.protocol as EVMProtocol,
+          strategy.chainId
+        ),
         allocation: strategy.allocation,
       }));
 

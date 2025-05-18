@@ -385,6 +385,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     tokens: [USDC],
     chainId: polygon.id,
   },
+
   // TODO: mock for demo
   {
     title: "Aave Lending Leverage",
@@ -425,6 +426,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
     chainId: base.id,
   },
 
+  // SUI //
   {
     title: "Bucket Lending",
     apy: 10.1,

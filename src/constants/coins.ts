@@ -1,5 +1,7 @@
 import { base, bsc, celo, arbitrum, polygon } from "viem/chains";
+
 import type { Token } from "@/types";
+import { sui } from "./chains";
 
 export const USDT: Token = {
   name: "USDT",
@@ -25,6 +27,8 @@ export const USDC: Token = {
     [base.id]: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     [bsc.id]: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
     [polygon.id]: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+    [sui.id]:
+      "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC",
   },
 };
 
@@ -48,8 +52,11 @@ export const SUI: Token = {
   name: "SUI",
   icon: "/crypto-icons/chains/-1.svg",
   decimals: 9,
-  isNativeToken: true,
+  isNativeToken: false,
   ecosystem: "SUI",
+  chains: {
+    [sui.id]: "0x2::sui::SUI",
+  },
 };
 
 export const wstETH: Token = {

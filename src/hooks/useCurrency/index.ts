@@ -3,12 +3,13 @@ import { getBalance } from "@wagmi/core";
 import { useChainId } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
+import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 
 import { Token } from "@/types";
 import { COINGECKO_IDS } from "@/constants/coins";
 import { wagmiConfig as config } from "@/providers/config";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
+import { sui } from "@/constants/chains";
 
 export default function useCurrency(token: Token) {
   const { client } = useSmartWallets();
@@ -16,8 +17,10 @@ export default function useCurrency(token: Token) {
   const [currency, setCurrency] = useState<Token>(token);
   const chainId = useChainId();
 
-  // Fetch balance function to be used with useQuery
-  const fetchTokenBalance = useCallback(async () => {
+  const suiClient = useSuiClient();
+  const suiAccount = useCurrentAccount();
+
+  const fetchEVMTokenBalance = useCallback(async () => {
     if (!client) return BigInt(0);
 
     await client.switchChain({ id: chainId });
@@ -33,6 +36,29 @@ export default function useCurrency(token: Token) {
     const { value } = await getBalance(config, params);
     return value;
   }, [client, currency, chainId]);
+
+  const fetchSuiTokenBalance = useCallback(async () => {
+    if (!suiAccount) {
+      console.warn("No account");
+      return BigInt(0);
+    }
+
+    const balance = await suiClient.getBalance({
+      owner: suiAccount?.address ?? "",
+      coinType: token.chains?.[sui.id],
+    });
+
+    return BigInt(balance.totalBalance);
+  }, [suiAccount, suiClient, token]);
+
+  // Fetch balance function to be used with useQuery
+  const fetchTokenBalance = useCallback(async () => {
+    if (token.ecosystem === "SUI") {
+      return fetchSuiTokenBalance();
+    } else {
+      return fetchEVMTokenBalance();
+    }
+  }, [fetchEVMTokenBalance, fetchSuiTokenBalance, token.ecosystem]);
 
   const fetchTokenPrice = useCallback(async () => {
     const id = COINGECKO_IDS[currency.name];
@@ -53,64 +79,34 @@ export default function useCurrency(token: Token) {
   // Use React Query for fetching and caching the balance
   const {
     data: balance = BigInt(0),
-    isLoading: isEvmLoadingBalance,
+    isLoading,
     refetch: fetchBalance,
-    isError: isEvmError,
-    isLoadingError: isEvmLoadingError,
-    error: evmError,
+    isError,
+    isLoadingError,
+    error,
   } = useQuery<bigint>({
     queryKey: [
       "tokenBalance",
       chainId,
       currency.name,
       currency.chains?.[chainId],
+      suiAccount?.address,
     ],
     queryFn: fetchTokenBalance,
-    enabled: !!client && currency.ecosystem === "EVM",
+    enabled: !!client || !!suiClient,
     staleTime: 30 * 1000, // Consider data stale after 30 seconds
     refetchOnWindowFocus: true,
   });
 
-  const account = useCurrentAccount();
-  const {
-    data: suiBalance,
-    refetch: refetchSuiBalance,
-    isLoading: isSuiLoadingBalance,
-    isLoadingError: isSuiLoadingError,
-    isError: isSuiError,
-    error: suiError,
-  } = useSuiClientQuery(
-    "getBalance",
-    { owner: account?.address ?? "" },
-    {
-      enabled: token.ecosystem === "SUI",
-      gcTime: 10000,
-    }
-  );
-
-  if (token.ecosystem === "SUI") {
-    return {
-      currency,
-      setCurrency,
-      balance: BigInt(suiBalance?.totalBalance ?? "0"),
-      fetchBalance: refetchSuiBalance,
-      fetchTokenPrice,
-      isError: isSuiError,
-      error: suiError,
-      isLoadingBalance: isSuiLoadingBalance,
-      isLoadingError: isSuiLoadingError,
-    };
-  } else {
-    return {
-      currency,
-      setCurrency,
-      balance,
-      fetchBalance,
-      fetchTokenPrice,
-      isError: isEvmError,
-      error: evmError,
-      isLoadingBalance: isEvmLoadingBalance,
-      isLoadingError: isEvmLoadingError,
-    };
-  }
+  return {
+    currency,
+    setCurrency,
+    balance,
+    fetchBalance,
+    fetchTokenPrice,
+    isError,
+    isLoadingError,
+    error,
+    isLoading,
+  };
 }

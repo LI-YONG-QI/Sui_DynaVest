@@ -1,6 +1,6 @@
 import { Address } from "viem";
 
-import type { PROTOCOLS } from "@/constants";
+import type { PROTOCOLS, SUI_PROTOCOLS } from "@/constants";
 import { RISK_OPTIONS } from "@/constants/risk";
 import { Token } from "./blockchain";
 
@@ -9,7 +9,10 @@ export type Protocols = Record<number, Record<string, Address>>;
 export type ProtocolChains<T extends Protocols> = keyof T;
 export type ProtocolContracts<T extends Protocols> = keyof T[keyof T];
 
-export type Protocol = (typeof PROTOCOLS)[number];
+export type EVMProtocol = (typeof PROTOCOLS)[number];
+export type SuiProtocol = (typeof SUI_PROTOCOLS)[number];
+
+export type Protocol = EVMProtocol | SuiProtocol;
 
 export type StrategyMetadata = InvestStrategy & {
   displayInsufficientBalance?: boolean;

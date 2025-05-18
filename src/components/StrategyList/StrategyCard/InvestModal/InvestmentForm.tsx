@@ -3,12 +3,12 @@ import { FC, useState, useEffect, FormEvent } from "react";
 import { toast } from "react-toastify";
 import { useChainId } from "wagmi";
 import { formatUnits, parseUnits } from "viem";
+import { MoonLoader } from "react-spinners";
 
 import useCurrency from "@/hooks/useCurrency";
 import useSwitchChain from "@/hooks/useSwitchChain";
-import { InvestStrategy } from "@/types";
-import { MoonLoader } from "react-spinners";
-import { getStrategy, getSuiStrategy } from "@/utils/strategies";
+import { EVMProtocol, InvestStrategy, SuiProtocol } from "@/types";
+import { getEVMStrategy, getSuiStrategy } from "@/utils/strategies";
 import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
 import { useSuiStrategyExecutor } from "@/hooks/useSuiStrategyExecutor";
 import { sui } from "@/constants/chains";
@@ -49,7 +49,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     currency,
     setCurrency,
     balance: maxBalance,
-    isLoadingBalance,
+    isLoading: isLoadingBalance,
   } = useCurrency(strategy.tokens[0]);
 
   const chainId = useChainId();
@@ -57,8 +57,6 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
   const { execute: executeSuiStrategy } = useSuiStrategyExecutor();
 
   const AMOUNT_LIMIT = 0.01;
-
-  console.log(strategy.chainId);
 
   // Handle setting max amount
   const handleSetMax = () => {
@@ -100,11 +98,16 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
 
       if (strategy.chainId === sui.id) {
         result = await executeSuiStrategy(
-          getSuiStrategy("BucketLending", sui.id),
+          //! not type safe
+          getSuiStrategy(strategy.protocol as SuiProtocol, sui.id),
           parsedAmount
         );
       } else {
-        const evmStrategy = getStrategy(strategy.protocol, chainId);
+        const evmStrategy = getEVMStrategy(
+          //! not type safe
+          strategy.protocol as EVMProtocol,
+          chainId
+        );
         if (currency.isNativeToken) {
           result = await execute(evmStrategy, parsedAmount);
         } else {
