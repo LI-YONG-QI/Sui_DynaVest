@@ -1,35 +1,33 @@
 import { useCallback, useState } from "react";
 import { getBalance } from "@wagmi/core";
-import { useChainId } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
+import { useSuiClient } from "@mysten/dapp-kit";
+import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 
 import { Token } from "@/types";
 import { COINGECKO_IDS } from "@/constants/coins";
 import { wagmiConfig as config } from "@/providers/config";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
-import { sui } from "@/constants/chains";
+import { useStatus } from "@/contexts/StatusContext";
 
 export default function useCurrency(token: Token) {
+  const { ecosystem, user, chainId } = useStatus();
   const { client } = useSmartWallets();
 
   const [currency, setCurrency] = useState<Token>(token);
-  const chainId = useChainId();
 
   const suiClient = useSuiClient();
-  const suiAccount = useCurrentAccount();
 
   const fetchEVMTokenBalance = useCallback(async () => {
     if (!client) return BigInt(0);
 
     await client.switchChain({ id: chainId });
-    const user = client.account.address;
+    const address = client.account.address;
 
-    if (!user) return BigInt(0);
+    if (!address) return BigInt(0);
 
     const params = {
-      address: user,
+      address: address,
       ...(currency.isNativeToken ? {} : { token: currency.chains?.[chainId] }),
     };
 
@@ -38,27 +36,27 @@ export default function useCurrency(token: Token) {
   }, [client, currency, chainId]);
 
   const fetchSuiTokenBalance = useCallback(async () => {
-    if (!suiAccount) {
-      console.warn("No account");
+    if (!user || !("address" in user)) {
+      console.warn("Failed to fetch SUI token balance: No SUI account");
       return BigInt(0);
     }
 
     const balance = await suiClient.getBalance({
-      owner: suiAccount?.address ?? "",
-      coinType: token.chains?.[sui.id],
+      owner: user.address,
+      coinType: token.chains?.[chainId],
     });
 
     return BigInt(balance.totalBalance);
-  }, [suiAccount, suiClient, token]);
+  }, [user, suiClient, token, chainId]);
 
   // Fetch balance function to be used with useQuery
   const fetchTokenBalance = useCallback(async () => {
-    if (token.ecosystem === "SUI") {
+    if (ecosystem === "SUI") {
       return fetchSuiTokenBalance();
     } else {
       return fetchEVMTokenBalance();
     }
-  }, [fetchEVMTokenBalance, fetchSuiTokenBalance, token.ecosystem]);
+  }, [fetchEVMTokenBalance, fetchSuiTokenBalance, ecosystem]);
 
   const fetchTokenPrice = useCallback(async () => {
     const id = COINGECKO_IDS[currency.name];
@@ -90,7 +88,7 @@ export default function useCurrency(token: Token) {
       chainId,
       currency.name,
       currency.chains?.[chainId],
-      suiAccount?.address,
+      user,
     ],
     queryFn: fetchTokenBalance,
     enabled: !!client || !!suiClient,

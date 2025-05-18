@@ -47,6 +47,7 @@ import { useStatus } from "@/contexts/StatusContext";
 //   }
 // }
 
+// TODO: support EVM by default
 export default function ConnectWalletButton() {
   const { switchEcosystem } = useStatus();
   const {
@@ -80,6 +81,7 @@ export default function ConnectWalletButton() {
 
   const handleButtonOnClick = () => {
     if (!buttonReady) return;
+
     if (!loggedIn) {
       if (authenticated) {
         // User is authenticated but wallet not connected, use linkWallet instead
