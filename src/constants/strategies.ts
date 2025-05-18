@@ -433,7 +433,7 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
       color: "#E83033",
       bgColor: "rgba(232, 48, 51, 0.3)",
     },
-    protocol: "AaveV3Supply",
+    protocol: "BucketLending",
     description:
       "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
     image: "/crypto-icons/polygon.svg",

@@ -2,10 +2,9 @@ import {
   useCurrentAccount,
   useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
+
 import { SuiBaseStrategy } from "@/classes/strategies/base";
 import { sui } from "@/constants/chains";
-import { Address } from "viem";
-import { Transaction } from "@mysten/sui/transactions";
 import { Protocols } from "@/types";
 
 export const SUI_PACKAGES = {
@@ -13,26 +12,6 @@ export const SUI_PACKAGES = {
     bucket: "0x2::sui",
   },
 } as const;
-
-export class SuiStrategy extends SuiBaseStrategy<typeof SUI_PACKAGES> {
-  constructor(chainId: number) {
-    super(chainId, SUI_PACKAGES, {
-      protocol: "Sui",
-      icon: "/crypto-icons/sui.svg",
-      type: "Lending",
-      description: "Lend assets to Sui",
-    });
-  }
-
-  async buildCalls(amount: bigint, user: Address): Promise<Transaction> {
-    const tx = new Transaction();
-
-    const [coin] = tx.splitCoins(tx.gas, [amount]);
-    tx.transferObjects([coin], user);
-
-    return tx;
-  }
-}
 
 export function useSuiStrategyExecutor() {
   const { mutateAsync: signAndExecuteTransaction } =

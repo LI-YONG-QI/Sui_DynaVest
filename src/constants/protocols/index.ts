@@ -16,4 +16,5 @@ export const PROTOCOLS = [
   "UniswapV3SwapLST",
   "CamelotStaking",
   "GMXDeposit",
+  "BucketLending", //! Sui
 ] as const;

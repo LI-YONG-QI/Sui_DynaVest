@@ -11,7 +11,8 @@ import {
   AaveV3Supply,
   UniswapV3AddLiquidity,
 } from "@/classes/strategies";
-import { EVMBaseStrategy } from "@/classes/strategies/base";
+import { EVMBaseStrategy, SuiBaseStrategy } from "@/classes/strategies/base";
+import { Lending } from "@/classes/bucket/lending";
 
 export function getDeadline(): bigint {
   const timestampInSeconds = Math.floor(Date.now() / 1000);
@@ -44,6 +45,18 @@ export function getStrategy(
       return new CamelotStaking(chainId);
     case "GMXDeposit":
       return new GMXDeposit(chainId);
+    default:
+      throw new Error("Unsupported protocol");
+  }
+}
+
+export function getSuiStrategy(
+  protocol: "BucketLending",
+  chainId: number
+): SuiBaseStrategy<Protocols> {
+  switch (protocol) {
+    case "BucketLending":
+      return new Lending(chainId);
     default:
       throw new Error("Unsupported protocol");
   }

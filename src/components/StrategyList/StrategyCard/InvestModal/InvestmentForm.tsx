@@ -8,12 +8,9 @@ import useCurrency from "@/hooks/useCurrency";
 import useSwitchChain from "@/hooks/useSwitchChain";
 import { InvestStrategy } from "@/types";
 import { MoonLoader } from "react-spinners";
-import { getStrategy } from "@/utils/strategies";
+import { getStrategy, getSuiStrategy } from "@/utils/strategies";
 import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
-import {
-  SuiStrategy,
-  useSuiStrategyExecutor,
-} from "@/hooks/useSuiStrategyExecutor";
+import { useSuiStrategyExecutor } from "@/hooks/useSuiStrategyExecutor";
 import { sui } from "@/constants/chains";
 
 // Props interface
@@ -61,16 +58,19 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
 
   const AMOUNT_LIMIT = 0.01;
 
+  console.log(strategy.chainId);
+
   // Handle setting max amount
   const handleSetMax = () => {
     setAmount(maxBalance.toString());
   };
 
   const invest = async () => {
-    if (Number(amount) < AMOUNT_LIMIT) {
-      toast.error("Investment amount must be greater than 0.01");
-      return;
-    }
+    // TODO: remove it for dev
+    // if (Number(amount) < AMOUNT_LIMIT) {
+    //   toast.error("Investment amount must be greater than 0.01");
+    //   return;
+    // }
 
     if (handlePortfolio) {
       handlePortfolio(amount);
@@ -93,29 +93,27 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
   const executeStrategy = async () => {
     setIsLoading(true);
 
-    if (strategy.chainId === sui.id) {
-      console.log("sui");
-      const result = await executeSuiStrategy(
-        new SuiStrategy(sui.id),
-        BigInt(1_000_000)
-      );
-      toast.success(`Investment successful! ${result}`);
-      return;
-    }
-
-    const strategyHandler = getStrategy(strategy.protocol, chainId);
     const parsedAmount = parseUnits(amount, currency.decimals);
 
     try {
       let result;
-      if (currency.isNativeToken) {
-        result = await execute(strategyHandler, parsedAmount);
-      } else {
-        result = await execute(
-          strategyHandler,
-          parsedAmount,
-          currency.chains![chainId]
+
+      if (strategy.chainId === sui.id) {
+        result = await executeSuiStrategy(
+          getSuiStrategy("BucketLending", sui.id),
+          parsedAmount
         );
+      } else {
+        const evmStrategy = getStrategy(strategy.protocol, chainId);
+        if (currency.isNativeToken) {
+          result = await execute(evmStrategy, parsedAmount);
+        } else {
+          result = await execute(
+            evmStrategy,
+            parsedAmount,
+            currency.chains![chainId]
+          );
+        }
       }
 
       toast.success(`Investment successful! ${result}`);
