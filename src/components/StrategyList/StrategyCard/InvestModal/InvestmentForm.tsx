@@ -10,6 +10,11 @@ import { InvestStrategy } from "@/types";
 import { MoonLoader } from "react-spinners";
 import { getStrategy } from "@/utils/strategies";
 import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
+import {
+  SuiStrategy,
+  useSuiStrategyExecutor,
+} from "@/hooks/useSuiStrategyExecutor";
+import { sui } from "@/constants/chains";
 
 // Props interface
 interface InvestmentFormProps {
@@ -52,6 +57,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
 
   const chainId = useChainId();
   const { execute } = useStrategyExecutor();
+  const { execute: executeSuiStrategy } = useSuiStrategyExecutor();
 
   const AMOUNT_LIMIT = 0.01;
 
@@ -86,6 +92,16 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
 
   const executeStrategy = async () => {
     setIsLoading(true);
+
+    if (strategy.chainId === sui.id) {
+      console.log("sui");
+      const result = await executeSuiStrategy(
+        new SuiStrategy(sui.id),
+        BigInt(1_000_000)
+      );
+      toast.success(`Investment successful! ${result}`);
+      return;
+    }
 
     const strategyHandler = getStrategy(strategy.protocol, chainId);
     const parsedAmount = parseUnits(amount, currency.decimals);

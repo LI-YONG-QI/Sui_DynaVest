@@ -61,7 +61,7 @@ export function useStrategyExecutor() {
         ],
       });
     } else if (strategy instanceof MultiStrategy) {
-      // TODO: rename
+      // TODO: rename (replace "strategy")
       const transactions = strategy.strategies.map((strategy) => {
         return {
           hash: txHash,
@@ -107,10 +107,5 @@ export function useStrategyExecutor() {
     }
   }
 
-  return {
-    user,
-    execute,
-    waitForUserOp,
-    isReady: !!client && !!user,
-  };
+  return { execute };
 }
