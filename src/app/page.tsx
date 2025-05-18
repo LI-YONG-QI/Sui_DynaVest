@@ -28,9 +28,9 @@ import {
   DefiStrategiesCardsChatWrapper,
 } from "@/components/ChatWrapper";
 import { BotResponse } from "@/types";
+import { arbitrum } from "viem/chains";
 
 import FindStrategiesChatWrapper from "@/components/ChatWrapper/FindStrategiesChatWrapper";
-import { arbitrum } from "viem/chains";
 export default function Home() {
   const [isInput, setIsInput] = useState(false);
   const [command, setCommand] = useState("");

@@ -15,6 +15,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@mysten/dapp-kit": "^0.16.3",
     "@mysten/sui": "^1.29.1",
+    "@mysten/wallet-standard": "^0.15.0",
     "@prisma/client": "^6.8.1",
     "@privy-io/react-auth": "^2.8.2",
     "@privy-io/wagmi": "^1.0.3",

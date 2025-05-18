@@ -10,9 +10,9 @@ import {
   StCeloStaking,
   AaveV3Supply,
   UniswapV3AddLiquidity,
+  Lending,
 } from "@/classes/strategies";
 import { EVMBaseStrategy, SuiBaseStrategy } from "@/classes/strategies/base";
-import { Lending } from "@/classes/bucket/lending";
 
 export function getDeadline(): bigint {
   const timestampInSeconds = Math.floor(Date.now() / 1000);

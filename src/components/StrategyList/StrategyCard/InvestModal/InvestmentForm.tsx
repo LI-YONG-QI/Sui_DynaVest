@@ -1,17 +1,17 @@
 import Image from "next/image";
 import { FC, useState, useEffect, FormEvent } from "react";
 import { toast } from "react-toastify";
-import { useChainId } from "wagmi";
 import { formatUnits, parseUnits } from "viem";
 import { MoonLoader } from "react-spinners";
 
 import useCurrency from "@/hooks/useCurrency";
-import useSwitchChain from "@/hooks/useSwitchChain";
 import { EVMProtocol, InvestStrategy, SuiProtocol } from "@/types";
 import { getEVMStrategy, getSuiStrategy } from "@/utils/strategies";
 import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
 import { useSuiStrategyExecutor } from "@/hooks/useSuiStrategyExecutor";
 import { sui } from "@/constants/chains";
+import { useStatus } from "@/contexts/StatusContext";
+import { useWallets } from "@privy-io/react-auth";
 
 // Props interface
 interface InvestmentFormProps {
@@ -38,13 +38,9 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
   );
   const [isDisabled, setIsDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSupportedChain, setIsSupportedChain] = useState<boolean>(false);
 
-  const {
-    switchChain,
-    isSupportedChain,
-    ready: isWalletReady,
-  } = useSwitchChain(strategy.chainId);
-
+  const { ready: isWalletReady } = useWallets();
   const {
     currency,
     setCurrency,
@@ -52,9 +48,10 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     isLoading: isLoadingBalance,
   } = useCurrency(strategy.tokens[0]);
 
-  const chainId = useChainId();
   const { execute } = useStrategyExecutor();
   const { execute: executeSuiStrategy } = useSuiStrategyExecutor();
+
+  const { user, chainId, switchChain } = useStatus();
 
   const AMOUNT_LIMIT = 0.01;
 
@@ -80,7 +77,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
 
   const handleSwitchChain = async () => {
     try {
-      await switchChain();
+      await switchChain(strategy.chainId);
       toast.success("Switched chain successfully");
     } catch (error) {
       console.error(error);
@@ -130,20 +127,24 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
     setIsLoading(false);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     switch (buttonState) {
       case ButtonState.Invest:
-        invest();
+        await invest();
         break;
       case ButtonState.SwitchChain:
-        handleSwitchChain();
+        await handleSwitchChain();
         break;
       default:
         break;
     }
   };
+
+  useEffect(() => {
+    setIsSupportedChain(strategy.chainId === chainId);
+  }, [strategy.chainId, chainId]);
 
   useEffect(() => {
     setButtonState(
@@ -155,6 +156,7 @@ const InvestmentForm: FC<InvestmentFormProps> = ({
         ? ButtonState.Invest
         : ButtonState.SwitchChain
     );
+
     setIsDisabled(isLoading);
   }, [isWalletReady, isLoading, isSupportedChain]);
 

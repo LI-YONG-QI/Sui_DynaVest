@@ -1,7 +1,7 @@
 import { Transaction } from "@mysten/sui/transactions";
 import { Address } from "viem";
 
-import { SuiBaseStrategy } from "../strategies/base";
+import { SuiBaseStrategy } from "../base";
 import { SUI_PACKAGES } from "@/hooks/useSuiStrategyExecutor";
 
 export class Lending extends SuiBaseStrategy<typeof SUI_PACKAGES> {

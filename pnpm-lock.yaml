@@ -20,6 +20,9 @@ importers:
       '@mysten/sui':
         specifier: ^1.29.1
         version: 1.29.1(typescript@5.8.3)
+      '@mysten/wallet-standard':
+        specifier: ^0.15.0
+        version: 0.15.0(typescript@5.8.3)
       '@prisma/client':
         specifier: ^6.8.1
         version: 6.8.1(prisma@6.8.1(typescript@5.8.3))(typescript@5.8.3)

@@ -7,6 +7,7 @@ import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 
 import { wagmiConfig, suiConfig } from "./config";
 import PrivyAccountProvider from "@/contexts/PrivyAccountProvider";
+import { StatusProvider } from "@/contexts/StatusContext";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +36,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           <QueryClientProvider client={queryClient}>
             <WalletProvider>
               <WagmiProvider config={wagmiConfig}>
-                <PrivyAccountProvider>{children}</PrivyAccountProvider>
+                <PrivyAccountProvider>
+                  <StatusProvider>{children}</StatusProvider>
+                </PrivyAccountProvider>
               </WagmiProvider>
             </WalletProvider>
           </QueryClientProvider>
