@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@1inch/cross-chain-sdk": "^0.1.13",
+    "@cetusprotocol/aggregator-sdk": "^0.10.0",
     "@hookform/resolvers": "^5.0.1",
     "@mysten/dapp-kit": "^0.16.3",
     "@mysten/sui": "^1.29.1",
@@ -29,6 +30,8 @@
     "@zerodev/ecdsa-validator": "^5.4.9",
     "@zerodev/sdk": "^5.4.34",
     "axios": "^1.9.0",
+    "bn.js": "^5.2.2",
+    "bucket-protocol-sdk": "^0.12.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -55,6 +58,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/bn.js": "^5.1.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-copy-to-clipboard": "^5.0.7",
