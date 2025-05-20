@@ -2,7 +2,9 @@ import { BUCKET_CONTRACTS } from "@/constants/protocols/bucket";
 import { SuiBaseStrategy } from "../base";
 import { Transaction } from "@mysten/sui/transactions";
 import { Address } from "viem";
-import { getInputCoins, suiClient } from "@/utils/sui";
+import { suiClient } from "@/utils/sui";
+import { getInputCoins } from "bucket-protocol-sdk";
+import { SuiClient } from "@mysten/sui/client";
 
 export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
   constructor(chainId: number) {
@@ -35,8 +37,8 @@ export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
     };
 
     const butCoin = await getInputCoins(
-      tx,
-      suiClient,
+      tx as any,
+      suiClient as any,
       user,
       buTTokenType,
       (10 ** 9).toString(),

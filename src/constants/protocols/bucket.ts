@@ -4,6 +4,8 @@ export const BUCKET_CONTRACTS = {
   [base.id]: {
     bucket:
       "0x0b6ba9889bb71abc5fa89e4ad5db12e63bc331dba858019dd8d701bc91184d79",
+    bucketOperations:
+      "0x50e0e9e549574c2ab7ee24d37bffd38eaeb2e93e83bcac26aac081606ac68fae",
     deToken:
       "0x9b1afe356c35a59e682047038fe73ed3204e3ac777242c2a7ea9e6c5eb6afab3",
     butCoinType:
