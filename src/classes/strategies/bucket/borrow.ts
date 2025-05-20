@@ -32,7 +32,7 @@ export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
   ): Promise<Transaction> {
     const tx = new Transaction();
 
-    const bucketOperations = this.getAddress("bucketOperation");
+    const bucketOperations = this.getAddress("bucketOperations");
 
     const suiBottleTableId =
       "0x86050d85ebdafe3bda92c36c8489d46a233f57f103672647062f72f3fe37a46d";
