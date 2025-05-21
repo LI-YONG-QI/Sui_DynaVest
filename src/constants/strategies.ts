@@ -1,7 +1,7 @@
 import { celo, flowMainnet, base, bsc, arbitrum, polygon } from "viem/chains";
 
 import type { StrategyMetadata } from "@/types";
-import { USDC, CELO, FLOW, cEUR, ETH, BNB, SUI } from "@/constants/coins";
+import { USDC, CELO, FLOW, cEUR, ETH, BNB, SUI, BUT } from "@/constants/coins";
 import { sui } from "./chains";
 
 export const BOT_STRATEGY: StrategyMetadata = {
@@ -17,8 +17,8 @@ export const BOT_STRATEGY: StrategyMetadata = {
   image: "",
   externalLink: "",
   learnMoreLink: "",
-  tokens: [USDC],
-  chainId: base.id,
+  tokens: [SUI],
+  chainId: sui.id,
 };
 
 export const STRATEGIES_METADATA: StrategyMetadata[] = [
@@ -427,17 +427,97 @@ export const STRATEGIES_METADATA: StrategyMetadata[] = [
   },
 
   // SUI //
+
   {
-    title: "Bucket Lending",
+    title: "Bucket Borrow",
     apy: 10.1,
     risk: {
       level: "low" as const,
       color: "#E83033",
       bgColor: "rgba(232, 48, 51, 0.3)",
     },
-    protocol: "BucketLending",
+    protocol: "BucketBorrow",
     description:
       "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
+    image: "/crypto-icons/polygon.svg",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    tokens: [SUI],
+    chainId: sui.id,
+  },
+
+  {
+    title: "Bucket Staking",
+    apy: 10.1,
+    risk: {
+      level: "low" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "BucketStaking",
+    description:
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
+    image: "/crypto-icons/polygon.svg",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    tokens: [BUT],
+    chainId: sui.id,
+  },
+
+  {
+    title: "Scallop Supply",
+    apy: 10.1,
+    risk: {
+      level: "medium" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "ScallopSupply",
+    description:
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
+    image: "/crypto-icons/polygon.svg",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    tokens: [SUI],
+    chainId: sui.id,
+  },
+
+  {
+    title: "Cetus Swap",
+    apy: 10.1,
+    risk: {
+      level: "medium" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "CetusSwap",
+    description:
+      "Supplying USDC to AAVE Lending Protocol enables earning interest and rewards, maximizing returns in DeFi.",
+    image: "/crypto-icons/polygon.svg",
+    externalLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    learnMoreLink:
+      "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",
+    tokens: [SUI],
+    chainId: sui.id,
+  },
+
+  {
+    title: "Cetus Add Liquidity",
+    apy: 10.1,
+    risk: {
+      level: "medium" as const,
+      color: "#E83033",
+      bgColor: "rgba(232, 48, 51, 0.3)",
+    },
+    protocol: "CetusAddLiquidity",
+    description: "Adding USDC and USDT to the Cetus pool",
     image: "/crypto-icons/polygon.svg",
     externalLink:
       "https://app.aave.com/reserve-overview/?underlyingAsset=0x3c499c542cef5e3811e1192ce70d8cc03d5c3359&marketName=proto_polygon_v3",

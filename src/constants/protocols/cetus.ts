@@ -1,5 +1,5 @@
-import { base } from "viem/chains";
+import { sui } from "../chains";
 
 export const CETUS_CONTRACTS = {
-  [base.id]: {},
+  [sui.id]: {},
 } as const;

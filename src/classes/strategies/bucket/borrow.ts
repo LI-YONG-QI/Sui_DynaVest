@@ -15,38 +15,37 @@ import {
 } from "bucket-protocol-sdk";
 import { bucketClient, suiClient } from "@/utils/sui";
 
-export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
+export class BucketBorrow extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, BUCKET_CONTRACTS, {
       protocol: "Bucket",
-      icon: "/crypto-icons/morpho.svg",
+      icon: "/crypto-icons/bucket.png",
       type: "Lending",
       description: "Lend assets to Bucket",
     });
   }
 
-  async buildCalls(
+  async buildTransaction(
+    tx: Transaction,
     amount: bigint,
     user: Address,
-    asset?: Address,
+    asset?: Address
   ): Promise<Transaction> {
-    const tx = new Transaction();
-
     const bucketOperations = this.getAddress("bucketOperations");
 
     const suiBottleTableId =
       "0x86050d85ebdafe3bda92c36c8489d46a233f57f103672647062f72f3fe37a46d";
     // collateral: 30 SUI
-    const suiCollateral = 30 * 10 ** COIN_DECIMALS.SUI;
+    const suiCollateral = 0.3 * 10 ** COIN_DECIMALS.SUI;
     const suiPrice = await bucketClient.getPrices().then((res) => res.SUI);
     // debt: 50 BUCK
-    const buckDebt = 50 * 10 ** COIN_DECIMALS.BUCK;
+    const buckDebt = 0.5 * 10 ** COIN_DECIMALS.BUCK;
     const targetCR = ((suiPrice || 0) * suiCollateral) / buckDebt;
     const insertionPlace = await bucketClient.findInsertionPlace(
       suiBottleTableId,
       targetCR,
       1,
-      COINS_TYPE_LIST.SUI,
+      COINS_TYPE_LIST.SUI
     );
 
     const collateralCoin = await getInputCoins(
@@ -54,13 +53,13 @@ export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
       suiClient as any,
       user,
       COINS_TYPE_LIST.SUI,
-      suiCollateral.toString(),
+      suiCollateral.toString()
     );
 
     const collateralBalance = coinIntoBalance(
       tx as any,
       COINS_TYPE_LIST.SUI,
-      collateralCoin,
+      collateralCoin
     );
 
     bucketClient.updateSupraOracle(tx as any, "SUI");
@@ -80,7 +79,7 @@ export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
     const buckCoin = coinFromBalance(
       tx as any,
       COINS_TYPE_LIST.BUCK,
-      buckBalance,
+      buckBalance
     );
 
     tx.transferObjects([buckCoin], user);

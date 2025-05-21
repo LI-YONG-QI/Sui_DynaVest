@@ -7,6 +7,8 @@ import InvestmentForm from "@/components/StrategyList/StrategyCard/InvestModal/I
 import { InvestMessage } from "@/classes/message";
 
 import type { Message } from "@/classes/message";
+import { sui } from "@/constants/chains";
+import { SUI, USDC } from "@/constants/coins";
 interface InvestmentFormChatWrapperProps {
   message: InvestMessage;
   addBotMessage: (message: Message) => Promise<void>;
@@ -19,12 +21,13 @@ const InvestmentFormChatWrapper = ({
   const [botStrategy, setBotStrategy] =
     useState<StrategyMetadata>(BOT_STRATEGY);
 
-  const [chain, setChain] = useState<number>(message.chain);
+  const [chain, setChain] = useState<number>(sui.id);
 
   useEffect(() => {
     setBotStrategy({
       ...BOT_STRATEGY,
       chainId: chain,
+      tokens: [SUI],
     });
   }, [chain]);
 

@@ -2,7 +2,6 @@ import { CETUS_CONTRACTS } from "@/constants/protocols/cetus";
 import { SuiBaseStrategy } from "../base";
 import { Transaction } from "@mysten/sui/transactions";
 import { Address } from "viem";
-import { SUI_TYPE_ARG } from "@mysten/sui/utils";
 import { cetusSDK } from "@/utils/sui";
 import {
   AddLiquidityFixTokenParams,
@@ -11,31 +10,34 @@ import {
 } from "@cetusprotocol/cetus-sui-clmm-sdk";
 import BN from "bn.js";
 
-export class CetusSwap extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
+export class CetusAddLiquidity extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, CETUS_CONTRACTS, {
       protocol: "Cetus",
-      icon: "/crypto-icons/morpho.svg",
-      type: "Trading",
+      icon: "/crypto-icons/cetus.svg",
+      type: "Yield",
       description: "Add Liquidity to Cetus",
     });
   }
 
-  async buildCalls(
+  async buildTransaction(
+    tx: Transaction,
     amount: bigint,
     user: Address,
-    asset?: Address,
+    asset?: Address
   ): Promise<Transaction> {
+    cetusSDK.senderAddress = user;
     const UsdcSuiPool =
       "0xb8d7d9e66a60c239e7a60110efcf8de6c705580ed924d0dde141f4a0e2c90105";
+
     const pool = await cetusSDK.Pool.getPool(UsdcSuiPool);
     const lowerTick = TickMath.getPrevInitializableTickIndex(
       new BN(pool.current_tick_index).toNumber(),
-      new BN(pool.tickSpacing).toNumber(),
+      new BN(pool.tickSpacing).toNumber()
     );
     const upperTick = TickMath.getNextInitializableTickIndex(
       new BN(pool.current_tick_index).toNumber(),
-      new BN(pool.tickSpacing).toNumber(),
+      new BN(pool.tickSpacing).toNumber()
     );
 
     const usdcAmount = new BN(10 ** 4); // 0.01 USDC
@@ -50,7 +52,7 @@ export class CetusSwap extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
       fix_amount_a,
       true,
       slippage,
-      curSqrtPrice,
+      curSqrtPrice
     );
 
     const amount_a = fix_amount_a
@@ -75,14 +77,16 @@ export class CetusSwap extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
       collect_fee: false,
       pos_id: "",
     };
-    const tx = await cetusSDK.Position.createAddLiquidityFixTokenPayload(
+
+    const newTx = await cetusSDK.Position.createAddLiquidityFixTokenPayload(
       addLiquidityPayloadParams,
       {
         slippage: slippage,
         curSqrtPrice: curSqrtPrice,
       },
+      tx
     );
 
-    return tx;
+    return newTx;
   }
 }

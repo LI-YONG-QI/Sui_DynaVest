@@ -11,19 +11,21 @@ export class CetusSwap extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, CETUS_CONTRACTS, {
       protocol: "Cetus",
-      icon: "/crypto-icons/morpho.svg",
+      icon: "/crypto-icons/cetus.svg",
       type: "Trading",
       description: "Swap token on Cetus",
     });
   }
 
-  async buildCalls(
+  /**
+   * @notice Swap SUI to USDC
+   */
+  async buildTransaction(
+    tx: Transaction,
     amount: bigint,
     user: Address,
-    asset?: Address,
+    asset?: Address
   ): Promise<Transaction> {
-    const tx = new Transaction();
-
     const from = SUI_TYPE_ARG;
     const target =
       "0xdba34672e30cb065b1f93e3ab55318768fd6fef66c15942c9f7cb846e2f900e7::usdc::USDC";
@@ -42,8 +44,9 @@ export class CetusSwap extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
       suiClient as any,
       user,
       SUI_TYPE_ARG,
-      amount.toString(),
+      amount.toString()
     );
+
     const swappedCoin = await cetusAggregatorClient.routerSwap({
       routers,
       txb: tx,

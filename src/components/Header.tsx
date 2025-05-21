@@ -17,6 +17,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Strategies", href: "/strategies", isActive: true },
   { label: "Bot", href: "/", isActive: true },
+  { label: "Profile", href: "/profile", isActive: true },
 ];
 
 export default function Header() {
@@ -49,8 +50,8 @@ export default function Header() {
 
       <div className="flex items-center gap-4">
         <SuiConnectButton />
-        <ChainSelector />
-        <ConnectWalletButton />
+        {/* <ChainSelector />
+        <ConnectWalletButton /> */}
       </div>
     </header>
   );

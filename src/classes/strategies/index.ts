@@ -7,4 +7,3 @@ export * from "./gmx/deposit";
 export * from "./morpho/supply";
 export * from "./base";
 export * from "./aave/supply";
-export * from "./bucket/lending";

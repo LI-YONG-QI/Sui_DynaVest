@@ -1,7 +1,7 @@
-import { base } from "viem/chains";
+import { sui } from "../chains";
 
 export const BUCKET_CONTRACTS = {
-  [base.id]: {
+  [sui.id]: {
     bucket:
       "0x0b6ba9889bb71abc5fa89e4ad5db12e63bc331dba858019dd8d701bc91184d79",
     bucketOperations:

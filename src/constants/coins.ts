@@ -59,6 +59,18 @@ export const SUI: Token = {
   },
 };
 
+export const BUT: Token = {
+  name: "BUT",
+  icon: "/crypto-icons/but.jpeg",
+  decimals: 9,
+  isNativeToken: false,
+  ecosystem: "SUI",
+  chains: {
+    [sui.id]:
+      "0xbc858cb910b9914bee64fff0f9b38855355a040c49155a17b265d9086d256545::but::BUT",
+  },
+};
+
 export const wstETH: Token = {
   name: "wstETH",
   icon: "/crypto-icons/wstETH.webp",
@@ -189,4 +201,5 @@ export const COINGECKO_IDS = {
   [ETH.name]: "ethereum",
   [BNB.name]: "binancecoin",
   [SUI.name]: "sui",
+  [BUT.name]: "bucket-token",
 };

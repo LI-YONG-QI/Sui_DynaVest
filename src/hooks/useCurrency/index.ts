@@ -9,7 +9,7 @@ import { Token } from "@/types";
 import { COINGECKO_IDS } from "@/constants/coins";
 import { wagmiConfig as config } from "@/providers/config";
 import { useStatus } from "@/contexts/StatusContext";
-
+import { sui } from "@/constants/chains";
 export default function useCurrency(token: Token) {
   const { ecosystem, user, chainId } = useStatus();
   const { client } = useSmartWallets();
@@ -51,7 +51,7 @@ export default function useCurrency(token: Token) {
 
   // Fetch balance function to be used with useQuery
   const fetchTokenBalance = useCallback(async () => {
-    if (ecosystem === "SUI") {
+    if (chainId === sui.id) {
       return fetchSuiTokenBalance();
     } else {
       return fetchEVMTokenBalance();

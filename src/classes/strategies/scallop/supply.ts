@@ -10,19 +10,18 @@ export class ScallopSupply extends SuiBaseStrategy<typeof SCALLOP_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, SCALLOP_CONTRACTS, {
       protocol: "Scallop",
-      icon: "/crypto-icons/morpho.svg",
+      icon: "/crypto-icons/scallop.png",
       type: "Lending",
       description: "Lend assets to Scallop",
     });
   }
 
-  async buildCalls(
+  async buildTransaction(
+    tx: Transaction,
     amount: bigint,
     user: Address,
-    asset?: Address,
+    asset?: Address
   ): Promise<Transaction> {
-    const tx = new Transaction();
-
     const scallopCorePackage = this.getAddress("scallop");
     const convertorPackage = this.getAddress("sCoinConvertor");
 
@@ -52,7 +51,7 @@ export class ScallopSupply extends SuiBaseStrategy<typeof SCALLOP_CONTRACTS> {
       suiClient as any,
       user,
       SUI_TYPE_ARG,
-      (10 ** COIN_DECIMALS.SUI).toString(),
+      amount.toString()
     );
 
     const marketCoin = tx.moveCall({

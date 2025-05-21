@@ -10,19 +10,18 @@ export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, BUCKET_CONTRACTS, {
       protocol: "Bucket",
-      icon: "/crypto-icons/morpho.svg",
-      type: "Lending",
-      description: "Lend assets to Bucket",
+      icon: "/crypto-icons/bucket.png",
+      type: "Staking",
+      description: "Stake BUT to earn rewards",
     });
   }
 
-  async buildCalls(
+  async buildTransaction(
+    tx: Transaction,
     amount: bigint,
     user: Address,
-    asset?: Address,
+    asset?: Address
   ): Promise<Transaction> {
-    const tx = new Transaction();
-
     // const
     const deTokenPackage = this.getAddress("deToken");
     const buTTokenType = this.getAddress("butCoinType");
@@ -41,7 +40,7 @@ export class BucketStakeBut extends SuiBaseStrategy<typeof BUCKET_CONTRACTS> {
       suiClient as any,
       user,
       buTTokenType,
-      (10 ** 9).toString(),
+      amount.toString() // AMOUNT
     );
 
     const duration = 86400 * 7 * 1000;

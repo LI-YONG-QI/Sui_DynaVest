@@ -7,11 +7,11 @@ export const sui = {
 };
 
 export const CHAINS = [
+  sui,
   ...wagmiConfig.chains.map((chain) => ({
     ...chain,
     icon: `/crypto-icons/chains/${chain.id}.svg`,
   })),
-  sui,
 ];
 
 export const getChainName = (chainId: number) => {

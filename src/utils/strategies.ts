@@ -10,9 +10,14 @@ import {
   StCeloStaking,
   AaveV3Supply,
   UniswapV3AddLiquidity,
-  Lending,
 } from "@/classes/strategies";
+
+import { BucketStakeBut, BucketBorrow } from "@/classes/strategies/bucket";
+
 import { EVMBaseStrategy, SuiBaseStrategy } from "@/classes/strategies/base";
+import { ScallopSupply } from "@/classes/strategies/scallop/supply";
+import { CetusSwap } from "@/classes/strategies/cetus/swap";
+import { CetusAddLiquidity } from "@/classes/strategies/cetus/addLiquidity";
 
 export function getDeadline(): bigint {
   const timestampInSeconds = Math.floor(Date.now() / 1000);
@@ -56,8 +61,16 @@ export function getSuiStrategy(
   chainId: number
 ): SuiBaseStrategy<Protocols> {
   switch (protocol) {
-    case "BucketLending":
-      return new Lending(chainId);
+    case "BucketBorrow":
+      return new BucketBorrow(chainId);
+    case "BucketStaking":
+      return new BucketStakeBut(chainId);
+    case "ScallopSupply":
+      return new ScallopSupply(chainId);
+    case "CetusSwap":
+      return new CetusSwap(chainId);
+    case "CetusAddLiquidity":
+      return new CetusAddLiquidity(chainId);
     default:
       throw new Error("Unsupported protocol");
   }

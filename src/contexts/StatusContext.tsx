@@ -34,8 +34,8 @@ interface StatusContextType {
 const StatusContext = createContext<StatusContextType | undefined>(undefined);
 
 export function StatusProvider({ children }: { children: ReactNode }) {
-  const [ecosystem, setEcosystem] = useState<Ecosystem>("EVM");
-  const [chainId, setChainId] = useState<number>(0);
+  const [ecosystem, setEcosystem] = useState<Ecosystem>("SUI");
+  const [chainId, setChainId] = useState<number>(sui.id);
   const [user, setUser] = useState<User | WalletAccount | null>(null);
 
   // EVM
@@ -46,6 +46,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
   // SUI
   const wallets = useSuiWallets();
   const currentAccount = useCurrentAccount();
+
   const { mutateAsync: connect } = useSuiConnectWallet();
 
   const switchToEVM = () => {

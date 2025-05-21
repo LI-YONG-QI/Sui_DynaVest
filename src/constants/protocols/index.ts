@@ -18,4 +18,10 @@ export const PROTOCOLS = [
   "GMXDeposit",
 ] as const;
 
-export const SUI_PROTOCOLS = ["BucketLending"] as const;
+export const SUI_PROTOCOLS = [
+  "BucketBorrow",
+  "BucketStaking",
+  "ScallopSupply",
+  "CetusSwap",
+  "CetusAddLiquidity",
+] as const;

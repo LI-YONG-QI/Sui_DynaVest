@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { MoveUpRight, Percent } from "lucide-react";
 import { parseUnits } from "viem";
 
-import { EVMProtocol, RiskLevel, RiskPortfolioStrategies } from "@/types";
+import {
+  EVMProtocol,
+  RiskLevel,
+  RiskPortfolioStrategies,
+  SuiProtocol,
+} from "@/types";
 import type { Message, PortfolioMessage } from "@/classes/message";
 import { RISK_OPTIONS } from "@/constants/risk";
 import { createPieChartStrategies } from "@/utils/pie";
@@ -12,10 +17,14 @@ import { RiskBadgeList } from "../../RiskBadgeList";
 import Button from "@/components/Button";
 import { USDC } from "@/constants/coins";
 import useCurrency from "@/hooks/useCurrency";
-import { getEVMStrategy } from "@/utils/strategies";
+import { getEVMStrategy, getSuiStrategy } from "@/utils/strategies";
 import { MultiStrategy } from "@/classes/strategies/multiStrategy";
 import { useStrategyExecutor } from "@/hooks/useStrategyExecutor";
 import { toast } from "react-toastify";
+import { useStatus } from "@/contexts/StatusContext";
+import { useSuiStrategyExecutor } from "@/hooks/useSuiStrategyExecutor";
+import { sui } from "@/constants/chains";
+import { MultiSuiStrategy } from "@/classes/strategies/multiSuiStrategy";
 
 interface PortfolioChatWrapperProps {
   message: PortfolioMessage;
@@ -31,8 +40,10 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
     message.strategies
   );
   const [isEdit, setIsEdit] = useState(true);
-  const { balance, isLoadingBalance } = useCurrency(USDC);
+  const { balance, isLoading: isLoadingBalance } = useCurrency(USDC);
   const { execute } = useStrategyExecutor();
+  const { execute: executeSuiStrategy } = useSuiStrategyExecutor();
+  const { chainId } = useStatus();
 
   const nextMessage = async (action: "build" | "edit") => {
     if (isLoadingBalance) return;
@@ -59,23 +70,38 @@ const PortfolioChatWrapper: React.FC<PortfolioChatWrapperProps> = ({
 
   async function executeMultiStrategy() {
     try {
-      const strategiesHandler = strategies.map((strategy) => ({
-        strategy: getEVMStrategy(
-          //! not type safe
-          strategy.protocol as EVMProtocol,
-          strategy.chainId
-        ),
-        allocation: strategy.allocation,
-      }));
+      if (chainId === sui.id) {
+        const strategiesHandler = strategies.map((strategy) => ({
+          strategy: getSuiStrategy(strategy.protocol as SuiProtocol, chainId),
+          allocation: strategy.allocation,
+        }));
 
-      const multiStrategy = new MultiStrategy(strategiesHandler);
-      const tx = await execute(
-        multiStrategy,
-        parseUnits(message.amount, USDC.decimals),
-        USDC.chains![message.chain]
-      );
+        const multiStrategy = new MultiSuiStrategy(strategiesHandler);
+        const tx = await executeSuiStrategy(
+          multiStrategy,
+          parseUnits(message.amount, USDC.decimals)
+        );
 
-      toast.success(`Portfolio built successfully, ${tx}`);
+        toast.success(`Portfolio built successfully, ${tx}`);
+      } else {
+        const strategiesHandler = strategies.map((strategy) => ({
+          strategy: getEVMStrategy(
+            //! not type safe
+            strategy.protocol as EVMProtocol,
+            strategy.chainId
+          ),
+          allocation: strategy.allocation,
+        }));
+
+        const multiStrategy = new MultiStrategy(strategiesHandler);
+        const tx = await execute(
+          multiStrategy,
+          parseUnits(message.amount, USDC.decimals),
+          USDC.chains![message.chain]
+        );
+
+        toast.success(`Portfolio built successfully, ${tx}`);
+      }
     } catch (error) {
       toast.error(`Error building portfolio, ${error}`);
     }

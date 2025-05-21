@@ -1,14 +1,14 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { Address, encodeFunctionData, parseUnits } from "viem";
 import { toast } from "react-toastify";
-import { useChainId } from "wagmi";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 
 import useCurrencies, { TokenData } from "@/hooks/useCurrencies";
 import { Token } from "@/types";
 import { ERC20_ABI } from "@/constants";
 import { SUPPORTED_TOKENS } from "@/constants/profile";
-import type { SupportedChainIds } from "@/providers/config";
+import { useStatus } from "@/contexts/StatusContext";
+import { SupportedChainIds } from "@/providers/config";
 
 interface AssetsContextType {
   tokensData: TokenData[];
@@ -39,8 +39,9 @@ interface AssetsProviderProps {
 }
 
 export function AssetsProvider({ children }: AssetsProviderProps) {
-  const chainId = useChainId() as SupportedChainIds;
-  const tokensWithChain = SUPPORTED_TOKENS[chainId];
+  const { chainId } = useStatus();
+  const tokensWithChain = SUPPORTED_TOKENS[chainId as SupportedChainIds];
+  console.log("Tokens with chain", tokensWithChain);
 
   const {
     tokensData,

@@ -101,7 +101,7 @@ export class InvestMessage extends Message {
     const strategiesSet = this.getStrategiesSetByChain(this.chain);
 
     return new PortfolioMessage(
-      this.createDefaultMetadata(`Portfolio: ${this.amount} USDC`),
+      this.createDefaultMetadata(`Portfolio: ${this.amount} SUI`),
       this.amount,
       this.chain,
       strategiesSet

@@ -4,6 +4,9 @@ import Image from "next/image";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { formatUnits } from "viem";
 import { useChainId } from "wagmi";
+import { useStatus } from "@/contexts/StatusContext";
+import { WalletAccount } from "@mysten/wallet-standard";
+
 type Transaction = {
   id: string;
   createdAt: string;
@@ -20,13 +23,14 @@ const initialTransactions: Transaction[] = [];
 
 export default function TransactionsTableComponent() {
   const { client } = useSmartWallets();
-  const chainId = useChainId();
+  const { chainId, user } = useStatus();
 
   const { data: transactions = initialTransactions } = useQuery({
-    queryKey: ["transactions", client?.account.address, chainId],
+    queryKey: ["transactions", client?.account.address, chainId, user],
     queryFn: async () => {
+      const userAddress = (user as WalletAccount).address;
       const response = await axios.get<{ txs: Transaction[] }>(
-        `/api/user?address=${client?.account.address}`
+        `/api/user?address=${userAddress}`
       );
 
       const txs = response.data.txs;
@@ -34,7 +38,7 @@ export default function TransactionsTableComponent() {
 
       return filteredTxs;
     },
-    enabled: !!client?.account.address,
+    enabled: !!user,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -55,7 +59,7 @@ export default function TransactionsTableComponent() {
               onClick={() =>
                 // TODO: hardcode chain
                 window.open(
-                  `https://basescan.org/tx/${transaction.hash}`,
+                  `https://suiscan.xyz/mainnet/tx/${transaction.hash}`,
                   "_blank"
                 )
               }

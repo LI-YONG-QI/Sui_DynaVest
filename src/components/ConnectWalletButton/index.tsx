@@ -59,7 +59,6 @@ export default function ConnectWalletButton() {
   } = usePrivy();
 
   const [address, setAddress] = useState<string | null>(null);
-  // const { client } = useSmartWallets();
   const { login } = useLogin({
     onComplete: async () => {
       console.log("Login complete");

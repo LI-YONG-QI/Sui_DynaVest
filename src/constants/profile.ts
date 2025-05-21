@@ -10,9 +10,11 @@ import {
   wbETH,
   wstETH,
   cEUR,
+  SUI,
 } from "@/constants/coins";
 import { Token } from "@/types";
 import type { SupportedChainIds } from "@/providers/config";
+import { sui } from "./chains";
 
 // Define SUPPORTED_TOKENS with the correct type annotation
 export const SUPPORTED_TOKENS: Record<SupportedChainIds, Token[]> = {
@@ -22,4 +24,5 @@ export const SUPPORTED_TOKENS: Record<SupportedChainIds, Token[]> = {
   [bsc.id]: [BNB, USDT, USDC, wbETH], // BSC
   [celo.id]: [CELO, USDT, USDC, cEUR], // Celo
   [flowMainnet.id]: [FLOW, USDT, USDC], // Flow
+  [sui.id]: [SUI, USDC], // Sui
 };
