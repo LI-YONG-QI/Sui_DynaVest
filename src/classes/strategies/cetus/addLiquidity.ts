@@ -16,7 +16,7 @@ export class CetusAddLiquidity extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, CETUS_CONTRACTS, {
       protocol: "Cetus",
-      icon: "/crypto-icons/cetus.svg",
+      icon: "/crypto-icons/cetus.png",
       type: "Yield",
       description: "Add Liquidity to Cetus",
     });

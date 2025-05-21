@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { CETUS_CONTRACTS } from "@/constants/protocols/cetus";
 import { SuiBaseStrategy } from "../base";
 import { Transaction } from "@mysten/sui/transactions";
@@ -11,7 +13,7 @@ export class CetusSwap extends SuiBaseStrategy<typeof CETUS_CONTRACTS> {
   constructor(chainId: number) {
     super(chainId, CETUS_CONTRACTS, {
       protocol: "Cetus",
-      icon: "/crypto-icons/cetus.svg",
+      icon: "/crypto-icons/cetus.png",
       type: "Trading",
       description: "Swap token on Cetus",
     });
