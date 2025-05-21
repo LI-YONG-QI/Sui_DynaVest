@@ -1,11 +1,8 @@
 import Image from "next/image";
 import { useLogin, usePrivy } from "@privy-io/react-auth";
-import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { useDisconnect } from "wagmi";
 import { useState, useRef, useEffect } from "react";
-import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { Address } from "viem";
 import { useStatus } from "@/contexts/StatusContext";
 
 /**

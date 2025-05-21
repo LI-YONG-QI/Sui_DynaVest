@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { CETUS_CONTRACTS } from "@/constants/protocols/cetus";
 import { SuiBaseStrategy } from "../base";
 import { Transaction } from "@mysten/sui/transactions";

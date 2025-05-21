@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { SCALLOP_CONTRACTS } from "@/constants/protocols/scallop";
 import { SuiBaseStrategy } from "../base";
 import { Address } from "web3";

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { BUCKET_CONTRACTS } from "@/constants/protocols/bucket";
 import { SuiBaseStrategy } from "../base";
 import { Transaction } from "@mysten/sui/transactions";

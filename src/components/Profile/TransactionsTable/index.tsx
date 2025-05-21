@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useSmartWallets } from "@privy-io/react-auth/smart-wallets";
 import { formatUnits } from "viem";
-import { useChainId } from "wagmi";
 import { useStatus } from "@/contexts/StatusContext";
 import { WalletAccount } from "@mysten/wallet-standard";
 
