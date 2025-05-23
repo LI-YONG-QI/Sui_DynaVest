@@ -1,16 +1,17 @@
 # DynaVest
 
-Introducing DynaVest, Your DeFAI Agent – an intelligent, fully autonomous system designed to execute, optimize, and adapt DeFi strategies based on your unique risk profile. With a user-friendly interface, it empowers you to interact effortlessly with DeFi protocols while staying up-to-date on the latest trends and insights in real time.
+Introducing DynaVest, Your Sui DeFAI Agent – an intelligent, fully autonomous system designed to execute, optimize, and adapt DeFi strategies based on your unique risk profile. With a user-friendly interface, it empowers you to interact effortlessly with DeFi protocols while staying up-to-date on the latest trends and insights in real time.
 
-# Contract Code
-https://github.com/LI-YONG-QI/agentic-hack
+## Currently Supported Protocols
+Bucket Protocol
 
-# Deployments
+Scallop Protocol
 
-## Celo
+Cetus Protocol
 
-- Executor: [0x2a386fb9e19d201a1daf875fcd5c934c06265b65](https://celoscan.io/address/0x2a386fb9e19d201a1daf875fcd5c934c06265b65)
-- LiquidityRouter: [0xfcfc4d0a0d6be5f2f8b7ffb77c1d9eebde97c977](https://celoscan.io/address/0xfcfc4d0a0d6be5f2f8b7ffb77c1d9eebde97c977)
+## What We Do
+We bundle transactions and help users build their desired Personal portfolio.
+
 
 ## Getting Started
 
