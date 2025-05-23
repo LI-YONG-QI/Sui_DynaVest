@@ -15,8 +15,6 @@ We bundle transactions and help users build their desired Personal portfolio.
 
 ## Getting Started
 
-0. Check the `env.example`
-
 1. Install dependencies
 
 ```bash
